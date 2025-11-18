@@ -1,4 +1,4 @@
-package app;
+package demo;
 
 import javax.swing.SwingUtilities;
 
