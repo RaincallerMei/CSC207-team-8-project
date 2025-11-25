@@ -1,5 +1,7 @@
 package app;
 
+import entity.CourseExplorerPanel;
+
 import javax.swing.*;
 
 public class Main {
