@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CourseExplorerPanel extends JPanel {
 
-    // ==== dependencies ====
+    // ==== dependency (use case) ====
     private final RecommendCoursesUseCase recommendCoursesUseCase;
 
     // ==== survey state ====
@@ -28,19 +28,15 @@ public class CourseExplorerPanel extends JPanel {
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_LIST = "list";
 
-    /**
-     * Convenience constructor that uses a dummy recommender.
-     * Good for quick testing or when wiring in Main.
-     */
+    // Buttons we want to keep references to (so we can set default button)
+    private JButton saveButton;
+    private JButton submitButton;
+
+    /** Convenience ctor for quick wiring. */
     public CourseExplorerPanel() {
-        this(new RecommendCoursesUseCase(
-                new RecommendCoursesUseCase.DummyCourseRecommender()
-        ));
+        this(new RecommendCoursesUseCase(new RecommendCoursesUseCase.DummyCourseRecommender()));
     }
 
-    /**
-     * Main constructor: UI depends only on the use case.
-     */
     public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase) {
         this.recommendCoursesUseCase = recommendCoursesUseCase;
 
@@ -54,6 +50,16 @@ public class CourseExplorerPanel extends JPanel {
 
         setLayout(new BorderLayout());
         add(splitPane, BorderLayout.CENTER);
+    }
+
+    // Ensure the root pane exists, then set Submit as the default button (Enter activates it)
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        JRootPane root = SwingUtilities.getRootPane(this);
+        if (root != null && submitButton != null) {
+            root.setDefaultButton(submitButton);
+        }
     }
 
     // =======================
@@ -76,6 +82,11 @@ public class CourseExplorerPanel extends JPanel {
         JLabel interestsLabel = new JLabel("What are your interests?");
         interestsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        JButton notSureButton = new JButton("Not sure…");
+        notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        notSureButton.setMaximumSize(new Dimension(200, 36));
+        notSureButton.addActionListener(e -> openPreferenceAssistant());
+
         interestsArea.setLineWrap(true);
         interestsArea.setWrapStyleWord(true);
         JScrollPane interestsScroll = new JScrollPane(interestsArea);
@@ -83,21 +94,32 @@ public class CourseExplorerPanel extends JPanel {
         interestsScroll.setPreferredSize(new Dimension(200, 200));
         interestsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
 
-        JButton submitButton = new JButton("Submit");
-        submitButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        submitButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+        // Default Look & Feel buttons (no custom colors/borders)
+        saveButton = new JButton("Save");
+        saveButton.addActionListener(e -> handleSave());
+
+        submitButton = new JButton("Submit"); // will be set as default button
         submitButton.addActionListener(e -> handleSubmit());
+
+        // Equal-size row
+        JPanel actionsRow = new JPanel(new GridLayout(1, 2, 10, 0));
+        actionsRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+        actionsRow.add(saveButton);
+        actionsRow.add(submitButton);
+        actionsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
         panel.add(title);
         panel.add(Box.createVerticalStrut(25));
         panel.add(coursesButton);
         panel.add(Box.createVerticalStrut(25));
         panel.add(interestsLabel);
-        panel.add(Box.createVerticalStrut(10));
+        panel.add(Box.createVerticalStrut(8));
+        panel.add(notSureButton);
+        panel.add(Box.createVerticalStrut(8));
         panel.add(interestsScroll);
         panel.add(Box.createVerticalGlue());
         panel.add(Box.createVerticalStrut(20));
-        panel.add(submitButton);
+        panel.add(actionsRow);
 
         return panel;
     }
@@ -112,9 +134,22 @@ public class CourseExplorerPanel extends JPanel {
         }
     }
 
+    private void openPreferenceAssistant() {
+        PreferenceDialog dialog = new PreferenceDialog(
+                this,
+                new DefaultKeywordSuggester(),
+                interestsArea::setText // apply callback
+        );
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void handleSave() {
+        JOptionPane.showMessageDialog(this, "Saved (UI stub).", "Save", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     private void handleSubmit() {
         String interests = interestsArea.getText().trim();
-
         if (interests.isEmpty()) {
             JOptionPane.showMessageDialog(
                     this,
@@ -124,7 +159,6 @@ public class CourseExplorerPanel extends JPanel {
             );
             return;
         }
-
         List<String> recommended = recommendCoursesUseCase.execute(interests, completedCourses);
         showRecommendedCourses(recommended);
     }
@@ -140,17 +174,20 @@ public class CourseExplorerPanel extends JPanel {
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         panel.add(title, BorderLayout.NORTH);
 
-        // Placeholder card
+        // Placeholder
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // List card
+        // List (reduced size, padded)
         courseList.setVisibleRowCount(8);
+        courseList.setFont(courseList.getFont().deriveFont(Font.BOLD, 15f));
+        courseList.setFixedCellHeight(44);
+        courseList.setCellRenderer(new CourseCellRenderer());
+
         JScrollPane listScroll = new JScrollPane(courseList);
         JPanel listPanel = new JPanel(new BorderLayout());
         listPanel.add(listScroll, BorderLayout.CENTER);
 
-        // Card layout: either placeholder or list
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
         recommendedCardPanel.add(listPanel, CARD_LIST);
         recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
@@ -171,88 +208,5 @@ public class CourseExplorerPanel extends JPanel {
             courseListModel.addElement(c);
         }
         recommendedCardLayout.show(recommendedCardPanel, CARD_LIST);
-    }
-
-    // ===========================================
-    // Simple dialog for "Courses I've taken"
-    // ===========================================
-    private static class CoursesTakenDialog extends JDialog {
-
-        private final JTextArea coursesArea = new JTextArea();
-        private boolean confirmed = false;
-
-        public CoursesTakenDialog(Component parent, List<String> existingCourses) {
-            super(
-                    SwingUtilities.getWindowAncestor(parent),
-                    "Courses I've taken",
-                    Dialog.ModalityType.APPLICATION_MODAL
-            );
-
-            setSize(400, 300);
-            setLayout(new BorderLayout());
-            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-            JPanel content = new JPanel(new BorderLayout());
-            content.setBorder(new EmptyBorder(15, 15, 15, 15));
-
-            JLabel instruction = new JLabel(
-                    "<html>Enter completed course codes, one per line<br>" +
-                            "(e.g., CSC108, MAT135).</html>"
-            );
-            content.add(instruction, BorderLayout.NORTH);
-
-            coursesArea.setLineWrap(true);
-            coursesArea.setWrapStyleWord(true);
-
-            if (existingCourses != null && !existingCourses.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                for (String c : existingCourses) {
-                    sb.append(c).append("\n");
-                }
-                coursesArea.setText(sb.toString());
-            }
-
-            JScrollPane scrollPane = new JScrollPane(coursesArea);
-            content.add(scrollPane, BorderLayout.CENTER);
-
-            JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            JButton cancel = new JButton("Cancel");
-            JButton save = new JButton("Save");
-
-            cancel.addActionListener(e -> {
-                confirmed = false;
-                dispose();
-            });
-
-            save.addActionListener(e -> {
-                confirmed = true;
-                dispose();
-            });
-
-            buttons.add(cancel);
-            buttons.add(save);
-            content.add(buttons, BorderLayout.SOUTH);
-
-            setContentPane(content);
-        }
-
-        public boolean isConfirmed() {
-            return confirmed;
-        }
-
-        public List<String> getCourses() {
-            List<String> result = new ArrayList<>();
-            String text = coursesArea.getText();
-            if (text == null) return result;
-
-            String[] lines = text.split("\\R");
-            for (String line : lines) {
-                String trimmed = line.trim();
-                if (!trimmed.isEmpty()) {
-                    result.add(trimmed);
-                }
-            }
-            return result;
-        }
     }
 }
