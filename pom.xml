@@ -14,14 +14,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <!-- Google Generative AI SDK for Gemini -->
-        <dependency>
-            <groupId>com.google.genai</groupId>
-            <artifactId>google-genai</artifactId>
-            <version>1.28.0</version>  <!-- Latest as of Nov 2025; check GitHub for updates -->
-        </dependency>
-    </dependencies>
+    <dependency>
+        <groupId>com.google.genai</groupId>
+        <artifactId>google-genai</artifactId>
+        <version>1.27.0</version>
+    </dependency>
 
     <build>
         <plugins>
