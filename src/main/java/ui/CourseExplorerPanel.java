@@ -1,6 +1,7 @@
 package ui;
 
 import entity.*;
+import storage.AppStateStore;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,8 +13,10 @@ import java.util.List;
 
 public class CourseExplorerPanel extends JPanel {
 
-    // ==== dependency (use case) ====
     private final RecommendCoursesUseCase recommendCoursesUseCase;
+
+    // Local "DB"
+    private final AppStateStore store = new AppStateStore();
 
     // ==== survey state ====
     private final JTextArea interestsArea = new JTextArea();
@@ -32,11 +35,9 @@ public class CourseExplorerPanel extends JPanel {
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_LIST = "list";
 
-    // Buttons we want to keep references to (so we can set default button)
     private JButton saveButton;
     private JButton submitButton;
 
-    /** Convenience ctor for quick wiring. */
     public CourseExplorerPanel() {
         this(new RecommendCoursesUseCase(new RecommendCoursesUseCase.DummyCourseRecommender()));
     }
@@ -54,6 +55,9 @@ public class CourseExplorerPanel extends JPanel {
 
         setLayout(new BorderLayout());
         add(splitPane, BorderLayout.CENTER);
+
+        // Load saved state (courses + last interests)
+        loadSavedStateIntoUI();
     }
 
     @Override
@@ -65,9 +69,6 @@ public class CourseExplorerPanel extends JPanel {
         }
     }
 
-    // =======================
-    // LEFT: Interest Survey
-    // =======================
     private JPanel createSurveyPanel() {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -90,6 +91,12 @@ public class CourseExplorerPanel extends JPanel {
         notSureButton.setMaximumSize(new Dimension(200, 36));
         notSureButton.addActionListener(e -> openPreferenceAssistant());
 
+        // Set API Key button
+        JButton apiKeyButton = new JButton("Set API Key");
+        apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        apiKeyButton.setMaximumSize(new Dimension(200, 36));
+        apiKeyButton.addActionListener(e -> openApiKeyDialog());
+
         interestsArea.setLineWrap(true);
         interestsArea.setWrapStyleWord(true);
         JScrollPane interestsScroll = new JScrollPane(interestsArea);
@@ -110,19 +117,32 @@ public class CourseExplorerPanel extends JPanel {
         actionsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
         panel.add(title);
-        panel.add(Box.createVerticalStrut(25));
+        panel.add(Box.createVerticalStrut(20));
         panel.add(coursesButton);
-        panel.add(Box.createVerticalStrut(25));
+
+        panel.add(Box.createVerticalStrut(15));
+        panel.add(new JLabel("API & Interests"));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(apiKeyButton);
+        panel.add(Box.createVerticalStrut(10));
+
         panel.add(interestsLabel);
         panel.add(Box.createVerticalStrut(8));
         panel.add(notSureButton);
         panel.add(Box.createVerticalStrut(8));
         panel.add(interestsScroll);
+
         panel.add(Box.createVerticalGlue());
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(16));
         panel.add(actionsRow);
 
         return panel;
+    }
+
+    private void openApiKeyDialog() {
+        ApiKeyDialog d = new ApiKeyDialog(this, store);
+        d.setLocationRelativeTo(this);
+        d.setVisible(true);
     }
 
     private void openCoursesTakenDialog() {
@@ -142,7 +162,8 @@ public class CourseExplorerPanel extends JPanel {
     }
 
     private void handleSave() {
-        JOptionPane.showMessageDialog(this, "Saved (UI stub).", "Save", JOptionPane.INFORMATION_MESSAGE);
+        store.saveCoursesAndInterests(completedCourses, interestsArea.getText());
+        JOptionPane.showMessageDialog(this, "Saved locally.", "Save", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void handleSubmit() {
@@ -156,13 +177,12 @@ public class CourseExplorerPanel extends JPanel {
             );
             return;
         }
+
+        // NOTE: Submit no longer saves to disk.
         List<String> recommended = recommendCoursesUseCase.execute(interests, completedCourses);
         showRecommendedCourses(recommended);
     }
 
-    // ===========================
-    // RIGHT: Recommended Courses
-    // ===========================
     private JPanel createRecommendedPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -171,17 +191,13 @@ public class CourseExplorerPanel extends JPanel {
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         panel.add(title, BorderLayout.NORTH);
 
-        // Placeholder
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // List
         courseList.setVisibleRowCount(8);
         courseList.setFont(courseList.getFont().deriveFont(Font.BOLD, 15f));
         courseList.setFixedCellHeight(44);
         courseList.setCellRenderer(new CourseCellRenderer());
-
-        // Double-click to open details
         courseList.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -208,19 +224,14 @@ public class CourseExplorerPanel extends JPanel {
 
     private void showRecommendedCourses(List<String> courses) {
         courseListModel.clear();
-
         if (courses == null || courses.isEmpty()) {
             recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
             return;
         }
-
-        for (String c : courses) {
-            courseListModel.addElement(c);
-        }
+        for (String c : courses) courseListModel.addElement(c);
         recommendedCardLayout.show(recommendedCardPanel, CARD_LIST);
     }
 
-    // ==== Details popup ====
     private void openCourseDetails(String courseText) {
         String[] parsed = parseCourse(courseText);
         String code = parsed[0];
@@ -231,19 +242,24 @@ public class CourseExplorerPanel extends JPanel {
         dialog.setVisible(true);
     }
 
-    // Try to split "CSC108 – Intro to CS" (supports -, –, —). Fallbacks are simple.
     private String[] parseCourse(String text) {
-        if (text == null || text.isEmpty()) {
-            return new String[] {"Unknown", "Description coming soon."};
-        }
+        if (text == null || text.isEmpty())
+            return new String[]{"Unknown", "Description coming soon."};
         String[] parts = text.split("\\s+[-–—]\\s+", 2);
-        if (parts.length == 2) {
-            return new String[] {parts[0].trim(), parts[1].trim()};
-        }
-        // Fallback: first token as code, rest as title/desc
+        if (parts.length == 2) return new String[]{parts[0].trim(), parts[1].trim()};
         String[] tokens = text.trim().split("\\s+", 2);
         String code = tokens[0];
         String desc = (tokens.length > 1) ? tokens[1] : "Description coming soon.";
-        return new String[] {code, desc};
+        return new String[]{code, desc};
+    }
+
+    private void loadSavedStateIntoUI() {
+        try {
+            this.completedCourses = store.loadCoursesTaken();
+            String last = store.loadLastInterests();
+            interestsArea.setText(last);
+        } catch (Exception e) {
+            System.err.println("Failed to load saved state: " + e.getMessage());
+        }
     }
 }
