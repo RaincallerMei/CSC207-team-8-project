@@ -80,7 +80,7 @@ public class CourseExplorerPanel extends JPanel {
 
         JButton coursesButton = new JButton("Courses I've taken");
         coursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // expands with width
         coursesButton.addActionListener(e -> openCoursesTakenDialog());
 
         JLabel interestsLabel = new JLabel("What are your interests?");
@@ -88,13 +88,13 @@ public class CourseExplorerPanel extends JPanel {
 
         JButton notSureButton = new JButton("Not sure…");
         notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        notSureButton.setMaximumSize(new Dimension(200, 36));
+        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36)); // ← expand like courses button
         notSureButton.addActionListener(e -> openPreferenceAssistant());
 
         // Set API Key button
         JButton apiKeyButton = new JButton("Set API Key");
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        apiKeyButton.setMaximumSize(new Dimension(200, 36));
+        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));   // ← expand like courses button
         apiKeyButton.addActionListener(e -> openApiKeyDialog());
 
         interestsArea.setLineWrap(true);
@@ -121,14 +121,13 @@ public class CourseExplorerPanel extends JPanel {
         panel.add(coursesButton);
 
         panel.add(Box.createVerticalStrut(15));
-        panel.add(new JLabel("API & Interests"));
-        panel.add(Box.createVerticalStrut(6));
-        panel.add(apiKeyButton);
+        // (removed "API & Interests" label)
+        panel.add(apiKeyButton);                // now full-width
         panel.add(Box.createVerticalStrut(10));
 
         panel.add(interestsLabel);
         panel.add(Box.createVerticalStrut(8));
-        panel.add(notSureButton);
+        panel.add(notSureButton);               // now full-width
         panel.add(Box.createVerticalStrut(8));
         panel.add(interestsScroll);
 
@@ -178,7 +177,7 @@ public class CourseExplorerPanel extends JPanel {
             return;
         }
 
-        // NOTE: Submit no longer saves to disk.
+        // Submit does not save.
         List<String> recommended = recommendCoursesUseCase.execute(interests, completedCourses);
         showRecommendedCourses(recommended);
     }
