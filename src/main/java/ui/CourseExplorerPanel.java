@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import ui.CourseResultPanel;
 
 public class CourseExplorerPanel extends JPanel {
 
@@ -209,31 +210,23 @@ public class CourseExplorerPanel extends JPanel {
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         panel.add(title, BorderLayout.NORTH);
 
+        // 1. Placeholder View
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        courseList.setVisibleRowCount(8);
-        courseList.setFont(courseList.getFont().deriveFont(Font.BOLD, 15f));
-        courseList.setFixedCellHeight(44);
-        courseList.setCellRenderer(new CourseCellRenderer());
-        courseList.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int idx = courseList.locationToIndex(e.getPoint());
-                    if (idx >= 0) {
-                        String item = courseListModel.getElementAt(idx);
-                        openCourseDetails(item);
-                    }
-                }
-            }
-        });
+        // 2. Results View (Accordion Container)
+        courseList.setLayout(new BoxLayout(courseList, BoxLayout.Y_AXIS));
 
-        JScrollPane listScroll = new JScrollPane(courseList);
-        JPanel listPanel = new JPanel(new BorderLayout());
-        listPanel.add(listScroll, BorderLayout.CENTER);
+        // Wrap coursesContainer in a BorderLayout panel to keep items aligned to the top
+        JPanel scrollWrapper = new JPanel(new BorderLayout());
+        scrollWrapper.add(courseList, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(scrollWrapper);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smoother scrolling
 
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
-        recommendedCardPanel.add(listPanel, CARD_LIST);
+        recommendedCardPanel.add(scrollPane, CARD_LIST);
         recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
 
         panel.add(recommendedCardPanel, BorderLayout.CENTER);

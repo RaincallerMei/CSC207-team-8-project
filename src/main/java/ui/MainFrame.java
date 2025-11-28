@@ -1,4 +1,4 @@
-package view;
+package ui;
 
 import entity.Course;
 import interface_adapter.recommend_courses.RecommendCoursesController;
@@ -114,27 +114,23 @@ public class MainFrame extends JFrame implements PropertyChangeListener {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JLabel title = new JLabel("Recommended Courses");
-        title.setFont(new Font("SansSerif", Font.BOLD, 20));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         panel.add(title, BorderLayout.NORTH);
 
-        // 1. Placeholder View (Empty State)
-        JLabel placeholderLabel = new JLabel(
-                "<html><div style='text-align: center;'>Enter your interests on the left<br>to see course recommendations here.</div></html>",
-                SwingConstants.CENTER
-        );
+        // 1. Placeholder View
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // 2. Results View (Scrollable List)
+        // 2. Results View (Accordion Container)
         coursesContainer.setLayout(new BoxLayout(coursesContainer, BoxLayout.Y_AXIS));
 
-        // Wrap container in a panel formatted for scrolling (aligns to top)
+        // Wrap coursesContainer in a BorderLayout panel to keep items aligned to the top
         JPanel scrollWrapper = new JPanel(new BorderLayout());
         scrollWrapper.add(coursesContainer, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(scrollWrapper);
         scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Faster scrolling
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smoother scrolling
 
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
         recommendedCardPanel.add(scrollPane, CARD_RESULTS);
