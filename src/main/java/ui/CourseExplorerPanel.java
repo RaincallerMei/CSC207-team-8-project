@@ -1,71 +1,80 @@
 package ui;
 
-import entity.*;
+import entity.Course;
+import entity.DefaultKeywordSuggester;
+import entity.KeywordGenerator;
+import interface_adapter.recommend_courses.RecommendCoursesController;
+import interface_adapter.recommend_courses.RecommendCoursesViewModel;
 import storage.AppStateStore;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CourseExplorerPanel extends JPanel {
+public class CourseExplorerPanel extends JPanel implements PropertyChangeListener {
 
-    private final RecommendCoursesUseCase recommendCoursesUseCase;
-    private final KeywordGenerator keywordGenerator;      // UI depends on abstraction
+    // ==== Clean Architecture Dependencies ====
+    private final RecommendCoursesController controller;
+    private final RecommendCoursesViewModel viewModel;
+    private final KeywordGenerator keywordGenerator;
 
-    // Local "DB"
+    // ==== Local Storage / DB ====
     private final AppStateStore store = new AppStateStore();
 
-    // ==== survey state ====
+    // ==== Survey State ====
     private final JTextArea interestsArea = new JTextArea();
     private List<String> completedCourses = new ArrayList<>();
 
-    // ==== recommended courses UI ====
-    private final DefaultListModel<String> courseListModel = new DefaultListModel<>();
-    private final JList<String> courseList = new JList<>(courseListModel);
-    private final JLabel placeholderLabel = new JLabel(
-            "<html><i>Once you complete the interest survey, courses will appear here!</i></html>",
-            SwingConstants.CENTER
-    );
+    // ==== Recommended Courses UI (Accordion) ====
+    private final JPanel coursesContainer = new JPanel();
     private final CardLayout recommendedCardLayout = new CardLayout();
     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
+    private final JLabel placeholderLabel = new JLabel(
+            "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>recommended courses will appear here!</i></div></html>",
+            SwingConstants.CENTER
+    );
 
     private static final String CARD_PLACEHOLDER = "placeholder";
-    private static final String CARD_LIST = "list";
+    private static final String CARD_RESULTS = "results";
 
-    private JButton saveButton;
+    // Buttons tracked for default button setting
     private JButton submitButton;
 
-    /** Convenience ctor: dummy recommender + default keyword generator. */
-    public CourseExplorerPanel() {
-        this(
-                new RecommendCoursesUseCase(new RecommendCoursesUseCase.DummyCourseRecommender()),
-                new DefaultKeywordSuggester()
-        );
+    /**
+     * Primary Constructor.
+     * Integrates Clean Architecture (Controller/ViewModel) with the Survey UI.
+     */
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               RecommendCoursesViewModel viewModel) {
+        this(controller, viewModel, new DefaultKeywordSuggester());
     }
 
-    /** Backward-compatible ctor: provide use case; generator defaults. */
-    public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase) {
-        this(recommendCoursesUseCase, new DefaultKeywordSuggester());
-    }
-
-    /** Primary ctor with explicit dependencies. */
-    public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase, KeywordGenerator keywordGenerator) {
-        this.recommendCoursesUseCase = recommendCoursesUseCase;
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               RecommendCoursesViewModel viewModel,
+                               KeywordGenerator keywordGenerator) {
+        this.controller = controller;
+        this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
+
+        // Register as an observer to update the view when the use case finishes
+        this.viewModel.addPropertyChangeListener(this);
+
+        setLayout(new BorderLayout());
 
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 createSurveyPanel(),
                 createRecommendedPanel()
         );
-        splitPane.setResizeWeight(0.35);
+        splitPane.setResizeWeight(0.35); // Left side takes 35% width
         splitPane.setDividerSize(4);
 
-        setLayout(new BorderLayout());
         add(splitPane, BorderLayout.CENTER);
 
         // Load saved state (courses + last interests)
@@ -75,39 +84,45 @@ public class CourseExplorerPanel extends JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
+        // Set "Submit" as the default button (Enter key)
         JRootPane root = SwingUtilities.getRootPane(this);
         if (root != null && submitButton != null) {
             root.setDefaultButton(submitButton);
         }
     }
 
+    // ==========================================================
+    // LEFT PANEL: Survey & User Inputs (From CourseExplorerPanel)
+    // ==========================================================
     private JPanel createSurveyPanel() {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Interest Survey");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
+        title.setFont(new Font("SansSerif", Font.BOLD, 20));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // 1. Courses Taken Button
         JButton coursesButton = new JButton("Courses I've taken");
         coursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40)); // expands with width
+        coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         coursesButton.addActionListener(e -> openCoursesTakenDialog());
+
+        // 2. API Key Button
+        JButton apiKeyButton = new JButton("Set API Key");
+        apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        apiKeyButton.addActionListener(e -> openApiKeyDialog());
 
         JLabel interestsLabel = new JLabel("What are your interests?");
         interestsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // 3. Keyword Helper Button
         JButton notSureButton = new JButton("Not sure…");
         notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36)); // expand like courses button
+        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         notSureButton.addActionListener(e -> openPreferenceAssistant());
-
-        // Set API Key button
-        JButton apiKeyButton = new JButton("Set API Key");
-        apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));   // expand like courses button
-        apiKeyButton.addActionListener(e -> openApiKeyDialog());
 
         interestsArea.setLineWrap(true);
         interestsArea.setWrapStyleWord(true);
@@ -116,10 +131,11 @@ public class CourseExplorerPanel extends JPanel {
         interestsScroll.setPreferredSize(new Dimension(200, 200));
         interestsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
 
-        saveButton = new JButton("Save");
+        // 4. Action Buttons
+        JButton saveButton = new JButton("Save State");
         saveButton.addActionListener(e -> handleSave());
 
-        submitButton = new JButton("Submit");
+        submitButton = new JButton("Get Recommendations");
         submitButton.addActionListener(e -> handleSubmit());
 
         JPanel actionsRow = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -128,21 +144,18 @@ public class CourseExplorerPanel extends JPanel {
         actionsRow.add(submitButton);
         actionsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
+        // Layout Assembly
         panel.add(title);
         panel.add(Box.createVerticalStrut(20));
         panel.add(coursesButton);
-
-        panel.add(Box.createVerticalStrut(15));
-        // (removed "API & Interests" label)
-        panel.add(apiKeyButton);                // now full-width
         panel.add(Box.createVerticalStrut(10));
-
+        panel.add(apiKeyButton);
+        panel.add(Box.createVerticalStrut(20));
         panel.add(interestsLabel);
         panel.add(Box.createVerticalStrut(8));
-        panel.add(notSureButton);               // now full-width
+        panel.add(notSureButton);
         panel.add(Box.createVerticalStrut(8));
         panel.add(interestsScroll);
-
         panel.add(Box.createVerticalGlue());
         panel.add(Box.createVerticalStrut(16));
         panel.add(actionsRow);
@@ -150,9 +163,107 @@ public class CourseExplorerPanel extends JPanel {
         return panel;
     }
 
+    // ==========================================================
+    // RIGHT PANEL: Results (From MainFrame / CourseResultPanel)
+    // ==========================================================
+    private JPanel createRecommendedPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        JLabel title = new JLabel("Recommended Courses");
+        title.setFont(new Font("SansSerif", Font.BOLD, 20));
+        panel.add(title, BorderLayout.NORTH);
+
+        // 1. Placeholder View
+        JPanel placeholderPanel = new JPanel(new BorderLayout());
+        placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
+
+        // 2. Results View (Accordion Container)
+        coursesContainer.setLayout(new BoxLayout(coursesContainer, BoxLayout.Y_AXIS));
+
+        // Wrap coursesContainer in a BorderLayout panel to keep items aligned to the top
+        JPanel scrollWrapper = new JPanel(new BorderLayout());
+        scrollWrapper.add(coursesContainer, BorderLayout.NORTH);
+
+        JScrollPane scrollPane = new JScrollPane(scrollWrapper);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
+        recommendedCardPanel.add(scrollPane, CARD_RESULTS);
+        recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
+
+        panel.add(recommendedCardPanel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    // ==========================================================
+    // CLEAN ARCHITECTURE OBSERVER LOGIC
+    // ==========================================================
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS)) {
+            // Update the UI with the list of Course entities
+            List<Course> courses = (List<Course>) evt.getNewValue();
+            updateResultsView(courses);
+        } else if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_ERROR)) {
+            JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateResultsView(List<Course> courses) {
+        coursesContainer.removeAll();
+
+        if (courses == null || courses.isEmpty()) {
+            recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
+        } else {
+            // Create accordion panels
+            for (Course c : courses) {
+                CourseResultPanel itemPanel = new CourseResultPanel(c);
+                coursesContainer.add(itemPanel);
+            }
+            // Refresh layout
+            coursesContainer.revalidate();
+            coursesContainer.repaint();
+            recommendedCardLayout.show(recommendedCardPanel, CARD_RESULTS);
+        }
+    }
+
+    // ==========================================================
+    // CONTROLLER & HELPER LOGIC
+    // ==========================================================
+
+    private void handleSubmit() {
+        String interests = interestsArea.getText().trim();
+        if (interests.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // CLEAN ARCHITECTURE: Call Controller, not UseCase directly
+        controller.execute(interests, completedCourses);
+    }
+
+    private void handleSave() {
+        store.saveCoursesAndInterests(completedCourses, interestsArea.getText());
+        JOptionPane.showMessageDialog(this, "Saved locally.", "Save", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void loadSavedStateIntoUI() {
+        try {
+            this.completedCourses = store.loadCoursesTaken();
+            String last = store.loadLastInterests();
+            interestsArea.setText(last);
+        } catch (Exception e) {
+            System.err.println("Failed to load saved state: " + e.getMessage());
+        }
+    }
+
+    // ==========================================================
+    // DIALOG HELPERS
+    // ==========================================================
+
     private void openApiKeyDialog() {
         ApiKeyDialog d = new ApiKeyDialog(this, store);
-        d.setLocationRelativeTo(this);
         d.setVisible(true);
     }
 
@@ -167,117 +278,13 @@ public class CourseExplorerPanel extends JPanel {
     }
 
     private void openPreferenceAssistant() {
-        // Dialog depends on KeywordGenerator and returns a List<String> of keywords
         PreferenceDialog dialog = new PreferenceDialog(this, keywordGenerator);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
 
         List<String> kws = dialog.getResultKeywords();
         if (kws != null && !kws.isEmpty()) {
-            // Formatting is a UI concern
             interestsArea.setText(String.join(", ", kws));
-        }
-    }
-
-    private void handleSave() {
-        store.saveCoursesAndInterests(completedCourses, interestsArea.getText());
-        JOptionPane.showMessageDialog(this, "Saved locally.", "Save", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void handleSubmit() {
-        String interests = interestsArea.getText().trim();
-        if (interests.isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please type your interests before submitting.",
-                    "Missing interests",
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-
-        // Submit does not save.
-        List<String> recommended = recommendCoursesUseCase.execute(interests, completedCourses);
-        showRecommendedCourses(recommended);
-    }
-
-    private JPanel createRecommendedPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        JLabel title = new JLabel("Recommended Courses");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
-        panel.add(title, BorderLayout.NORTH);
-
-        JPanel placeholderPanel = new JPanel(new BorderLayout());
-        placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
-
-        courseList.setVisibleRowCount(8);
-        courseList.setFont(courseList.getFont().deriveFont(Font.BOLD, 15f));
-        courseList.setFixedCellHeight(44);
-        courseList.setCellRenderer(new CourseCellRenderer());
-        courseList.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int idx = courseList.locationToIndex(e.getPoint());
-                    if (idx >= 0) {
-                        String item = courseListModel.getElementAt(idx);
-                        openCourseDetails(item);
-                    }
-                }
-            }
-        });
-
-        JScrollPane listScroll = new JScrollPane(courseList);
-        JPanel listPanel = new JPanel(new BorderLayout());
-        listPanel.add(listScroll, BorderLayout.CENTER);
-
-        recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
-        recommendedCardPanel.add(listPanel, CARD_LIST);
-        recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
-
-        panel.add(recommendedCardPanel, BorderLayout.CENTER);
-        return panel;
-    }
-
-    private void showRecommendedCourses(List<String> courses) {
-        courseListModel.clear();
-        if (courses == null || courses.isEmpty()) {
-            recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
-            return;
-        }
-        for (String c : courses) courseListModel.addElement(c);
-        recommendedCardLayout.show(recommendedCardPanel, CARD_LIST);
-    }
-
-    private void openCourseDetails(String courseText) {
-        String[] parsed = parseCourse(courseText);
-        String code = parsed[0];
-        String description = parsed[1];
-
-        CourseDetailsDialog dialog = new CourseDetailsDialog(this, code, description);
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-    }
-
-    private String[] parseCourse(String text) {
-        if (text == null || text.isEmpty())
-            return new String[]{"Unknown", "Description coming soon."};
-        String[] parts = text.split("\\s+[-–—]\\s+", 2);
-        if (parts.length == 2) return new String[]{parts[0].trim(), parts[1].trim()};
-        String[] tokens = text.trim().split("\\s+", 2);
-        String code = tokens[0];
-        String desc = (tokens.length > 1) ? tokens[1] : "Description coming soon.";
-        return new String[]{code, desc};
-    }
-
-    private void loadSavedStateIntoUI() {
-        try {
-            this.completedCourses = store.loadCoursesTaken();
-            String last = store.loadLastInterests();
-            interestsArea.setText(last);
-        } catch (Exception e) {
-            System.err.println("Failed to load saved state: " + e.getMessage());
         }
     }
 }
