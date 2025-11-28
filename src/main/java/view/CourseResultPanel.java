@@ -39,7 +39,7 @@ public class CourseResultPanel extends JPanel {
         // 2. Content Area (Hidden by default)
         // We include Description + Prerequisites + Relevance + Keywords
         String details = String.format(
-                "Description: %s\n\nPrerequisites: %s\n\nRelevance: %s\n\nKeywords: %s",
+                "Description: %s%n%nPrerequisites: %s%n%nRelevance: %s%n%nKeywords: %s",
                 course.getDescription(),
                 course.getPrerequisiteCodes(),
                 course.getCourseRelevance(),
