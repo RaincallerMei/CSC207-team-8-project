@@ -1,4 +1,6 @@
-package entity;
+package ui;
+
+import entity.DefaultKeywordSuggester;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -6,7 +8,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 class PreferenceDialog extends JDialog {
     private final DefaultListModel<String> model = new DefaultListModel<>();
@@ -17,26 +18,25 @@ class PreferenceDialog extends JDialog {
     private final JScrollPane keywordsScroll = new JScrollPane(keywordsArea);
     private final JPanel keywordsRow = new JPanel(new BorderLayout(8, 0));
 
-    private final KeywordSuggester suggester;
-    private final Consumer<String> applyCallback;
+    // We directly update this target (no Consumer method reference)
+    private final JTextArea interestsTarget;
 
     private static final List<String> BASE_ITEMS = Arrays.asList(
             "Analyzing data and patterns",
             "Creating visual designs / art",
             "Solving complex problems",
             "Helping and teaching",
-            "Building websites or applications",
-            "Starting projects or business"
+            "Building websites and applications",
+            "Starting projects or businesses"
     );
 
-    PreferenceDialog(Component parent, KeywordSuggester suggester, Consumer<String> applyCallback) {
+    PreferenceDialog(Component parent, JTextArea interestsTarget) {
         super(
                 SwingUtilities.getWindowAncestor(parent),
                 "Help me choose interests",
                 Dialog.ModalityType.APPLICATION_MODAL
         );
-        this.suggester = suggester;
-        this.applyCallback = applyCallback;
+        this.interestsTarget = interestsTarget;
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
@@ -69,13 +69,11 @@ class PreferenceDialog extends JDialog {
         keywordsArea.setLineWrap(true);
         keywordsArea.setWrapStyleWord(true);
         keywordsArea.setText(""); // empty until Generate
-        // keep colors consistent with L&F
         Color inactiveBg = UIManager.getColor("TextField.inactiveBackground");
         if (inactiveBg != null) keywordsArea.setBackground(inactiveBg);
 
         keywordsScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         keywordsScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        // Fixed size to prevent dialog widening on long text
         keywordsScroll.setPreferredSize(new Dimension(520, 72));
         keywordsScroll.setMinimumSize(new Dimension(520, 72));
         keywordsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 96));
@@ -83,28 +81,33 @@ class PreferenceDialog extends JDialog {
         keywordsRow.add(new JLabel("Keywords:"), BorderLayout.WEST);
         keywordsRow.add(keywordsScroll, BorderLayout.CENTER);
 
-        // ----- Buttons -----
+        // ----- Buttons (Generate on far left; right side: Cancel then Apply) -----
         JButton generateBtn = new JButton("Generate");
-        JButton applyBtn = new JButton("Apply");
         JButton cancelBtn = new JButton("Cancel");
+        JButton applyBtn = new JButton("Apply");
 
         generateBtn.addActionListener(e -> onGenerate());
-        applyBtn.addActionListener(e -> onApply());
         cancelBtn.addActionListener(e -> dispose());
+        applyBtn.addActionListener(e -> onApply());
 
-        JPanel bottomButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomButtons.add(generateBtn);
-        bottomButtons.add(applyBtn);
-        bottomButtons.add(cancelBtn);
+        JPanel leftButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftButtons.add(generateBtn);
 
-        // SOUTH container: keywords row (NORTH) + buttons (SOUTH)
+        JPanel rightButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightButtons.add(cancelBtn);
+        rightButtons.add(applyBtn);
+
+        JPanel buttonsBar = new JPanel(new BorderLayout());
+        buttonsBar.add(leftButtons, BorderLayout.WEST);
+        buttonsBar.add(rightButtons, BorderLayout.EAST);
+
+        // SOUTH container: keywords row (NORTH) + buttons bar (SOUTH)
         JPanel south = new JPanel(new BorderLayout(0, 8));
         south.add(keywordsRow, BorderLayout.NORTH);
-        south.add(bottomButtons, BorderLayout.SOUTH);
+        south.add(buttonsBar, BorderLayout.SOUTH);
         add(south, BorderLayout.SOUTH);
 
         pack();
-        // Set a reasonable minimum width so layout stays stable
         setMinimumSize(new Dimension(560, getHeight()));
         setLocationRelativeTo(parent);
     }
@@ -126,10 +129,11 @@ class PreferenceDialog extends JDialog {
         List<String> ordered = new ArrayList<>();
         for (int i = 0; i < model.size(); i++) ordered.add(model.get(i));
 
-        String keywords = suggester.suggest(ordered);
+        // Direct call; no method reference or Function
+        String keywords = DefaultKeywordSuggester.suggest(ordered);
         keywordsArea.setText(keywords);
         keywordsArea.setCaretPosition(0); // scroll to top
-        // No pack() here — avoids horizontal stretching
+        // No pack() to avoid resizing
         keywordsArea.revalidate();
         keywordsArea.repaint();
     }
@@ -140,7 +144,8 @@ class PreferenceDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Click Generate first.", "No keywords yet", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        applyCallback.accept(text);
+        // Write directly into the interests text area
+        interestsTarget.setText(text);
         dispose();
     }
 }

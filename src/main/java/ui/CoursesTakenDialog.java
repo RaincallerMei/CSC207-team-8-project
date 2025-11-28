@@ -1,4 +1,4 @@
-package entity;
+package ui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class CoursesTakenDialog extends JDialog {
+public class CoursesTakenDialog extends JDialog {
 
     private final JTextArea coursesArea = new JTextArea();
     private boolean confirmed = false;
@@ -26,8 +26,7 @@ class CoursesTakenDialog extends JDialog {
         content.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         JLabel instruction = new JLabel(
-                "<html>Enter completed course codes, one per line<br>" +
-                        "(e.g., CSC108, MAT135).</html>"
+                "<html>Enter completed course codes, one per line<br>(e.g., CSC108, MAT135).</html>"
         );
         content.add(instruction, BorderLayout.NORTH);
 
@@ -40,12 +39,11 @@ class CoursesTakenDialog extends JDialog {
             coursesArea.setText(sb.toString());
         }
 
-        JScrollPane scrollPane = new JScrollPane(coursesArea);
-        content.add(scrollPane, BorderLayout.CENTER);
+        content.add(new JScrollPane(coursesArea), BorderLayout.CENTER);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton cancel = new JButton("Cancel");
-        JButton save = new JButton("Save");
+        JButton save = new JButton("Save and Apply");
 
         cancel.addActionListener(e -> { confirmed = false; dispose(); });
         save.addActionListener(e -> { confirmed = true;  dispose(); });

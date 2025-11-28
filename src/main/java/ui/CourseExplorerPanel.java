@@ -1,8 +1,12 @@
-package entity;
+package ui;
+
+import entity.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +56,6 @@ public class CourseExplorerPanel extends JPanel {
         add(splitPane, BorderLayout.CENTER);
     }
 
-    // Ensure the root pane exists, then set Submit as the default button (Enter activates it)
     @Override
     public void addNotify() {
         super.addNotify();
@@ -94,14 +97,12 @@ public class CourseExplorerPanel extends JPanel {
         interestsScroll.setPreferredSize(new Dimension(200, 200));
         interestsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
 
-        // Default Look & Feel buttons (no custom colors/borders)
         saveButton = new JButton("Save");
         saveButton.addActionListener(e -> handleSave());
 
-        submitButton = new JButton("Submit"); // will be set as default button
+        submitButton = new JButton("Submit");
         submitButton.addActionListener(e -> handleSubmit());
 
-        // Equal-size row
         JPanel actionsRow = new JPanel(new GridLayout(1, 2, 10, 0));
         actionsRow.setAlignmentX(Component.LEFT_ALIGNMENT);
         actionsRow.add(saveButton);
@@ -135,11 +136,7 @@ public class CourseExplorerPanel extends JPanel {
     }
 
     private void openPreferenceAssistant() {
-        PreferenceDialog dialog = new PreferenceDialog(
-                this,
-                new DefaultKeywordSuggester(),
-                interestsArea::setText // apply callback
-        );
+        PreferenceDialog dialog = new PreferenceDialog(this, interestsArea);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
@@ -178,11 +175,24 @@ public class CourseExplorerPanel extends JPanel {
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // List (reduced size, padded)
+        // List
         courseList.setVisibleRowCount(8);
         courseList.setFont(courseList.getFont().deriveFont(Font.BOLD, 15f));
         courseList.setFixedCellHeight(44);
         courseList.setCellRenderer(new CourseCellRenderer());
+
+        // Double-click to open details
+        courseList.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int idx = courseList.locationToIndex(e.getPoint());
+                    if (idx >= 0) {
+                        String item = courseListModel.getElementAt(idx);
+                        openCourseDetails(item);
+                    }
+                }
+            }
+        });
 
         JScrollPane listScroll = new JScrollPane(courseList);
         JPanel listPanel = new JPanel(new BorderLayout());
@@ -208,5 +218,32 @@ public class CourseExplorerPanel extends JPanel {
             courseListModel.addElement(c);
         }
         recommendedCardLayout.show(recommendedCardPanel, CARD_LIST);
+    }
+
+    // ==== Details popup ====
+    private void openCourseDetails(String courseText) {
+        String[] parsed = parseCourse(courseText);
+        String code = parsed[0];
+        String description = parsed[1];
+
+        CourseDetailsDialog dialog = new CourseDetailsDialog(this, code, description);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    // Try to split "CSC108 – Intro to CS" (supports -, –, —). Fallbacks are simple.
+    private String[] parseCourse(String text) {
+        if (text == null || text.isEmpty()) {
+            return new String[] {"Unknown", "Description coming soon."};
+        }
+        String[] parts = text.split("\\s+[-–—]\\s+", 2);
+        if (parts.length == 2) {
+            return new String[] {parts[0].trim(), parts[1].trim()};
+        }
+        // Fallback: first token as code, rest as title/desc
+        String[] tokens = text.trim().split("\\s+", 2);
+        String code = tokens[0];
+        String desc = (tokens.length > 1) ? tokens[1] : "Description coming soon.";
+        return new String[] {code, desc};
     }
 }
