@@ -14,6 +14,7 @@ import java.util.List;
 public class CourseExplorerPanel extends JPanel {
 
     private final RecommendCoursesUseCase recommendCoursesUseCase;
+    private final KeywordGenerator keywordGenerator;      // UI depends on abstraction
 
     // Local "DB"
     private final AppStateStore store = new AppStateStore();
@@ -38,12 +39,23 @@ public class CourseExplorerPanel extends JPanel {
     private JButton saveButton;
     private JButton submitButton;
 
+    /** Convenience ctor: dummy recommender + default keyword generator. */
     public CourseExplorerPanel() {
-        this(new RecommendCoursesUseCase(new RecommendCoursesUseCase.DummyCourseRecommender()));
+        this(
+                new RecommendCoursesUseCase(new RecommendCoursesUseCase.DummyCourseRecommender()),
+                new DefaultKeywordSuggester()
+        );
     }
 
+    /** Backward-compatible ctor: provide use case; generator defaults. */
     public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase) {
+        this(recommendCoursesUseCase, new DefaultKeywordSuggester());
+    }
+
+    /** Primary ctor with explicit dependencies. */
+    public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase, KeywordGenerator keywordGenerator) {
         this.recommendCoursesUseCase = recommendCoursesUseCase;
+        this.keywordGenerator = keywordGenerator;
 
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
@@ -88,13 +100,13 @@ public class CourseExplorerPanel extends JPanel {
 
         JButton notSureButton = new JButton("Not sure…");
         notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36)); // ← expand like courses button
+        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36)); // expand like courses button
         notSureButton.addActionListener(e -> openPreferenceAssistant());
 
         // Set API Key button
         JButton apiKeyButton = new JButton("Set API Key");
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));   // ← expand like courses button
+        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));   // expand like courses button
         apiKeyButton.addActionListener(e -> openApiKeyDialog());
 
         interestsArea.setLineWrap(true);
@@ -155,9 +167,16 @@ public class CourseExplorerPanel extends JPanel {
     }
 
     private void openPreferenceAssistant() {
-        PreferenceDialog dialog = new PreferenceDialog(this, interestsArea);
+        // Dialog depends on KeywordGenerator and returns a List<String> of keywords
+        PreferenceDialog dialog = new PreferenceDialog(this, keywordGenerator);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+
+        List<String> kws = dialog.getResultKeywords();
+        if (kws != null && !kws.isEmpty()) {
+            // Formatting is a UI concern
+            interestsArea.setText(String.join(", ", kws));
+        }
     }
 
     private void handleSave() {
