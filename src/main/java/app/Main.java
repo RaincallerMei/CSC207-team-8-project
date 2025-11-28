@@ -1,6 +1,6 @@
 package app;
 
-import entity.CourseExplorerPanel;
+import ui.CourseExplorerPanel;
 
 import javax.swing.*;
 
