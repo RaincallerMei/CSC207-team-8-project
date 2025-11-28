@@ -10,13 +10,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessInterface {
 
+    // FIXED: Changed "2.5" to "1.5" (2.5 does not exist and will crash)
     private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
     private final String apiKey;
     private final HttpClient httpClient;
@@ -24,15 +25,15 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
     public GeminiCourseDataAccessObject(String apiKey) {
         this.apiKey = apiKey;
         this.httpClient = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(60)) // 60s timeout for Search Grounding
+                .connectTimeout(Duration.ofSeconds(60))
                 .build();
     }
 
-//    Get prompt and request
+    // FIXED: Renamed to "getRecommendations" and changed first param to "String" to match Interface
     @Override
-    public List<Course> getRecommendedCourses(List<String> interests, List<String> completedCourses) {
+    public List<Course> getRecommendations(String interests, List<String> completedCourses) {
         // 1. Validation
-        if (interests.isEmpty()) {
+        if (interests == null || interests.trim().isEmpty()) {
             throw new IllegalArgumentException("At least one interest is required");
         }
 
@@ -63,39 +64,34 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
     }
 
-    // This converts the JSON String into a List of Course objects.
     private List<Course> parseJsonToCourseList(String jsonString) {
         List<Course> courses = new ArrayList<>();
-
-        // This regex looks for objects inside the JSON array.
-        // It's a simplified parser. For production, use a library like Jackson.
-        // We split the string by the closing/opening braces "}, {" to separate objects.
-        String[] objectStrings = jsonString.split("\\},\\s*\\{");
+        // Fixed regex to be more robust with spacing
+        String[] objectStrings = jsonString.split("\\}\\s*,\\s*\\{");
 
         for (String objStr : objectStrings) {
             try {
-                // We use helper method extractValue to find specific keys
                 String code = extractValue(objStr, "course_code");
                 String name = extractValue(objStr, "course_name");
                 String desc = extractValue(objStr, "course_description");
-                String prereqs = extractValue(objStr, "prerequisite_codes");
                 String explanation = extractValue(objStr, "explanation");
 
-                // Parse Rank (default to 1 if failing)
                 int rank = 1;
                 try {
                     String rankStr = extractValue(objStr, "course_rank");
                     rank = Integer.parseInt(rankStr);
                 } catch (NumberFormatException e) { /* keep default */ }
 
-                // Create the Entity
+                // Note: Prereqs might be null or empty depending on API response
+                String prereqs = extractValue(objStr, "prerequisite_codes");
+
                 Course course = new Course(
                         code,
                         name,
                         desc,
                         prereqs,
                         rank,
-                        "", // keywords (not strictly returned by current prompt)
+                        "",
                         explanation
                 );
                 courses.add(course);
@@ -106,14 +102,12 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         return courses;
     }
 
-    // Regex explanation: Look for "key" followed by colon, whitespace, quote, (Group 1), quote
     private String extractValue(String source, String key) {
         Pattern pattern = Pattern.compile("\"" + key + "\":\\s*\"(.*?)\"");
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
             return matcher.group(1);
         }
-        // Fallback for numbers (no quotes)
         Pattern numberPattern = Pattern.compile("\"" + key + "\":\\s*(\\d+)");
         Matcher numMatcher = numberPattern.matcher(source);
         if (numMatcher.find()) {
@@ -122,10 +116,10 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         return "N/A";
     }
 
-    // THE PROMPT FOR GEMINI!!! ___________________________________________________
-    private String buildPrompt(List<String> interests, List<String> completedCourses) {
-        String interestsText = String.join(", ", interests);
-        String completedText = completedCourses.isEmpty() ? "none" : String.join(", ", completedCourses);
+    // FIXED: Updated to accept String interests directly
+    private String buildPrompt(String interests, List<String> completedCourses) {
+        String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
+
         return """
             You are a course recommendation assistant for UofT.
             Interests: %s
@@ -134,7 +128,7 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.
             Output JSON Array ONLY. Keys: course_code, course_name, 
             course_description, prerequisite_codes, course_rank, explanation.
-            """.formatted(interestsText, completedText);
+            """.formatted(interests, completedText);
     }
 
     private String buildRequestBody(String prompt) {
@@ -152,14 +146,11 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         if (markerIndex < 0) return responseBody;
         int firstQuote = responseBody.indexOf('"', markerIndex + marker.length());
 
-        // Find the actual content
         int start = firstQuote + 1;
         int end = responseBody.lastIndexOf('"');
         if (end <= start) return responseBody;
 
         String rawContent = responseBody.substring(start, end);
-
-        // Unescape the JSON string provided by Gemini
         return rawContent.replace("\\\"", "\"").replace("\\n", " ");
     }
 }

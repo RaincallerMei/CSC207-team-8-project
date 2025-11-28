@@ -49,19 +49,39 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::createAndShowGUI);
-        // 1. Create the Data Access Object
-        String apiKey = "AIzaSyBE6rg-j3hyXHvz9uYX01BbbjFDDm-vgKk";
-        RecommendCoursesDataAccessInterface courseDAO = new GeminiCourseDataAccessObject(apiKey);
+        SwingUtilities.invokeLater(() -> {
+            // 1. Create the ViewModel (Holds the state of the UI)
+            RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-        // 2. TODO: Display recommended courses in the UI
-        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(courseDAO);
-        // Example usage:
-        var recommendedCourses = interactor.recommendCourses(
-                java.util.List.of("machine learning", "data science"),
-                java.util.List.of("CSC108", "MAT137")
-        );
-        recommendedCourses.forEach(System.out::println);
+            // 2. Create the Data Access Object
+            String apiKey = "AIzaSyBE6rg-j3hyXHvz9uYX01BbbjFDDm-vgKk";
+            GeminiCourseDataAccessObject userDataAccessObject = new GeminiCourseDataAccessObject(apiKey);
+
+            // 3. Create the Presenter (Updates the ViewModel)
+            // You need a Presenter class that implements your Output Boundary
+            RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
+
+            // 4. Create the Interactor (The "Brain")
+            // Note: Your Interactor must now accept the Presenter, not just the DAO.
+            RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(
+                    userDataAccessObject,
+                    presenter
+            );
+
+            // 5. Create the Controller (Accepts Input)
+            RecommendCoursesController controller = new RecommendCoursesController(interactor);
+
+            // 6. Create the View (The Panel you provided)
+            CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
+
+            // 7. Setup the Frame
+            JFrame frame = new JFrame("UofT Course Explorer");
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.add(view);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
     }
 
 }
