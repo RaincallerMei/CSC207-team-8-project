@@ -3,6 +3,7 @@ package app;
 import ui.CourseExplorerPanel;
 import data_access.GeminiCourseDataAccessObject;
 import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+import use_case.recommend_courses.RecommendCoursesInteractor;
 
 import javax.swing.*;
 
@@ -23,11 +24,17 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::createAndShowGUI);
         // 1. Create the Data Access Object
-        String apiKey = "YOUR_API_KEY_HERE";
+        String apiKey = "AIzaSyBE6rg-j3hyXHvz9uYX01BbbjFDDm-vgKk";
         RecommendCoursesDataAccessInterface courseDAO = new GeminiCourseDataAccessObject(apiKey);
 
-        // 2. Inject it into your Interactor
-        // RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(courseDAO, presenter);
+        // 2. TODO: Display recommended courses in the UI
+        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(courseDAO);
+        // Example usage:
+        var recommendedCourses = interactor.recommendCourses(
+                java.util.List.of("machine learning", "data science"),
+                java.util.List.of("CSC108", "MAT137")
+        );
+        recommendedCourses.forEach(System.out::println);
     }
 
 }

@@ -28,6 +28,7 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                 .build();
     }
 
+//    Get prompt and request
     @Override
     public List<Course> getRecommendedCourses(List<String> interests, List<String> completedCourses) {
         // 1. Validation
@@ -62,7 +63,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
     }
 
-    // --- 5. The PARSING Logic (Refactored from placeholder) ---
     // This converts the JSON String into a List of Course objects.
     private List<Course> parseJsonToCourseList(String jsonString) {
         List<Course> courses = new ArrayList<>();
@@ -106,9 +106,8 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         return courses;
     }
 
-    // Helper to find "key": "value" in a string using Regex
+    // Regex explanation: Look for "key" followed by colon, whitespace, quote, (Group 1), quote
     private String extractValue(String source, String key) {
-        // Regex explanation: Look for "key" followed by colon, whitespace, quote, (Group 1), quote
         Pattern pattern = Pattern.compile("\"" + key + "\":\\s*\"(.*?)\"");
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
@@ -123,19 +122,18 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         return "N/A";
     }
 
-    // --- Existing Helper Methods (Copied from LLMs.java) ---
-
+    // THE PROMPT FOR GEMINI!!! ___________________________________________________
     private String buildPrompt(List<String> interests, List<String> completedCourses) {
         String interestsText = String.join(", ", interests);
         String completedText = completedCourses.isEmpty() ? "none" : String.join(", ", completedCourses);
-
         return """
             You are a course recommendation assistant for UofT.
             Interests: %s
             Completed: %s
             Task: Recommend 3-5 valid UofT courses. 
             STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.
-            Output JSON Array ONLY. Keys: course_code, course_name, course_description, prerequisite_codes, course_rank, explanation.
+            Output JSON Array ONLY. Keys: course_code, course_name, 
+            course_description, prerequisite_codes, course_rank, explanation.
             """.formatted(interestsText, completedText);
     }
 
