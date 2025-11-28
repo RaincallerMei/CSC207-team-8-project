@@ -1,4 +1,4 @@
-package demo;
+package entity;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -6,7 +6,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainFrame extends JFrame {
+public class CourseExplorerPanel extends JPanel {
 
     // ==== dependencies ====
     private final RecommendCoursesUseCase recommendCoursesUseCase;
@@ -28,24 +28,32 @@ public class MainFrame extends JFrame {
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_LIST = "list";
 
-    public MainFrame(RecommendCoursesUseCase recommendCoursesUseCase) {
-        super("UofT Course Explorer & Planner");
+    /**
+     * Convenience constructor that uses a dummy recommender.
+     * Good for quick testing or when wiring in Main.
+     */
+    public CourseExplorerPanel() {
+        this(new RecommendCoursesUseCase(
+                new RecommendCoursesUseCase.DummyCourseRecommender()
+        ));
+    }
 
+    /**
+     * Main constructor: UI depends only on the use case.
+     */
+    public CourseExplorerPanel(RecommendCoursesUseCase recommendCoursesUseCase) {
         this.recommendCoursesUseCase = recommendCoursesUseCase;
-
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(950, 550);
-        setLocationRelativeTo(null); // center on screen
 
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 createSurveyPanel(),
                 createRecommendedPanel()
         );
-        splitPane.setResizeWeight(0.35);   // left 35%, right 65%
+        splitPane.setResizeWeight(0.35);
         splitPane.setDividerSize(4);
 
-        setContentPane(splitPane);
+        setLayout(new BorderLayout());
+        add(splitPane, BorderLayout.CENTER);
     }
 
     // =======================
@@ -60,7 +68,6 @@ public class MainFrame extends JFrame {
         title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // "Courses I've taken" button
         JButton coursesButton = new JButton("Courses I've taken");
         coursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
@@ -168,15 +175,18 @@ public class MainFrame extends JFrame {
 
     // ===========================================
     // Simple dialog for "Courses I've taken"
-    // (kept as an inner class to reduce file count)
     // ===========================================
     private static class CoursesTakenDialog extends JDialog {
 
         private final JTextArea coursesArea = new JTextArea();
         private boolean confirmed = false;
 
-        public CoursesTakenDialog(JFrame parent, List<String> existingCourses) {
-            super(parent, "Courses I've taken", true);
+        public CoursesTakenDialog(Component parent, List<String> existingCourses) {
+            super(
+                    SwingUtilities.getWindowAncestor(parent),
+                    "Courses I've taken",
+                    Dialog.ModalityType.APPLICATION_MODAL
+            );
 
             setSize(400, 300);
             setLayout(new BorderLayout());
