@@ -5,18 +5,15 @@ import storage.AppStateStore;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import interface_adapter.profile.ProfileController;
 
 public class ApiKeyDialog extends JDialog {
 
     private final JTextField apiKeyField = new JTextField();
     private final JPasswordField passField = new JPasswordField();
 
-    public ApiKeyDialog(Component parent, AppStateStore store) {
-        super(
-                SwingUtilities.getWindowAncestor(parent),
-                "Set API Key",
-                Dialog.ModalityType.APPLICATION_MODAL
-        );
+    public ApiKeyDialog(Component parent, ProfileController controller) {
+        super(SwingUtilities.getWindowAncestor(parent), "Set API Key", Dialog.ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
@@ -28,13 +25,6 @@ public class ApiKeyDialog extends JDialog {
         apiLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         apiKeyField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel passLabel = new JLabel("Passphrase (to encrypt/decrypt locally):");
-        passLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        passField.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel tip = new JLabel("<html><i>You'll need this passphrase to decrypt the key later.</i></html>");
-        tip.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         JButton saveBtn = new JButton("Save");
         JButton cancelBtn = new JButton("Cancel");
 
@@ -45,24 +35,21 @@ public class ApiKeyDialog extends JDialog {
         content.add(apiLabel);
         content.add(apiKeyField);
         content.add(Box.createVerticalStrut(10));
-        content.add(passLabel);
-        content.add(passField);
-        content.add(Box.createVerticalStrut(6));
-        content.add(tip);
 
         add(content, BorderLayout.CENTER);
         add(buttons, BorderLayout.SOUTH);
+        pack();
+        setLocationRelativeTo(parent);
 
         cancelBtn.addActionListener(e -> dispose());
         saveBtn.addActionListener(e -> {
             String apiKey = apiKeyField.getText().trim();
-            char[] pass = passField.getPassword();
-            if (apiKey.isEmpty() || pass.length == 0) {
+            if (apiKey.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Enter API key and passphrase.", "Missing input", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             try {
-                store.saveEncryptedApiKey(apiKey, pass);
+                controller.saveApiKey(apiKey);
                 JOptionPane.showMessageDialog(this, "API key saved securely.", "Saved", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } catch (Exception ex) {

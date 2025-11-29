@@ -1,8 +1,8 @@
 package app;
-//
-//import data_access.InMemoryCourseDataAccessObject;
-//import entity.Course;
-//import entity.RecommendCoursesUseCase;
+
+import data_access.InMemoryCourseDataAccessObject;
+import storage.AppStateStore;
+import interface_adapter.profile.ProfileController; // Import the new controller
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
@@ -18,56 +18,37 @@ import javax.swing.*;
 
 public class Main {
 
-//    private static void createAndShowGUI() {
-//
-//
-//        // 1. Create the Data Access Object (Frameworks & Drivers) Switch to Real/Gemini DAO here later when ready
-//        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
-//
-//        // 2. Create the View Model (Interface Adapter)
-//        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
-//
-//        // 3. Create the Presenter (Interface Adapter)
-//        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
-//
-//        // 4. Create the Interactor (Application Business Rules)
-//        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
-//
-//        // 5. Create the Controller (Interface Adapter)
-//        RecommendCoursesController controller = new RecommendCoursesController(interactor);
-//
-//        // 6. Create the Main View (Frameworks & Drivers)
-//        // Inject Controller and ViewModel into the UI
-//        JFrame frame = new JFrame("UofT Course Explorer & Planner");
-//        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
-//        frame.add(mainPanel);
-//        frame.pack();
-//        frame.setSize(1000, 650); // Set a reasonable default size
-//        frame.setLocationRelativeTo(null); // Center on screen
-//        frame.setVisible(true);
-//    }
+    private static void createAndShowGUI() {
+        // 1. Dependencies (Frameworks/Drivers)
+        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
+        AppStateStore store = new AppStateStore(); // Persistence
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
+        // 2. View Model (Interface Adapter)
+        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-            RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
+        // 3. Presenter (Interface Adapter)
+        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
 
-            // 1. Load the .env file
-            Dotenv dotenv = Dotenv.load();
-            String apiKey = dotenv.get("GEMINI_API_KEY");
+        // 4. Interactor (Use Case)
+        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
 
-            // 2. Pass the key into the DAO Constructor
-            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
+        // 5. Controllers (Interface Adapters)
+        RecommendCoursesController recommendController = new RecommendCoursesController(interactor);
+        ProfileController profileController = new ProfileController(store, viewModel); // New!
 
-            // 3. Create the Presenter (Updates the ViewModel)
-            RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
+        // 6. View (Frameworks/Drivers)
+        JFrame frame = new JFrame("UofT Course Explorer & Planner");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-            // 4. Create the Interactor (The "Brain") now accept the Presenter, not just the DAO.
-            RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
+        // Inject both controllers into the View
+        CourseExplorerPanel mainPanel = new CourseExplorerPanel(recommendController, profileController, viewModel);
+        frame.add(mainPanel);
 
-            // 5. Create the Controller (Accepts Input)
-            RecommendCoursesController controller = new RecommendCoursesController(interactor);
+        frame.pack();
+        frame.setSize(1000, 650);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
 
             // 6. Create the View (The Panel you provided)
             CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
