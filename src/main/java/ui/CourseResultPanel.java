@@ -42,7 +42,7 @@ public class CourseResultPanel extends JPanel {
                 "Description: %s%n%nPrerequisites: %s%n%nRelevance: %s%n%nKeywords: %s",
                 course.getDescription(),
                 course.getPrerequisiteCodes(),
-                course.getCourseRelevance(),
+                course.getCourseDescription(),
                 course.getCourseKeywords()
         );
 

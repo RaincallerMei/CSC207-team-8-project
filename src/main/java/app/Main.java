@@ -18,8 +18,9 @@ import javax.swing.*;
 public class Main {
 
     private static void createAndShowGUI() {
-        // 1. Create the Data Access Object (Frameworks & Drivers)
-        // Switch to Real/Gemini DAO here later when ready
+
+
+        // 1. Create the Data Access Object (Frameworks & Drivers) Switch to Real/Gemini DAO here later when ready
         RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
 
         // 2. Create the View Model (Interface Adapter)
@@ -38,10 +39,8 @@ public class Main {
         // Inject Controller and ViewModel into the UI
         JFrame frame = new JFrame("UofT Course Explorer & Planner");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
         frame.add(mainPanel);
-
         frame.pack();
         frame.setSize(1000, 650); // Set a reasonable default size
         frame.setLocationRelativeTo(null); // Center on screen
@@ -53,20 +52,15 @@ public class Main {
             // 1. Create the ViewModel (Holds the state of the UI)
             RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
+            String apiKey = "the api key";
             // 2. Create the Data Access Object
-            String apiKey = "AIzaSyBE6rg-j3hyXHvz9uYX01BbbjFDDm-vgKk";
-            GeminiCourseDataAccessObject userDataAccessObject = new GeminiCourseDataAccessObject(apiKey);
+            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
 
             // 3. Create the Presenter (Updates the ViewModel)
-            // You need a Presenter class that implements your Output Boundary
             RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
 
-            // 4. Create the Interactor (The "Brain")
-            // Note: Your Interactor must now accept the Presenter, not just the DAO.
-            RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(
-                    userDataAccessObject,
-                    presenter
-            );
+            // 4. Create the Interactor (The "Brain") now accept the Presenter, not just the DAO.
+            RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
 
             // 5. Create the Controller (Accepts Input)
             RecommendCoursesController controller = new RecommendCoursesController(interactor);
