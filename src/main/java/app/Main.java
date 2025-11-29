@@ -6,9 +6,13 @@ import interface_adapter.profile.ProfileController; // Import the new controller
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
-import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
 import use_case.recommend_courses.RecommendCoursesInteractor;
 import ui.CourseExplorerPanel;
+import data_access.GeminiCourseDataAccessObject;
+//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+//import use_case.recommend_courses.RecommendCoursesInteractor;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 
@@ -46,7 +50,19 @@ public class Main {
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::createAndShowGUI);
+            // 6. Create the View (The Panel you provided)
+            CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
+
+            // 7. Setup the Frame
+            JFrame frame = new JFrame("UofT Course Explorer & Planner");
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+            frame.add(mainPanel);
+            frame.pack();
+            frame.setSize(1000, 650); // Set a reasonable default size
+            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setVisible(true);
+        });
     }
+
 }

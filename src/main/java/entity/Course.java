@@ -7,18 +7,18 @@ public class Course {
     private final String prerequisiteCodes;
     private final int courseRank;
     private final String courseKeywords;
-    private final String courseRelevance;
+    private final String courseDescription;
 
     public Course(String courseCode, String courseName, String description,
                   String prerequisiteCodes, int courseRank,
-                  String courseKeywords, String courseRelevance) {
+                  String courseKeywords, String courseDescription) {
         this.courseCode = courseCode;
         this.courseName = courseName;
         this.description = description;
         this.prerequisiteCodes = prerequisiteCodes;
         this.courseRank = courseRank;
         this.courseKeywords = courseKeywords;
-        this.courseRelevance = courseRelevance;
+        this.courseDescription = courseDescription;
     }
 
     public String getCourseCode() { return courseCode; }
@@ -27,7 +27,7 @@ public class Course {
     public String getPrerequisiteCodes() { return prerequisiteCodes; }
     public int getCourseRank() { return courseRank; }
     public String getCourseKeywords() { return courseKeywords; }
-    public String getCourseRelevance() { return courseRelevance; }
+    public String getCourseDescription() { return courseDescription; }
 
     @Override
     public String toString() {
