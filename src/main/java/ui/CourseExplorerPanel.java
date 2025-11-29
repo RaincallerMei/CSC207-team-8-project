@@ -50,20 +50,31 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         // 1. Observe the ViewModel (Reactive UI)
         this.viewModel.addPropertyChangeListener(this);
 
-        // 2. Build UI
+        // 2. Build UI (slim left panel)
         setLayout(new BorderLayout());
+
+        JPanel leftPanel = createSurveyPanel();
+        JPanel rightPanel = createRecommendedPanel();
+
+        // Keep left slim and stable
+        leftPanel.setPreferredSize(new Dimension(300, 1)); // ~300px wide initially
+        leftPanel.setMinimumSize(new Dimension(240, 1));   // don't let it collapse
+
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
-                createSurveyPanel(),
-                createRecommendedPanel()
+                leftPanel,
+                rightPanel
         );
-        splitPane.setResizeWeight(0.35);
         splitPane.setDividerSize(4);
+        // Extra space goes to the RIGHT when resizing (left stays slim)
+        splitPane.setResizeWeight(1.0);
+
         add(splitPane, BorderLayout.CENTER);
 
+        // Set the initial divider after layout to ensure a slim left pane
+        SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(300));
+
         // 3. Trigger Initial Data Load via Controller
-        // The View asks the Controller to load data. The Controller will update the VM.
-        // The VM will trigger propertyChange(), which updates the UI.
         profileController.loadProfile();
     }
 
@@ -83,6 +94,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
         if (RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS.equals(prop)) {
             // Update the Accordion List
+            @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
             updateResultsView(courses);
         }
@@ -153,7 +165,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         apiKeyButton.addActionListener(e -> {
-            // Updated ApiKeyDialog constructor to take ProfileController
+            // ApiKeyDialog hooked to ProfileController
             ApiKeyDialog d = new ApiKeyDialog(this, profileController);
             d.setVisible(true);
         });
