@@ -10,8 +10,6 @@ import storage.AppStateStore;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -43,13 +41,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_RESULTS = "results";
 
-    // Buttons tracked for default button setting
+    // Default button
     private JButton submitButton;
 
-    /**
-     * Primary Constructor.
-     * Integrates Clean Architecture (Controller/ViewModel) with the Survey UI.
-     */
     public CourseExplorerPanel(RecommendCoursesController controller,
                                RecommendCoursesViewModel viewModel) {
         this(controller, viewModel, new DefaultKeywordSuggester());
@@ -62,20 +56,25 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
 
-        // Register as an observer to update the view when the use case finishes
         this.viewModel.addPropertyChangeListener(this);
-
         setLayout(new BorderLayout());
 
-        JSplitPane splitPane = new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT,
-                createSurveyPanel(),
-                createRecommendedPanel()
-        );
-        splitPane.setResizeWeight(0.35); // Left side takes 35% width
+        // Build split pane with a slimmer, stable left panel
+        JPanel leftPanel = createSurveyPanel();
+        JPanel rightPanel = createRecommendedPanel();
+
+        // Keep the left from collapsing; don't set a 0 height
+        leftPanel.setMinimumSize(new Dimension(220, 1));
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        // Extra space goes to the RIGHT so the left stays slim
+        splitPane.setResizeWeight(1.0);
         splitPane.setDividerSize(4);
 
         add(splitPane, BorderLayout.CENTER);
+
+        // Set initial left width in pixels after layout so it never collapses
+        SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(280));
 
         // Load saved state (courses + last interests)
         loadSavedStateIntoUI();
@@ -84,16 +83,15 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     @Override
     public void addNotify() {
         super.addNotify();
-        // Set "Submit" as the default button (Enter key)
         JRootPane root = SwingUtilities.getRootPane(this);
         if (root != null && submitButton != null) {
             root.setDefaultButton(submitButton);
         }
     }
 
-    // ==========================================================
-    // LEFT PANEL: Survey & User Inputs (From CourseExplorerPanel)
-    // ==========================================================
+    // =======================
+    // LEFT: Survey & Inputs
+    // =======================
     private JPanel createSurveyPanel() {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -103,13 +101,11 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // 1. Courses Taken Button
         JButton coursesButton = new JButton("Courses I've taken");
         coursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         coursesButton.addActionListener(e -> openCoursesTakenDialog());
 
-        // 2. API Key Button
         JButton apiKeyButton = new JButton("Set API Key");
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
@@ -118,7 +114,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         JLabel interestsLabel = new JLabel("What are your interests?");
         interestsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // 3. Keyword Helper Button
         JButton notSureButton = new JButton("Not sure…");
         notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
@@ -131,7 +126,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         interestsScroll.setPreferredSize(new Dimension(200, 200));
         interestsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));
 
-        // 4. Action Buttons
         JButton saveButton = new JButton("Save State");
         saveButton.addActionListener(e -> handleSave());
 
@@ -144,28 +138,27 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         actionsRow.add(submitButton);
         actionsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
 
-        // Layout Assembly
         panel.add(title);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(16));
         panel.add(coursesButton);
-        panel.add(Box.createVerticalStrut(10));
+        panel.add(Box.createVerticalStrut(8));
         panel.add(apiKeyButton);
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(16));
         panel.add(interestsLabel);
-        panel.add(Box.createVerticalStrut(8));
+        panel.add(Box.createVerticalStrut(6));
         panel.add(notSureButton);
-        panel.add(Box.createVerticalStrut(8));
+        panel.add(Box.createVerticalStrut(6));
         panel.add(interestsScroll);
         panel.add(Box.createVerticalGlue());
-        panel.add(Box.createVerticalStrut(16));
+        panel.add(Box.createVerticalStrut(12));
         panel.add(actionsRow);
 
         return panel;
     }
 
-    // ==========================================================
-    // RIGHT PANEL: Results (From MainFrame / CourseResultPanel)
-    // ==========================================================
+    // =======================
+    // RIGHT: Results
+    // =======================
     private JPanel createRecommendedPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -174,14 +167,11 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
         panel.add(title, BorderLayout.NORTH);
 
-        // 1. Placeholder View
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // 2. Results View (Accordion Container)
         coursesContainer.setLayout(new BoxLayout(coursesContainer, BoxLayout.Y_AXIS));
 
-        // Wrap coursesContainer in a BorderLayout panel to keep items aligned to the top
         JPanel scrollWrapper = new JPanel(new BorderLayout());
         scrollWrapper.add(coursesContainer, BorderLayout.NORTH);
 
@@ -197,13 +187,13 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         return panel;
     }
 
-    // ==========================================================
-    // CLEAN ARCHITECTURE OBSERVER LOGIC
-    // ==========================================================
+    // =======================
+    // ViewModel Observer
+    // =======================
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS)) {
-            // Update the UI with the list of Course entities
+            @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
             updateResultsView(courses);
         } else if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_ERROR)) {
@@ -217,29 +207,25 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         if (courses == null || courses.isEmpty()) {
             recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
         } else {
-            // Create accordion panels
             for (Course c : courses) {
                 CourseResultPanel itemPanel = new CourseResultPanel(c);
                 coursesContainer.add(itemPanel);
             }
-            // Refresh layout
             coursesContainer.revalidate();
             coursesContainer.repaint();
             recommendedCardLayout.show(recommendedCardPanel, CARD_RESULTS);
         }
     }
 
-    // ==========================================================
-    // CONTROLLER & HELPER LOGIC
-    // ==========================================================
-
+    // =======================
+    // Controller & Helpers
+    // =======================
     private void handleSubmit() {
         String interests = interestsArea.getText().trim();
         if (interests.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        // CLEAN ARCHITECTURE: Call Controller, not UseCase directly
         controller.execute(interests, completedCourses);
     }
 
@@ -258,10 +244,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         }
     }
 
-    // ==========================================================
-    // DIALOG HELPERS
-    // ==========================================================
-
+    // =======================
+    // Dialogs
+    // =======================
     private void openApiKeyDialog() {
         ApiKeyDialog d = new ApiKeyDialog(this, store);
         d.setVisible(true);
@@ -271,7 +256,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         CoursesTakenDialog dialog = new CoursesTakenDialog(this, completedCourses);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
-
         if (dialog.isConfirmed()) {
             completedCourses = dialog.getCourses();
         }

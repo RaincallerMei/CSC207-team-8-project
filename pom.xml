@@ -14,11 +14,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependency>
-        <groupId>com.google.genai</groupId>
-        <artifactId>google-genai</artifactId>
-        <version>1.27.0</version>
-    </dependency>
+    <dependencies>
+        <!-- Google Generative AI SDK for Gemini -->
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>1.28.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
+        </dependency>
+
+</dependencies>
 
     <build>
         <plugins>
