@@ -1,13 +1,13 @@
-# Team Project
+# Passion Finder (placeholding name) -- CSC207 Final Project Team 8
 
-The readme should include information such as:
-- a summary of what your application is all about
-- a list of the user stories, along with who is responsible for each one
-- information about the API(s) that your project uses 
-- screenshots or animations demonstrating current functionality
+### Summary:
+Personalized University of Toronto Course Explorer for students of various backgrounds. The purpose is to provide University of Toronto students with a user-friendly tool to find courses they care about, learn about the course’s basic info, and eventually optimize their university journey planning.
 
-By keeping this README up-to-date,
-your team will find it easier to prepare for the final presentation
-at the end of the term.
+### User Story:
+1. 
 
+### APIs Used:
+Google Gemini 2.5 Flash API, Free of Charge. Requires user to input their own API key.
+
+### Screenshots/Animations:
 
