@@ -1,0 +1,159 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "[\n    {\n        \"course_code\": \"RLG204H1\",\n        \"course_name\": \"Islam\",\n        \"course_description\": \"This course offers an introduction to the religion of Islam, exploring its diverse history and development from its beginnings to the present day. It covers topics such as pre-Islamic Arabia, the life of Prophet Muhammad and the Qur'an, the evolution of Islamic legal and traditional concepts (Sunna and Hadith), various Islamic communities including Sunni, Shiite, and Ismaili traditions, and spiritual practices like Sufism. The course also examines the complexities of Islam in both its classical forms and in the modern world, including its presence in the diaspora.\",\n        \"prerequisite_codes\": [],\n        \"course_rank\": 1,\n        \"explanation\": \"This course provides a foundational understanding of Islam, a religion with a significant historical and cultural presence across various parts of Africa, making it highly relevant to African culture studies. It's a second-year level course with no prerequisites, making it accessible for someone new to the field. It is listed in the 2024-2025 Academic Calendar.\"\n    },\n    {\n        \"course_code\": \"AFR298H1\",\n        \"course_name\": \"Popular Uprising in Africa\",\n        \"course_description\": \"This course historically examines how Africa has been understood and represented, both by people within Africa and outside of it. It explores various viewpoints that have shaped our ideas about what Africa and being African mean.\",\n        \"prerequisite_codes\": [],\n        \"course_rank\": 2,\n        \"explanation\": \"This course directly addresses a contemporary and vital aspect of African studies: popular uprisings and their societal implications. As a 200-level course, it is appropriate for a second-year student. While AFR150Y1 is recommended preparation, it is not a strict prerequisite, making it accessible.\"\n    },\n    {\n        \"course_code\": \"AFR280Y1\",\n        \"course_name\": \"Elementary Swahili\",\n        \"course_description\": \"This course introduces students to the fundamentals of the Swahili language. It focuses on developing basic communication skills in listening, speaking, reading, and writing, and also explores the language's relationship to its East African cultural context.\",\n        \"prerequisite_codes\": [],\n        \"course_rank\": 3,\n        \"explanation\": \"Learning an African language like Swahili offers a deep dive into African culture. Swahili is a widely spoken language in East Africa and studying it provides direct access to cultural nuances. As an elementary language course, it typically has no prerequisites and is suitable for a second-year student interested in a hands-on cultural experience. This course is listed as part of the African Studies program.\"\n    }\n]"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0,
+      "groundingMetadata": {
+        "searchEntryPoint": {
+          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEp_SwTPMO2uUnh_RpG98RznimHUo9ScAZ6O91wgg3AhYSc4XU6i_Gx66mRKdygeyv3WNz_XKjz0TuC-s762dkaNHYf7Vsj1yxJjWcDISQuLtMH5Dx6ccrfhj9nsdmMEWKixajUkSI88S29ODjqax0PdSA7YRN848KnUTENRIQIOH5yM_NyuLxP9mDg_cMx6VPITudmgGfYclkJctvLab-YPSJA\"\u003eUofT AFR210Y1 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHiQGjZL0sohBGUxPH_ruQRQE4V-ZPwIqaxN9uYyyPqlY93tprD2SLOcs3ssepXvJZAa3dTIhVscTMw68fD44V2ck0g6IjEfyQMPJSg9ArVmDCxE-N-BfI6z-mMnN3VW1TasbGHbHRBsDpG7C8blKL69RLw02MF76oDYI9OQgJlsuOMfEkGhNki7HtufJCk1fPkIAWg6e-TzdX8yHqZnfzGh5zV\"\u003eUofT AFR201H1 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFnkz3J4V-lzggw1tbOECMIxJxtH77jG_KDEdml59tIqUXUGA57cJHNFv7ktbl4makzmT_I-lhfVOTTDlqytMHvCznF4XDb88wxnK7cy4IDY-fH5wsa-BROveUAs4aHigaYZDIQE4BJZij3Yv7fGBINWSJ5gmKRVVVeisqN7LZugL8TW3i8aW7_Kcc-LDy0KBiA7YOKO2kC0nzot9kY6DH3wMGVUTCqHCprPjU=\"\u003eUofT African Studies courses second year\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFUhfuEFp3IPd3u4Prrho6Uo0XOiDCuEVMo82vtHDOyhVCRyKIHglAsT_ZH0Q8xx_Y23EzkJPvi9tt2SLni9LdAtruyzgwKWiExDEzKKwMDSGScCQfdbpzHzs4yt9SSP4IsqG6OOLRiDeDOJqCun_pwC339LC8bRp4ZNI5ZunpyptaRmGAOpkQ6DB93qb-7GfKwFPQPVqOE57bIEALCj5i4XBer\"\u003eUofT AFR200H1 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH5-JHIZQ93oqZ64IbMEL7o95cHzm-kAiIZciACMbAhOzTPPO82ip9dqaJvr6SqcZhPB9zdL9apIM2teS__lM0WzCgIIHfcVs3dpdg-yj4Fh2D-K8_4sw5sTJAfY07megdq0goO3mgnaluyHPpRsyi8EwQeLJjg-LFUvZIT2GK7S7d4FNv8xEmhantgWEZLg0JOw2G9ItSXHCdTRuzZ8zCKM0Rf\"\u003eUofT RLG204H1 2024-2025 calendar\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+        },
+        "groundingChunks": [
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVkY_DZd5uCiEObZ5q65ugPYYLZ6JN5ZS3XS-dYBzld9wLLLUzZRXQ4D8q7-3zfRKQImtjhWVrTpV1M-r46QWvrNZx_UCHVBLVUG2m5yCnIM421wDCz4XwUc951w-EstD6pIwByRBsc8L1lDGDWQ==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGdS9rCqmvveqsGo-b6r3KcYhfTJ7heRK5XS7L4EW5034BBrEHMGKKPyS1h9YN5D1EDGQCNXlfO7Xab-I_6yKcPBEHWcMoItdkz4-TMHi4f8bR-oTVtKFBerbBWMQ80NZprT4d20oS5EEmruO7SSq0g-mEKRdxhi-UmP-VlZqFI_MPhMRUbl5rmLdFx78RV5D-Egybz-9306Q==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEr1LLF0MH2MaOM_E1G1QG4twnwCVlk5xk3ETdM1oESOuj0Z8FizvN-YUvDnal9dNKV291MMC4XwSTNc0fZEcxAr2YuX9GiTRgDHy_wbQCrXqkbXDZbPnSE4pEGe2NVLJ8iwgpV04iY-ggiiJloc2qeuf3yx-duLDO6_W40kR1cVFZD87Ts0lhg0xqEGF1A9HWS9hc=",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEBwojJ12JUpEz_phXOAi_U1vnbioJy3__E81s2NgEWlAebmnT5mX_FLDMqAH6jzFSLF1swMolOQQLXXtcCzZM4tVPw65SIRZfLhWR1toG93Vzog0oosoBogOFg4vR5kKyi6Cva63Y61z0l86gSY9IO-4Mvk4_Y",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQXbo_Yo8GamzOlY0ojLc_3x_p3Iw8urXMBT51iG3TrnCiDnEcDbXlYOfEBQdI8pLitftf5smY2a-kPIQZnnq2Ytvwk99pS36iF6838iLGcgKYDzUKMDvL_OfPNa4YCgTwR6TQsp2ax5jxQs63B3lZSayJzA==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH5jZBUVtS9DaUzWTam1kRrOIIqpqtFs8e5aC21VNvpUTkpslD8BFdtz6lE0dSy0HzA0Jpr4xyBiV3TsDDkIxVHWBOQxTJUwrWYh6H1BeksOa-czhXiIhLxJae7CIyMhZJHx0m7mSsAppvF2v-_surXnRPocPRWaBwgue4=",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEK98rylbc9gg07EcS2PKZVSXk0m2MDVT_x2RD2JsDbpsdZjBAwrvD-aToidzjeGEgAPycoVGM6Cc38vvjwZ4fOzqBi2UT67mvTw4yAoJ-E6mDGqGJtaLT1XZZ3v-CKCCwnbqV4ai_HAUF6dKQjU5o6",
+              "title": "utoronto.ca"
+            }
+          }
+        ],
+        "groundingSupports": [
+          {
+            "segment": {
+              "startIndex": 533,
+              "endIndex": 676,
+              "text": "The course also examines the complexities of Islam in both its classical forms and in the modern world, including its presence in the diaspora."
+            },
+            "groundingChunkIndices": [
+              0,
+              1
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1078,
+              "endIndex": 1126,
+              "text": "It is listed in the 2024-2025 Academic Calendar."
+            },
+            "groundingChunkIndices": [
+              0,
+              2,
+              1
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1390,
+              "endIndex": 1489,
+              "text": "It explores various viewpoints that have shaped our ideas about what Africa and being African mean."
+            },
+            "groundingChunkIndices": [
+              3
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1778,
+              "endIndex": 1875,
+              "text": "While AFR150Y1 is recommended preparation, it is not a strict prerequisite, making it accessible."
+            },
+            "groundingChunkIndices": [
+              3
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2078,
+              "endIndex": 2259,
+              "text": "It focuses on developing basic communication skills in listening, speaking, reading, and writing, and also explores the language's relationship to its East African cultural context."
+            },
+            "groundingChunkIndices": [
+              4
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2696,
+              "endIndex": 2757,
+              "text": "This course is listed as part of the African Studies program."
+            },
+            "groundingChunkIndices": [
+              5,
+              6
+            ]
+          }
+        ],
+        "webSearchQueries": [
+          "UofT African Studies courses second year",
+          "UofT AFR200H1 2024-2025 calendar",
+          "UofT AFR201H1 2024-2025 calendar",
+          "UofT AFR210Y1 2024-2025 calendar",
+          "UofT RLG204H1 2024-2025 calendar"
+        ]
+      }
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 133,
+    "candidatesTokenCount": 717,
+    "totalTokenCount": 3503,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 133
+      }
+    ],
+    "toolUsePromptTokenCount": 436,
+    "toolUsePromptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 436
+      }
+    ],
+    "thoughtsTokenCount": 2217
+  },
+  "modelVersion": "gemini-2.5-flash",
+  "responseId": "nVQqabfCLZrv_uMPmIaQiQc"
+}
