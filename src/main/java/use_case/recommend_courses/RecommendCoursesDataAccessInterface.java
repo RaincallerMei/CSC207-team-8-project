@@ -4,5 +4,5 @@ import entity.Course;
 import java.util.List;
 
 public interface RecommendCoursesDataAccessInterface {
-    List<Course> getRecommendations(String interests, List<String> completedCourses);
+    List<Course> getRecommendations(String interests, List<String> completedCourses, String apiKey);
 }
