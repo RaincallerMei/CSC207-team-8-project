@@ -17,44 +17,44 @@ import javax.swing.*;
 
 public class Main {
 
-    private static void createAndShowGUI() {
-
-
-        // 1. Create the Data Access Object (Frameworks & Drivers) Switch to Real/Gemini DAO here later when ready
-        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
-
-        // 2. Create the View Model (Interface Adapter)
-        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
-
-        // 3. Create the Presenter (Interface Adapter)
-        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
-
-        // 4. Create the Interactor (Application Business Rules)
-        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
-
-        // 5. Create the Controller (Interface Adapter)
-        RecommendCoursesController controller = new RecommendCoursesController(interactor);
-
-        // 6. Create the Main View (Frameworks & Drivers)
-        // Inject Controller and ViewModel into the UI
-        JFrame frame = new JFrame("UofT Course Explorer & Planner");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
-        frame.add(mainPanel);
-        frame.pack();
-        frame.setSize(1000, 650); // Set a reasonable default size
-        frame.setLocationRelativeTo(null); // Center on screen
-        frame.setVisible(true);
-    }
+//    private static void createAndShowGUI() {
+//
+//
+//        // 1. Create the Data Access Object (Frameworks & Drivers) Switch to Real/Gemini DAO here later when ready
+//        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
+//
+//        // 2. Create the View Model (Interface Adapter)
+//        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
+//
+//        // 3. Create the Presenter (Interface Adapter)
+//        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
+//
+//        // 4. Create the Interactor (Application Business Rules)
+//        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
+//
+//        // 5. Create the Controller (Interface Adapter)
+//        RecommendCoursesController controller = new RecommendCoursesController(interactor);
+//
+//        // 6. Create the Main View (Frameworks & Drivers)
+//        // Inject Controller and ViewModel into the UI
+//        JFrame frame = new JFrame("UofT Course Explorer & Planner");
+//        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+//        frame.add(mainPanel);
+//        frame.pack();
+//        frame.setSize(1000, 650); // Set a reasonable default size
+//        frame.setLocationRelativeTo(null); // Center on screen
+//        frame.setVisible(true);
+//    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // 1. Create the ViewModel (Holds the state of the UI)
             RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-            String apiKey = "the api key";
+//            String apiKey = "";
             // 2. Create the Data Access Object
-            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
+            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject();
 
             // 3. Create the Presenter (Updates the ViewModel)
             RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
@@ -69,11 +69,13 @@ public class Main {
             CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
 
             // 7. Setup the Frame
-            JFrame frame = new JFrame("UofT Course Explorer");
+            JFrame frame = new JFrame("UofT Course Explorer & Planner");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            frame.add(view);
+            CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+            frame.add(mainPanel);
             frame.pack();
-            frame.setLocationRelativeTo(null);
+            frame.setSize(1000, 650); // Set a reasonable default size
+            frame.setLocationRelativeTo(null); // Center on screen
             frame.setVisible(true);
         });
     }

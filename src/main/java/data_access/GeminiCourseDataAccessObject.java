@@ -23,18 +23,18 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
     // VERIFY THIS URL IS EXACTLY AS SHOWN:
     private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-    private final String apiKey;
+//    private final String apiKey;
     private final HttpClient httpClient;
 
-    public GeminiCourseDataAccessObject(String apiKey) {
-        this.apiKey = apiKey;
+    public GeminiCourseDataAccessObject() {
+//        this.apiKey = apiKey;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(60))
                 .build();
     }
 
     @Override
-    public List<Course> getRecommendations(String interests, List<String> completedCourses) {
+    public List<Course> getRecommendations(String interests, List<String> completedCourses, String apiKey) {
         if (interests == null || interests.trim().isEmpty()) {
             throw new IllegalArgumentException("At least one interest is required");
         }
