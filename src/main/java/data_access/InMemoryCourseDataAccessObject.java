@@ -8,7 +8,7 @@ import java.util.List;
 public class InMemoryCourseDataAccessObject implements RecommendCoursesDataAccessInterface {
 
     @Override
-    public List<Course> getRecommendations(String interests, List<String> completedCourses) {
+    public List<Course> getRecommendations(String interests, List<String> completedCourses, String apiKey) {
         // Dummy data populated with the new 7-field constructor
         return Arrays.asList(
                 new Course(

@@ -18,7 +18,8 @@ public class RecommendCoursesInteractor implements RecommendCoursesInputBoundary
         // 1. Fetch data
         List<Course> recommendations = dataAccessObject.getRecommendations(
                 inputData.getInterests(),
-                inputData.getCompletedCourses()
+                inputData.getCompletedCourses(),
+                inputData.getApi_key()
         );
 
         // 2. Apply business logic (e.g., empty check)
