@@ -1,17 +1,18 @@
 package app;
-
-import data_access.InMemoryCourseDataAccessObject;
-import entity.Course;
-import entity.RecommendCoursesUseCase;
+//
+//import data_access.InMemoryCourseDataAccessObject;
+//import entity.Course;
+//import entity.RecommendCoursesUseCase;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
-import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
 import use_case.recommend_courses.RecommendCoursesInteractor;
 import ui.CourseExplorerPanel;
 import data_access.GeminiCourseDataAccessObject;
-import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
-import use_case.recommend_courses.RecommendCoursesInteractor;
+//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+//import use_case.recommend_courses.RecommendCoursesInteractor;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 
@@ -49,12 +50,15 @@ public class Main {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // 1. Create the ViewModel (Holds the state of the UI)
+
             RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-//            String apiKey = "";
-            // 2. Create the Data Access Object
-            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject();
+            // 1. Load the .env file
+            Dotenv dotenv = Dotenv.load();
+            String apiKey = dotenv.get("GEMINI_API_KEY");
+
+            // 2. Pass the key into the DAO Constructor
+            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
 
             // 3. Create the Presenter (Updates the ViewModel)
             RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);

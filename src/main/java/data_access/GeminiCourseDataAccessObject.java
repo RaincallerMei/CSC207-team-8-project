@@ -20,14 +20,13 @@ import java.util.regex.Pattern;
 
 public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessInterface {
 
-    // VERIFY THIS URL IS EXACTLY AS SHOWN:
     private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-
-//    private final String apiKey;
+    private final String apiKey; // Store the key here
     private final HttpClient httpClient;
 
-    public GeminiCourseDataAccessObject() {
-//        this.apiKey = apiKey;
+    // Update Constructor to accept apiKey
+    public GeminiCourseDataAccessObject(String apiKey) {
+        this.apiKey = apiKey;
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(60))
                 .build();
@@ -43,8 +42,9 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             String prompt = buildPrompt(interests, completedCourses);
             String requestBody = buildRequestBody(prompt);
 
+            // Use 'this.apiKey' instead of the method argument
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(GEMINI_ENDPOINT + "?key=" + apiKey))
+                    .uri(URI.create(GEMINI_ENDPOINT + "?key=" + this.apiKey))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -52,7 +52,10 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             // DEBUG: Save response to file
-            try { Files.writeString(Paths.get("gemini_debug.json"), response.body()); } catch (Exception ignored) {}
+            try {
+                Files.writeString(Paths.get("gemini_debug.json"), response.body());
+            } catch (Exception ignored) {
+            }
 
             if (response.statusCode() != 200) {
                 // This is where your 404 is coming from.
@@ -126,19 +129,19 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
     private String buildPrompt(String interests, List<String> completedCourses) {
         String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
         return """
-            You are a course recommendation assistant for UofT.
-            Interests: %s
-            Completed: %s
-            Task: Recommend 3-5 valid UofT courses. 
-            STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.
-            
-            CRITICAL: Summarize course descriptions in your own words. 
-            DO NOT copy text verbatim from the web to avoid copyright blocks.
-            
-            Output JSON Array ONLY. Keys: course_code, course_name, 
-            course_description, prerequisite_codes, course_rank, explanation.
-            Do NOT use Markdown formatting.
-            """.formatted(interests, completedText);
+                You are a course recommendation assistant for UofT.
+                Interests: %s
+                Completed: %s
+                Task: Recommend 3-5 valid UofT courses. 
+                STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.
+                
+                CRITICAL: Summarize course descriptions in your own words. 
+                DO NOT copy text verbatim from the web to avoid copyright blocks.
+                
+                Output JSON Array ONLY. Keys: course_code, course_name, 
+                course_description, prerequisite_codes, course_rank, explanation.
+                Do NOT use Markdown formatting.
+                """.formatted(interests, completedText);
     }
 
     private String buildRequestBody(String prompt) {
