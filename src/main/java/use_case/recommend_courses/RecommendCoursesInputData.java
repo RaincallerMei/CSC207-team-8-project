@@ -11,7 +11,8 @@ public class RecommendCoursesInputData {
     public RecommendCoursesInputData(String interests, List<String> completedCourses) {
         this.interests = interests;
         this.completedCourses = completedCourses;
-        this.api_key = System.getenv("GEMINI_API_KEY");
+        Dotenv dotenv = Dotenv.load();
+        this.api_key = dotenv.get("GEMINI_API_KEY");
     }
 
     public String getInterests() { return interests; }

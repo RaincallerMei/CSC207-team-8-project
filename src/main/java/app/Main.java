@@ -1,62 +1,48 @@
 package app;
 
-import data_access.InMemoryCourseDataAccessObject;
-import storage.AppStateStore;
-import interface_adapter.profile.ProfileController; // Import the new controller
+import interface_adapter.profile.ProfileController;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
-//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
 import use_case.recommend_courses.RecommendCoursesInteractor;
 import ui.CourseExplorerPanel;
 import data_access.GeminiCourseDataAccessObject;
-//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
-//import use_case.recommend_courses.RecommendCoursesInteractor;
+import storage.AppStateStore;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 
 public class Main {
 
-    private static void createAndShowGUI() {
-        // 1. Dependencies (Frameworks/Drivers)
-        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
-        AppStateStore store = new AppStateStore(); // Persistence
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
 
-        // 2. View Model (Interface Adapter)
-        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
+            AppStateStore store = new AppStateStore();
+            RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-        // 3. Presenter (Interface Adapter)
-        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
+            Dotenv dotenv = Dotenv.load();
+            String apiKey = dotenv.get("GEMINI_API_KEY");
 
-        // 4. Interactor (Use Case)
-        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
+            ProfileController profileController = new ProfileController(store, viewModel);
+            RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
 
-        // 5. Controllers (Interface Adapters)
-        RecommendCoursesController recommendController = new RecommendCoursesController(interactor);
-        ProfileController profileController = new ProfileController(store, viewModel); // New!
+            // 2. Pass the key into the DAO Constructor
+            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
 
-        // 6. View (Frameworks/Drivers)
-        JFrame frame = new JFrame("UofT Course Explorer & Planner");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            // 4. Create the Interactor (The "Brain") now accept the Presenter, not just the DAO.
+            RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
 
-        // Inject both controllers into the View
-        CourseExplorerPanel mainPanel = new CourseExplorerPanel(recommendController, profileController, viewModel);
-        frame.add(mainPanel);
-
-        frame.pack();
-        frame.setSize(1000, 650);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
+            // 5. Create the Controller (Accepts Input)
+            RecommendCoursesController controller = new RecommendCoursesController(interactor);
 
             // 6. Create the View (The Panel you provided)
-            CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
+            CourseExplorerPanel view = new CourseExplorerPanel(controller, profileController, viewModel);
 
             // 7. Setup the Frame
             JFrame frame = new JFrame("UofT Course Explorer & Planner");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+            CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, profileController, viewModel);
             frame.add(mainPanel);
             frame.pack();
             frame.setSize(1000, 650); // Set a reasonable default size
