@@ -17,13 +17,13 @@ public class DefaultKeywordSuggester implements KeywordGenerator {
 
     @Override
     public List<String> generate(List<String> orderedInterests) {
-        // Simple, deterministic: concatenate mapped lists in the given order, de-dup while preserving order.
+
         LinkedHashSet<String> out = new LinkedHashSet<>();
         for (String k : orderedInterests) {
             List<String> kws = MAP.getOrDefault(k, List.of(k));
             out.addAll(kws);
         }
-        // Return a plain list; formatting (commas, etc.) is a UI concern.
+
         return new ArrayList<>(out);
     }
 }

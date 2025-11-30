@@ -7,9 +7,9 @@ public class WeightedKeywordGenerator implements KeywordGenerator {
     private static final Map<String, List<WeightedKeyword>> KEYWORD_WEIGHTS = Map.of(
             "Analyzing data and patterns", List.of(
                     new WeightedKeyword("data analysis", 10),
-                    new WeightedKeyword("statistics", 9),
                     new WeightedKeyword("science", 9),
-                    new WeightedKeyword("machine learning", 8)
+                    new WeightedKeyword("statistics", 8),
+                    new WeightedKeyword("machine learning", 7)
             ),
             "Creating visual designs / art", List.of(
                     new WeightedKeyword("design", 10),
@@ -20,8 +20,8 @@ public class WeightedKeywordGenerator implements KeywordGenerator {
             "Solving complex problems", List.of(
                     new WeightedKeyword("algorithms", 10),
                     new WeightedKeyword("logic", 9),
-                    new WeightedKeyword("math", 9),
-                    new WeightedKeyword("theory", 8)
+                    new WeightedKeyword("math", 8),
+                    new WeightedKeyword("theory", 7)
             ),
             "Helping and teaching", List.of(
                     new WeightedKeyword("education", 10),
