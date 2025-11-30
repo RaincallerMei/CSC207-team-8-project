@@ -52,11 +52,9 @@ public class WeightedKeywordGenerator implements KeywordGenerator {
             int positionWeight = orderedInterests.size() - i;
 
             List<WeightedKeyword> weightedKeywords = KEYWORD_WEIGHTS.get(interest);
-            if (weightedKeywords != null) {
-                for (WeightedKeyword wk : weightedKeywords) {
-                    int score = wk.baseWeight * positionWeight;
-                    keywordScores.merge(wk.keyword, score, Integer::sum);
-                }
+            for (WeightedKeyword wk : weightedKeywords) {
+                int score = wk.baseWeight * positionWeight;
+                keywordScores.merge(wk.keyword, score, Integer::sum);
             }
         }
 
