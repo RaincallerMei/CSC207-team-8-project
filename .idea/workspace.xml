@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/entity/WeightedKeywordGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entity/WeightedKeywordGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/entity/DefaultKeywordSuggester.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/entity/DefaultKeywordSuggester.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +43,19 @@
   }
 }</component>
   <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="app.Main" />
+      <module name="TeamProject" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="app.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="CSC207-team-8-project" />
       <method v="2">
@@ -54,6 +67,11 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -73,7 +91,7 @@
       <workItem from="1764453947764" duration="303000" />
       <workItem from="1764454332389" duration="80000" />
       <workItem from="1764454543951" duration="5000" />
-      <workItem from="1764458128284" duration="5885000" />
+      <workItem from="1764458128284" duration="9179000" />
     </task>
     <servers />
   </component>
