@@ -38,13 +38,13 @@ This project utilizes the **Google Gemini Developer API** (Model: `gemini-2.5-fl
 
 ### 1. Interest Survey & Settings
 *The main input area where users enter interests, manage their history, and securely set their API key.*
-![Interest Survey UI](images/survey_ui_placeholder.png)
+
 <img width="295" height="617" alt="Right panel" src="https://github.com/user-attachments/assets/f77b12a7-9155-40b4-bfa0-6a87996b4a0d" />
 
 
 ### 2. Course Recommendations (Accordion View)
 *The results panel showing a list of recommended courses. Clicking a course expands it to reveal details, prerequisites, and the AI's relevance explanation.*
-![Accordion View UI](images/accordion_ui_placeholder.png)
+
 <img width="689" height="610" alt="Left Panel" src="https://github.com/user-attachments/assets/ea3d1bda-1624-4f8e-bb2e-ed2cccc88a56" />
 
 ---
