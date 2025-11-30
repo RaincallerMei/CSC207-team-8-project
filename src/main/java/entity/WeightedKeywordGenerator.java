@@ -60,7 +60,7 @@ public class WeightedKeywordGenerator implements KeywordGenerator {
 
         return keywordScores.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .limit(8) // Return top 8 keywords
+                .limit(6) // Return top 6 keywords
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
