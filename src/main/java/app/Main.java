@@ -9,7 +9,6 @@ import use_case.recommend_courses.RecommendCoursesInteractor;
 import ui.CourseExplorerPanel;
 import data_access.GeminiCourseDataAccessObject;
 import storage.AppStateStore;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.swing.*;
 
@@ -21,34 +20,29 @@ public class Main {
             AppStateStore store = new AppStateStore();
             RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
 
-            Dotenv dotenv = Dotenv.load();
-            String apiKey = dotenv.get("GEMINI_API_KEY");
-
             ProfileController profileController = new ProfileController(store, viewModel);
             RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
 
-            // 2. Pass the key into the DAO Constructor
-            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject(apiKey);
+            // 1. Create Data Access (No API Key needed at startup)
+            GeminiCourseDataAccessObject dao = new GeminiCourseDataAccessObject();
 
-            // 4. Create the Interactor (The "Brain") now accept the Presenter, not just the DAO.
+            // 2. Create Interactor
             RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
 
-            // 5. Create the Controller (Accepts Input)
+            // 3. Create Controller
             RecommendCoursesController controller = new RecommendCoursesController(interactor);
 
-            // 6. Create the View (The Panel you provided)
-            CourseExplorerPanel view = new CourseExplorerPanel(controller, profileController, viewModel);
-
-            // 7. Setup the Frame
+            // 4. Create View
             JFrame frame = new JFrame("UofT Course Explorer & Planner");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
             CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, profileController, viewModel);
             frame.add(mainPanel);
+
             frame.pack();
-            frame.setSize(1000, 650); // Set a reasonable default size
-            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setSize(1000, 650);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }
-
 }
