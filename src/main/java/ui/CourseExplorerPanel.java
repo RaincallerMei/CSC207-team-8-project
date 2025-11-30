@@ -3,6 +3,7 @@ package ui;
 import entity.Course;
 import entity.DefaultKeywordSuggester;
 import entity.KeywordGenerator;
+import entity.WeightedKeywordGenerator;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
 import storage.AppStateStore;
@@ -46,7 +47,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
     public CourseExplorerPanel(RecommendCoursesController controller,
                                RecommendCoursesViewModel viewModel) {
-        this(controller, viewModel, new DefaultKeywordSuggester());
+        this(controller, viewModel, new WeightedKeywordGenerator());
     }
 
     public CourseExplorerPanel(RecommendCoursesController controller,
