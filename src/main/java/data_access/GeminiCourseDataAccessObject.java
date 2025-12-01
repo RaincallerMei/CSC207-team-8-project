@@ -20,13 +20,11 @@ import java.util.regex.Pattern;
 
 public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessInterface {
 
-    private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-    private final String apiKey; // Store the key here
+    private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private final HttpClient httpClient;
 
-    // Update Constructor to accept apiKey
-    public GeminiCourseDataAccessObject(String apiKey) {
-        this.apiKey = apiKey;
+    // No API Key in constructor anymore!
+    public GeminiCourseDataAccessObject() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(60))
                 .build();
@@ -34,6 +32,11 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     @Override
     public List<Course> getRecommendations(String interests, List<String> completedCourses, String apiKey) {
+        // Validate Key at runtime when the button is clicked
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalArgumentException("API Key is missing. Please set it in the settings.");
+        }
+
         if (interests == null || interests.trim().isEmpty()) {
             throw new IllegalArgumentException("At least one interest is required");
         }
@@ -42,9 +45,9 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             String prompt = buildPrompt(interests, completedCourses);
             String requestBody = buildRequestBody(prompt);
 
-            // Use 'this.apiKey' instead of the method argument
+            // Use the passed 'apiKey' argument here
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(GEMINI_ENDPOINT + "?key=" + this.apiKey))
+                    .uri(URI.create(GEMINI_ENDPOINT + "?key=" + apiKey))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
@@ -58,12 +61,9 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             }
 
             if (response.statusCode() != 200) {
-                // This is where your 404 is coming from.
-                // If it prints 404 here, the URL above is incorrect or the model name is wrong.
                 throw new RuntimeException("Gemini API Failed: " + response.statusCode() + " " + response.body());
             }
 
-            // Check if blocked by copyright (Recitation error)
             if (response.body().contains("\"finishReason\": \"RECITATION\"")) {
                 System.err.println("Gemini blocked output due to Copyright/Recitation.");
                 return new ArrayList<>();
@@ -87,7 +87,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             try {
                 String code = extractValue(objStr, "course_code");
 
-                // Prevent Duplicates
                 if (seenCodes.contains(code) || code.equals("N/A")) {
                     continue;
                 }
@@ -128,20 +127,20 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     private String buildPrompt(String interests, List<String> completedCourses) {
         String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
-        return """
-                You are a course recommendation assistant for UofT.
-                Interests: %s
-                Completed: %s
-                Task: Recommend 3-5 valid UofT courses. 
-                STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.
-                
-                CRITICAL: Summarize course descriptions in your own words. 
-                DO NOT copy text verbatim from the web to avoid copyright blocks.
-                
-                Output JSON Array ONLY. Keys: course_code, course_name, 
-                course_description, prerequisite_codes, course_rank, explanation.
-                Do NOT use Markdown formatting.
-                """.formatted(interests, completedText);
+        // Using String.format for Java 11 compatibility as requested previously
+        return String.format(
+                "You are a course recommendation assistant for UofT.\n" +
+                        "Interests: %s\n" +
+                        "Completed: %s\n" +
+                        "Task: Recommend 3-5 valid UofT courses.\n" +
+                        "STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.\n\n" +
+                        "CRITICAL: Summarize course descriptions in your own words.\n" +
+                        "DO NOT copy text verbatim from the web to avoid copyright blocks.\n\n" +
+                        "Output JSON Array ONLY. Keys: course_code, course_name,\n" +
+                        "course_description, prerequisite_codes, course_rank, explanation.\n" +
+                        "Do NOT use Markdown formatting.",
+                interests, completedText
+        );
     }
 
     private String buildRequestBody(String prompt) {
@@ -164,12 +163,10 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         String rawContent = responseBody.substring(startQuote + 1, endQuote);
         String unescaped = rawContent.replace("\\\"", "\"").replace("\\n", " ");
 
-        // Remove markdown wrappers if present
         if (unescaped.contains("```")) {
             unescaped = unescaped.replaceAll("```json", "").replaceAll("```", "");
         }
 
-        // Isolate the array brackets
         int arrayStart = unescaped.indexOf('[');
         int arrayEnd = unescaped.lastIndexOf(']');
         if (arrayStart >= 0 && arrayEnd > arrayStart) {
