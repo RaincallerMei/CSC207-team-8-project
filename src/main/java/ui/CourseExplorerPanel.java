@@ -1,8 +1,8 @@
 package ui;
 
 import entity.Course;
-import entity.DefaultKeywordSuggester;
 import entity.KeywordGenerator;
+import entity.WeightedKeywordGenerator;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
@@ -42,10 +42,17 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     public CourseExplorerPanel(RecommendCoursesController recommendController,
                                ProfileController profileController,
                                RecommendCoursesViewModel viewModel) {
-        this.recommendController = recommendController;
+        this(recommendController, profileController, viewModel, new WeightedKeywordGenerator());
+    }
+
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               ProfileController profileController,
+                               RecommendCoursesViewModel viewModel,
+                               KeywordGenerator keywordGenerator) {
+        this.recommendController = controller;
         this.profileController = profileController;
         this.viewModel = viewModel;
-        this.keywordGenerator = new DefaultKeywordSuggester(); // Defaulting for simplicity
+        this.keywordGenerator = keywordGenerator;
 
         // 1. Observe the ViewModel (Reactive UI)
         this.viewModel.addPropertyChangeListener(this);
