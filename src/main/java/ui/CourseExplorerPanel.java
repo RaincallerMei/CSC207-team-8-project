@@ -42,13 +42,15 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     public CourseExplorerPanel(RecommendCoursesController recommendController,
                                ProfileController profileController,
                                RecommendCoursesViewModel viewModel) {
-        this(recommendController, viewModel, new WeightedKeywordGenerator());
+        this(recommendController, profileController, viewModel, new WeightedKeywordGenerator());
     }
 
     public CourseExplorerPanel(RecommendCoursesController controller,
+                               ProfileController profileController,
                                RecommendCoursesViewModel viewModel,
                                KeywordGenerator keywordGenerator) {
-        this.controller = controller;
+        this.recommendController = controller;
+        this.profileController = profileController;
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
 
