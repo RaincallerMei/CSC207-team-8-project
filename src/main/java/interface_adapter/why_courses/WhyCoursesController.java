@@ -1,3 +1,8 @@
+package interface_adapter.why_courses;
+
+import use_case.why_courses.WhyCoursesInputBoundary;
+import use_case.why_courses.WhyCoursesInputData;
+
 public class WhyCoursesController {
 
     private final WhyCoursesInputBoundary interactor;
