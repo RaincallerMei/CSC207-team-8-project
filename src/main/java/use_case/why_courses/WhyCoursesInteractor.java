@@ -1,18 +1,33 @@
-package use_case_why_courses;
+package use_case.why_courses;
 
 public class WhyCoursesInteractor implements WhyCoursesInputBoundary {
 
     private final WhyCoursesDataAccessInterface dataAccess;
-    private final WhyCoursesOutputBoundary outputBoundary;
+    private final WhyCoursesOutputBoundary presenter;
 
     public WhyCoursesInteractor(WhyCoursesDataAccessInterface dataAccess,
-                                WhyCoursesOutputBoundary outputBoundary) {
+                                WhyCoursesOutputBoundary presenter) {
         this.dataAccess = dataAccess;
-        this.outputBoundary = outputBoundary;
+        this.presenter = presenter;
     }
 
     @Override
     public void execute(WhyCoursesInputData inputData) {
+        String code = inputData.getCourseCode();
 
+        if (code == null || code.isEmpty()) {
+            presenter.prepareFailView("Invalid course code.");
+            return;
+        }
+
+        String reason = dataAccess.getReasonForCourse(code);
+
+        if (reason == null) {
+            presenter.prepareFailView("No reason found for course: " + code);
+            return;
+        }
+
+        WhyCoursesOutputData output = new WhyCoursesOutputData(code, reason);
+        presenter.prepareSuccessView(output);
     }
 }

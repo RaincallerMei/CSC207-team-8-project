@@ -1,4 +1,4 @@
-package use_case_why_courses;
+package use_case.why_courses;
 
 public class WhyCoursesOutputData {
 
