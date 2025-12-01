@@ -1,0 +1,27 @@
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"KubernetesApiProvider\"><![CDATA[{}]]></component>\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"corretto-24\" project-jdk-type=\"JavaSDK\" />\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision cdd20d085174069c78f16a33789a457bade316e9)
++++ b/.idea/misc.xml	(date 1764618841183)
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+-  <component name="KubernetesApiProvider"><![CDATA[{}]]></component>
++  <component name="KubernetesApiProvider">{}</component>
+   <component name="MavenProjectsManager">
+     <option name="originalFiles">
+       <list>
+@@ -9,5 +9,5 @@
+       </list>
+     </option>
+   </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="corretto-24" project-jdk-type="JavaSDK" />
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="corretto-24" project-jdk-type="JavaSDK" />
+ </project>
+\ No newline at end of file
