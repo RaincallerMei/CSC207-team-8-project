@@ -4,35 +4,70 @@
       "content": {
         "parts": [
           {
-            "text": "Based on your interests (\"dd\" and \"popp\") and the requirement to recommend 3-5 valid UofT courses for the 2024-2025 academic year, here are some suggestions. I have summarized the course descriptions in my own words.\n\n"
-          },
-          {
-            "text": "```json\n[\n  {\n    \"course_code\": \"PPG301H1\",\n    \"course_name\": \"Introduction to Public Policy\",\n    \"course_description\": \"This course offers an introduction to the study of public policy, the policy-making process, and Canadian policy institutions. It explores how issues emerge, how ideas are framed, priorities are established, and agendas are managed. It also examines how formal and informal rules shape policy-making in Canada.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"This course provides a foundational understanding of public policy, which aligns with the 'policy' aspect potentially related to 'popp'. It also introduces the Canadian context.\"\n  },\n  {\n    \"course_code\": \"PPG410H1\",\n    \"course_name\": \"Advanced Topics in Public Policy\",\n    \"course_description\": \"This course delves into a specific advanced topic in public policy, which varies depending on the instructor's research interests. The topics and instructor are subject to change each time the course is offered.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"This course allows for exploration of current issues. The 'popp' interest could potentially be explored within the context of a specific policy topic if available.\"\n  },\n  {\n    \"course_code\": \"ANT194H1\",\n    \"course_name\": \"Human-nonhuman relations through Manga & Anime\",\n    \"course_description\": \"This course explores human relationships with non-human beings (animals, plants, technology, spirits) through the lens of Japanese manga and anime.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"This course may relate to 'dd' if interpreted as an interest in design and digital media, using popular visual culture as a medium for exploration.\"\n  },\n  {\n    \"course_code\": \"PPG1004H\",\n    \"course_name\": \"Quantitative Methods for Policy Analysis\",\n    \"course_description\": \"This course teaches quantitative methods used in policy analysis. It requires knowledge of high school mathematics, especially algebra and working with graphs and fractions. Students who don't pass this course may need to retake a math-stats prep course.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Develops analytical skills, which are broadly applicable. Public Policy courses align with the 'popp' interest.\"\n  },\n  {\n    \"course_code\": \"VIC162H1\",\n    \"course_name\": \"Cultural Forms and Science Fiction\",\n    \"course_description\": \"This course explores science fiction as a genre, media industry, and sociocultural phenomenon. It examines key themes, texts, creators, audiences, and its place in contemporary culture. Course content is chosen by both the class and the instructor. Open to first-year students only.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"If 'dd' is interpreted as an interest in design or dystopian themes, this course offers a relevant exploration through the science fiction genre.\"\n  }\n]\n```"
+            "text": "```json\n[\n  {\n    \"course_code\": \"CSC373H1\",\n    \"course_name\": \"Algorithm Design, Analysis & Complexity\",\n    \"course_description\": \"This course dives into standard algorithm design techniques such as divide-and-conquer, greedy strategies, dynamic programming, linear programming, randomization, network flows, and approximation algorithms. You'll learn to apply these techniques, reason about the correctness and complexity of algorithms, and potentially touch on NP-completeness.\",\n    \"prerequisite_codes\": [\n      \"CSC263H1\",\n      \"CSC265H1\",\n      \"CSC263H5\",\n      \"CSCB63H3\"\n    ],\n    \"course_rank\": 5,\n    \"explanation\": \"Builds directly upon your existing knowledge from CSC207 and CSC148, focusing on more advanced algorithm design, which is crucial for software engineering and machine learning.\"\n  },\n  {\n    \"course_code\": \"STA302H1\",\n    \"course_name\": \"Methods of Data Analysis I\",\n    \"course_description\": \"An introductory course to data analysis that emphasizes regression methods. Topics covered include initial data examination, correlation, simple and multiple regression models using least squares, inference for regression parameters, confidence and prediction intervals, diagnostics and remedial measures, interactions and dummy variables, and variable selection. You'll also explore least squares estimation and inference for non-linear regression.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"This course provides a strong foundation in statistical data analysis and regression, essential for data science and machine learning. It will equip you with the tools to analyze and interpret data effectively.\"\n  },\n  {\n    \"course_code\": \"CSC318H1\",\n    \"course_name\": \"The Design of Interactive Computational Media\",\n    \"course_description\": \"This course explores user-centered design of interactive systems, covering methodologies, principles, metaphors, and task analysis. It delves into interdisciplinary design, considering the roles of graphic design, industrial design, and the behavioral sciences. You'll learn about interactive hardware and software, including concepts from computer graphics, typography, layout, color, sound, video, and gesture. The course also covers classes of interactive graphical media, direct manipulation systems, extensible systems, and rapid prototyping tools. Expect to work on projects in interdisciplinary teams.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in design, graphics, UI/UX, this course is a natural fit. It provides a solid foundation in user-centered design principles and methodologies, and allows you to apply what you learn through project work.\"\n  },\n  {\n    \"course_code\": \"CSC309H1\",\n    \"course_name\": \"Programming on the Web\",\n    \"course_description\": \"An introduction to software development for the web. This course covers the concepts behind web programs, surveys technological alternatives, and provides in-depth study of specific technologies. Topics include internet and web operational concepts, static and dynamic client content, dynamically served content, n-tiered architectures, web development processes, and security.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Addresses your interest in web development, frontend, and backend technologies. It provides a comprehensive overview of web programming concepts and practices.\"\n  }\n]\n```"
           }
         ],
         "role": "model"
       },
       "finishReason": "STOP",
+      "citationMetadata": {
+        "citationSources": [
+          {
+            "startIndex": 1072,
+            "endIndex": 1281,
+            "uri": "https://www.statistics.utoronto.ca/graduate/graduate-course-descriptions"
+          },
+          {
+            "startIndex": 1072,
+            "endIndex": 1281,
+            "uri": "https://artsci.calendar.utoronto.ca/course/sta302h1"
+          }
+        ]
+      },
       "groundingMetadata": {
         "searchEntryPoint": {
-          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGHc41PZLzap9OzVudt3mz6RatWnHdHlMEuSYT8QyDAH5XiSDf8MjVqxvMQifS4juaI-zN54-GyZcypeeYQLrnPjbmp4ZVm0UAkjOXfe_22FFtts4D_77AT0dPl5JJ1xg1wRra8Yv6obMIkhSvlvmLx_ZaDIWQFEPfqtawpnuGPagnrWYRnirdQQUrg7bK0hLYKzVNtCpxfZnl9vei9yk7D\"\u003eUofT course calendar 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGNjZrMEYX0C_Zxpy7lft2Qza7XEeXcyNMwOcTWTaUw399m8zYKvYN6nRzWFAp9lHy0dxnYPs9uxKsW597YmG9OcbIhPw5V2Q0DEXM3JPELZQ02vRM_cxuKbwTp_bPnoldx7ZUnYodh5R5pmp8Vi9oP34rCab7uG7tY49nkKzdNKrEyyoI2tCvXWHcTNcs=\"\u003e &quot;popp&quot;\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgf3qkrOAufLZZSxMiA-KPZUJ3kcvUzySqRcMllphWwaUBYQJSXhya74nmv-q2VgNJfjLlgqH0iriwZUZlBopgU3kffCSgFZsdR9VocNqRCPPkqVz4qUIWyulfXQ4JoTK7X7aMFIrtUfDcgQdbzKTMJOfWfTxzj0prZ3U4l5Ivh0775cP8Bz7XlVI3\"\u003e &quot;dd&quot;\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGjMJnKAvn31cV3sjSn_Fyi8PVtOUuNdcyflDOgDP77YmCwiV3dUMsN6q88CRGerIWbOYxl358dQJuxOzGsqiXGC4B73zJhDdQF_shcJC_MKZfnQYYXfDiyU7Mq9mUxqQqV1zB9ZWIAYKQCpMAh778qLCF4AJclHIwPEDb2VSGSyVWMsUFi0Rv00aZdlYWXPq3\"\u003eUofT courses dd\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHnSSF394xH-Wu7Zw-GqGHs2Yyak-JRXoEyCbLZPzDVQkUyYb58j9xFc4PvdwpP7ZtPACR2fq2DB22PztC3KEdeM_P_LUnuhAgzB_64eeftyxxr6hHwXq4vbtX-_Of-77eWdyQspk-SFVBhaE32IL_wV52voJdf22UIU8IflCwW2IkYP1Gl63_8s_hXqCjw3JfoWfo=\"\u003eUofT courses popp\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFlDn_s-z9yPwPt6OAJ_gX2K9R2qFED_8IEbLnSo_NQiwk0sWdq7alYVPuR0WpLbdkqRC89LJWk_XvJnYw9D5qaI9nYzyHeKW1OB7h40kp4G97XbwXg5drnB_XtSexqqUXJUdBwui5XpkFL6YN9kGkVH-K9z71_knGEqVXftQsER4OKJkVGww7hsMEdUcy15a2r3r7yoUJGE4fyFGUb27Yo0A==\"\u003eUofT CSC309 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH4-eyqxTcLivcezbRtshT6QQJM7IeHerOQw6lSuNsFH5hkdShsJWdaG9yFDAWVQrnnza1Z4BEqwlG-YDWQjxx7HdgRfrPt40oXESwhUDXg7uLu522mjJzcF0JeGcViAfEom27w-tmIHukDIP4Rk--BK-7Tkni-eNiH3FZ_TSZR2mDd4RBLyZx7uwzz-1ORODcddFuE7dyN4M_FYFhhh0oEVg==\"\u003eUofT CSC373 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQESWeMsoawi0r4bT3C9Uospf8b9U-2JRb7qeVaCZU0d22D9Gyz4HwAB6ogo8nm0OqAsaIO3kkHVfUNsz67hXdOL9rugIXlh3WQ4-T29uSlrI1JS7nQHZv0GBVtE_Nbj2UfDhhUOaO1f5bxQwGwgEDJfCRWLpy8OAyvOgb8s5V3KeQYxUiJXf-i3_4Yyzj4i_qgxo-cYy8-ZyTGtKVhkAuGN5Cy2GTLYW3zDbQ9VMaFBpTT9xVFItupmb4OjgBV4EA7UWusR9K2FIyjuuo1KpxdvGoabRUVnb1q_FV2-GDPOL_mGkIQouAH4JlWhfrAk_EF-GeUvht0eh3plyTMj6I0QsWbY5i_k7QgyK8mOmWSD6v_zkN8amim2y-3g0JwTyPdBcEwHosmcwRb8JudzS9pd6Mhq1Ap-cCAhOhIaRP7oPjHZdRno1tvsTbtwp6GyIwtfoc9o8-dpGsPc13x5L1j9f-JPNvI2DWqckvrHqg8VfZMG5oLxaNCjXq_v2WBqkrsiScdIHDc9YGqhzPQtFsQuZ5wGR9ELrj0RyMCrdu8=\"\u003eUofT courses data analysis statistics machine learning design graphics ui ux algorithms logic theory education mentorship communication web development frontend backend software engineering entrepreneurship product leadership management prerequisite CSC207 CSC148 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHlZqNtzOBANNA6wscZbAnWqHW8HpUdUvwUGb6Ulhn0ScTidpEgQVgs75-40a0oHiGWQt_FtRiQjGY3WpnRscAJHhxqw0aQd_3cYsCkD35WQhy3sQAS2_jOHPW1wA1a2BTGIvveDEMatuzymQdo7W6RHGaQjcUrJ-f01UmjDylalRWI4aJRfS7Iep6Lg-RmM_oSN-V57CYu8r9sN-cd7JetlA==\"\u003eUofT STA302 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH6aGzf7enveB3vY8z8d9XMHWlK_B9ivh970QZt4M1jCo2IWIoCzqmyuEJOoNn_74bpvRiXOz_B-Jt_El6g6BmE2NmDKDvXSpTBoDWhagL-mfxtplG_Xxdl-k52CkYyyja7BFDlERfolqaBdJi2e-ixNKq_wh5JhtW-CLJVV7hTej61PzNxSAO5wITqetBRcJKyHdkZYMMwT6AH6-lbeGXnVQ==\"\u003eUofT MGT201 2024-2025 calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFRX-MqIk7GUGXzEIKjPcW5TH6OFTdQtD38Yd9yqd8RZmTr18AJe_wzJFuhhu7PLFsuOqruVWn1EXUTAaTI5zsI9L0ASUZ1SY_FrN26dHCbMsXbHssSr0oqzBEDhXIkCI26lMX9OSq83XrlljJXws_2wW8LRfS-Ajbw4HS6rOlO-D7pgBxaXgm5YNTlnOoU20RtL9HH54tWwMAnkVYp3cknQQ==\"\u003eUofT CSC318 2024-2025 calendar\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
         },
         "groundingChunks": [
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFygiEaR82dMT24vXRYzPu2SC2Ka7qitcwkAZLAM2InYgRgI8lE-60KiK5LVk1_7yY-nzCvodU4FPzRyz9vgJ0fwI9MWpuh8wRt7ZCJp8DL6pm56HTzOwEueAkrTAl2e3SJVpEnGVDrL3W4mG9IIZDPrp4H",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG6t_Cvo0O0gOQWgWFuua0odIO7W7r3RIfVUwvSGVTs7orq6Ci-1iTT9MT6JLPZAGHu6NoIvvpW7hwEYgCH_SJrwbEtlqQ2DK_diBDssJLHV8xeDRuz9X0eGbCVIxBXTC7wrCzPPN3JjUl4lmcNFw==",
               "title": "utoronto.ca"
             }
           },
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHyAiB5FQ4eWaCSrBxZgVOym0lb0CJ1ouZph9Ytimic8ekpcibzOkkxFEf4ScKd72fmQtqkO8QPXpjgdl_lIjnsh_Q0cTIl_o--EBqYXLTcZVEEOLu4T8RCoF0Cn_IbopO5e1wqLQOz2LFoNPShFMq20f8jpmlY3eMC6j41",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHAvs4kknNn89hZ7S1sGpRRhTs4qXoS7BENDCGtrnq0a2vRkBHnO5u1jKAv0YbYY7bNWNtcdkgOs3CuMfbf6cE9AHM6w_xZDB2vvjqUUeFTbyZHAHWfJOqIM2J92E6MS7vdx3hDXgUA3SehwID2Qw==",
               "title": "utoronto.ca"
             }
           },
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFhshCAvGumk_w7VmKoiThu8ZeE3t5wPEesna0yKrVB0fNKgm6CvM2d4_IOoSlLmxi-r82H3cQeu4x0im-TyGgiwUFc4Jr1BO-zZplL52gW0CMsOLxkUH_5l9_RQSWUwmR1OwoJ",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgyzeuc1nxrTlBkzS5x5X67k14xvJLtCXYnmmQxVwycXK9uNxYuEsG9hJJrSiqL-7FgfPOKOF0QYojJyyAxc5UmubGf2zBqYt5fb9Y3PMthSjH0i5VUFP10luIGPVjhJWOqIY4f5UhjJPWrLSLdg==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEI02r3i0oG7uuMe3tpk-Ui5i6KbwGL0TXH61ARUvqvAanN_4GowHXVr6dUdpEPqj01SjYe73xy9WlfiIQxPPnZanqzaDfmCaXvnaYYAgbfnG9_BJcf4PK9Kd3cC0_0MAwOZ0xPaeyUkGIe8JhVn3q6ddt_p4i81hkYdlqdCM-OjJXlKVE_fEul1hkXeA_owJdl",
+              "title": "toronto.edu"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEdF8sErXsuLY_mzz4n9nauOHGnjRkagWXYX-oCLWQziXit2yyNq15_tuRQejnjTI5h6VFrfdja1oNxaOUQ3VEVf6Bvo94R6pQp4lSX0wb7QZUNRqEXZc6dBhgO6K69SDuk5258iJCvM6dC5A==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFLiKiQvJUYebjjlQY4kcUjOSNaKu3UOi9lvtp_kfxQMT_XV6FG_JWctkau04PJcYEo-YsD-hJnTQJjzlq-IKaBiKDJxbSZ7KK3RDB9knvsd17vKmEh_X4qoYamGXUtVm07QGl26efZaYxBpWYqfA==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFILo5oE62pK3_c2bjgY8iviVlFzjRomRV4wnIXEiVgIQ0pUJ_ajgLzX6crG0Ekxyv0yhrsXqCuJE6UFpiK8rLy43giSPnkQGjn8hz_X97MAcTffs3Edxjv7mEDBZAfM55F2NlO8AvWeGMxBg==",
               "title": "utoronto.ca"
             }
           }
@@ -40,111 +75,230 @@
         "groundingSupports": [
           {
             "segment": {
-              "startIndex": 575,
-              "endIndex": 651,
-              "text": "It also examines how formal and informal rules shape policy-making in Canada"
+              "startIndex": 342,
+              "endIndex": 481,
+              "text": "You'll learn to apply these techniques, reason about the correctness and complexity of algorithms, and potentially touch on NP-completeness"
             },
             "groundingChunkIndices": [
               0
             ],
             "confidenceScores": [
-              0.57329637
+              0.7262923
             ]
           },
           {
             "segment": {
-              "startIndex": 1159,
-              "endIndex": 1238,
-              "text": "The topics and instructor are subject to change each time the course is offered"
+              "startIndex": 482,
+              "endIndex": 808,
+              "text": "\",\n    \"prerequisite_codes\": [\n      \"CSC263H1\",\n      \"CSC265H1\",\n      \"CSC263H5\",\n      \"CSCB63H3\"\n    ],\n    \"course_rank\": 5,\n    \"explanation\": \"Builds directly upon your existing knowledge from CSC207 and CSC148, focusing on more advanced algorithm design, which is crucial for software engineering and machine learning"
             },
             "groundingChunkIndices": [
               0
             ],
             "confidenceScores": [
-              0.8810482
+              0.013043931
             ]
           },
           {
             "segment": {
-              "startIndex": 1368,
-              "endIndex": 1761,
-              "text": "The 'popp' interest could potentially be explored within the context of a specific policy topic if available.\"\n  },\n  {\n    \"course_code\": \"ANT194H1\",\n    \"course_name\": \"Human-nonhuman relations through Manga & Anime\",\n    \"course_description\": \"This course explores human relationships with non-human beings (animals, plants, technology, spirits) through the lens of Japanese manga and anime"
+              "startIndex": 1003,
+              "endIndex": 1289,
+              "text": "Topics covered include initial data examination, correlation, simple and multiple regression models using least squares, inference for regression parameters, confidence and prediction intervals, diagnostics and remedial measures, interactions and dummy variables, and variable selection"
             },
             "groundingChunkIndices": [
               1
             ],
             "confidenceScores": [
-              0.14821503
+              0.8753714
             ]
           },
           {
             "segment": {
-              "startIndex": 1762,
-              "endIndex": 2180,
-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"This course may relate to 'dd' if interpreted as an interest in design and digital media, using popular visual culture as a medium for exploration.\"\n  },\n  {\n    \"course_code\": \"PPG1004H\",\n    \"course_name\": \"Quantitative Methods for Policy Analysis\",\n    \"course_description\": \"This course teaches quantitative methods used in policy analysis"
-            },
-            "groundingChunkIndices": [
-              2
-            ],
-            "confidenceScores": [
-              0.31575888
-            ]
-          },
-          {
-            "segment": {
-              "startIndex": 2290,
-              "endIndex": 2369,
-              "text": "Students who don't pass this course may need to retake a math-stats prep course"
-            },
-            "groundingChunkIndices": [
-              2
-            ],
-            "confidenceScores": [
-              0.0047545545
-            ]
-          },
-          {
-            "segment": {
-              "startIndex": 2931,
-              "endIndex": 2963,
-              "text": "Open to first-year students only"
+              "startIndex": 1291,
+              "endIndex": 1375,
+              "text": "You'll also explore least squares estimation and inference for non-linear regression"
             },
             "groundingChunkIndices": [
               1
             ],
             "confidenceScores": [
-              0.08319971
+              0.58303106
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1586,
+              "endIndex": 1660,
+              "text": "It will equip you with the tools to analyze and interpret data effectively"
+            },
+            "groundingChunkIndices": [
+              1
+            ],
+            "confidenceScores": [
+              0.011007241
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1660,
+              "endIndex": 1928,
+              "text": ".\"\n  },\n  {\n    \"course_code\": \"CSC318H1\",\n    \"course_name\": \"The Design of Interactive Computational Media\",\n    \"course_description\": \"This course explores user-centered design of interactive systems, covering methodologies, principles, metaphors, and task analysis"
+            },
+            "groundingChunkIndices": [
+              2,
+              3
+            ],
+            "confidenceScores": [
+              0.6785524,
+              0.64430046
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1930,
+              "endIndex": 2058,
+              "text": "It delves into interdisciplinary design, considering the roles of graphic design, industrial design, and the behavioral sciences"
+            },
+            "groundingChunkIndices": [
+              2,
+              3
+            ],
+            "confidenceScores": [
+              0.9550512,
+              0.94003403
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2060,
+              "endIndex": 2209,
+              "text": "You'll learn about interactive hardware and software, including concepts from computer graphics, typography, layout, color, sound, video, and gesture"
+            },
+            "groundingChunkIndices": [
+              2
+            ],
+            "confidenceScores": [
+              0.9390667
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2352,
+              "endIndex": 2405,
+              "text": "Expect to work on projects in interdisciplinary teams"
+            },
+            "groundingChunkIndices": [
+              2,
+              4
+            ],
+            "confidenceScores": [
+              0.7719719,
+              0.7191726
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2559,
+              "endIndex": 2703,
+              "text": "It provides a solid foundation in user-centered design principles and methodologies, and allows you to apply what you learn through project work"
+            },
+            "groundingChunkIndices": [
+              3,
+              2
+            ],
+            "confidenceScores": [
+              0.1171454,
+              0.08207865
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2703,
+              "endIndex": 2869,
+              "text": ".\"\n  },\n  {\n    \"course_code\": \"CSC309H1\",\n    \"course_name\": \"Programming on the Web\",\n    \"course_description\": \"An introduction to software development for the web"
+            },
+            "groundingChunkIndices": [
+              5,
+              6
+            ],
+            "confidenceScores": [
+              0.78598726,
+              0.68753445
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2871,
+              "endIndex": 3012,
+              "text": "This course covers the concepts behind web programs, surveys technological alternatives, and provides in-depth study of specific technologies"
+            },
+            "groundingChunkIndices": [
+              5,
+              6
+            ],
+            "confidenceScores": [
+              0.89504695,
+              0.921625
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 3014,
+              "endIndex": 3194,
+              "text": "Topics include internet and web operational concepts, static and dynamic client content, dynamically served content, n-tiered architectures, web development processes, and security"
+            },
+            "groundingChunkIndices": [
+              5
+            ],
+            "confidenceScores": [
+              0.7939606
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 3350,
+              "endIndex": 3428,
+              "text": "It provides a comprehensive overview of web programming concepts and practices"
+            },
+            "groundingChunkIndices": [
+              5,
+              6
+            ],
+            "confidenceScores": [
+              0.30090246,
+              0.3938369
             ]
           }
         ],
         "retrievalMetadata": {},
         "webSearchQueries": [
-          " \"popp\"",
-          " \"dd\"",
-          "UofT course calendar 2024-2025",
-          "UofT courses popp",
-          "UofT courses dd"
+          "UofT CSC373 2024-2025 calendar",
+          "UofT CSC318 2024-2025 calendar",
+          "UofT courses data analysis statistics machine learning design graphics ui ux algorithms logic theory education mentorship communication web development frontend backend software engineering entrepreneurship product leadership management prerequisite CSC207 CSC148 2024-2025 calendar",
+          "UofT STA302 2024-2025 calendar",
+          "UofT CSC309 2024-2025 calendar",
+          "UofT MGT201 2024-2025 calendar"
         ]
       }
     }
   ],
   "usageMetadata": {
-    "promptTokenCount": 125,
-    "candidatesTokenCount": 779,
-    "totalTokenCount": 904,
+    "promptTokenCount": 177,
+    "candidatesTokenCount": 763,
+    "totalTokenCount": 940,
     "promptTokensDetails": [
       {
         "modality": "TEXT",
-        "tokenCount": 125
+        "tokenCount": 177
       }
     ],
     "candidatesTokensDetails": [
       {
         "modality": "TEXT",
-        "tokenCount": 779
+        "tokenCount": 763
       }
     ]
   },
   "modelVersion": "gemini-2.0-flash",
-  "responseId": "yDYvadK-FOfV_uMPkt7qgAQ"
+  "responseId": "izkvaa2sDqDO_uMPrv-o8AI"
 }
