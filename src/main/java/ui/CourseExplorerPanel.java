@@ -6,6 +6,9 @@ import entity.WeightedKeywordGenerator;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
+import interface_adapter.why_courses.WhyCoursesController;
+import interface_adapter.why_courses.WhyCoursesViewModel;
+import storage.AppStateStore;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,6 +18,10 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main UI panel: left = interest survey, right = recommended courses (accordion).
+ * Listens to RecommendCoursesViewModel. “Why this course?” is handled in CourseResultPanel.
+ */
 public class CourseExplorerPanel extends JPanel implements PropertyChangeListener {
 
     // ==== Dependencies (Clean Architecture: Controllers & ViewModel) ====
@@ -23,6 +30,14 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final RecommendCoursesViewModel viewModel;
     private final KeywordGenerator keywordGenerator;
 
+    // NEW: Why use case wiring
+    private final WhyCoursesController whyController;
+    private final WhyCoursesViewModel whyViewModel;
+
+    // ==== Local Storage / DB ====
+    private final AppStateStore store = new AppStateStore();
+
+    // ==== Survey State ====
     // ==== View State ====
     private final JTextArea interestsArea = new JTextArea();
     private List<String> completedCourses = new ArrayList<>();
@@ -31,6 +46,11 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final JPanel coursesContainer = new JPanel();
     private final CardLayout recommendedCardLayout = new CardLayout();
     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
+    private final JLabel placeholderLabel = new JLabel(
+            "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>" +
+                    "recommended courses will appear here!</i></div></html>",
+            SwingConstants.CENTER
+    );
 
     // Track submit for enabling/disabling
     private JButton submitButton;
@@ -39,6 +59,14 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private static final String CARD_RESULTS = "results";
     private static final String CARD_LOADING = "loading"; // NEW
 
+    // =======================
+    // Constructors
+    // =======================
+
+    // Old 2-arg constructor (for tests or simple wiring)
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               RecommendCoursesViewModel viewModel) {
+        this(controller, viewModel, new DefaultKeywordSuggester(), null, null);
     /**
      * Primary Constructor with Dependency Injection
      */
@@ -48,14 +76,35 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         this(recommendController, profileController, viewModel, new WeightedKeywordGenerator());
     }
 
+    // Old 3-arg constructor (if someone wants custom KeywordGenerator)
     public CourseExplorerPanel(RecommendCoursesController controller,
                                ProfileController profileController,
                                RecommendCoursesViewModel viewModel,
                                KeywordGenerator keywordGenerator) {
+        this(controller, viewModel, keywordGenerator, null, null);
+    }
+
+    // NEW: full injection including Why use case
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               RecommendCoursesViewModel viewModel,
+                               WhyCoursesController whyController,
+                               WhyCoursesViewModel whyViewModel) {
+        this(controller, viewModel, new DefaultKeywordSuggester(), whyController, whyViewModel);
+    }
+
+    // Canonical constructor
+    private CourseExplorerPanel(RecommendCoursesController controller,
+                                RecommendCoursesViewModel viewModel,
+                                KeywordGenerator keywordGenerator,
+                                WhyCoursesController whyController,
+                                WhyCoursesViewModel whyViewModel) {
+        this.controller = controller;
         this.recommendController = controller;
         this.profileController = profileController;
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
+        this.whyController = whyController;
+        this.whyViewModel = whyViewModel;
 
         // Observe the ViewModel
         this.viewModel.addPropertyChangeListener(this);
@@ -125,6 +174,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         }
     }
 
+    // ==========================================================
+    // LEFT PANEL: Survey & User Inputs
+    // ==========================================================
     // =======================
     // USER ACTIONS
     // =======================
@@ -224,6 +276,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         return panel;
     }
 
+    // ==========================================================
+    // RIGHT PANEL: Results (Accordion)
+    // ==========================================================
     private JPanel createRecommendedPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -270,6 +325,97 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         return panel;
     }
 
+    // ==========================================================
+    // CLEAN ARCHITECTURE OBSERVER LOGIC
+    // ==========================================================
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS)) {
+            // Update the UI with the list of Course entities
+            @SuppressWarnings("unchecked")
+            List<Course> courses = (List<Course>) evt.getNewValue();
+            updateResultsView(courses);
+        } else if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_ERROR)) {
+            JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateResultsView(List<Course> courses) {
+        coursesContainer.removeAll();
+
+        if (courses == null || courses.isEmpty()) {
+            recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
+        } else {
+            // Create accordion panels
+            for (Course c : courses) {
+                CourseResultPanel itemPanel =
+                        new CourseResultPanel(c, whyController, whyViewModel);
+                coursesContainer.add(itemPanel);
+            }
+            // Refresh layout
+            coursesContainer.revalidate();
+            coursesContainer.repaint();
+            recommendedCardLayout.show(recommendedCardPanel, CARD_RESULTS);
+        }
+    }
+
+    // ==========================================================
+    // CONTROLLER & HELPER LOGIC
+    // ==========================================================
+
+    private void handleSubmit() {
+        String interests = interestsArea.getText().trim();
+        if (interests.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        // CLEAN ARCHITECTURE: Call Controller, not UseCase directly
+        controller.execute(interests, completedCourses);
+    }
+
+    private void handleSave() {
+        store.saveCoursesAndInterests(completedCourses, interestsArea.getText());
+        JOptionPane.showMessageDialog(this, "Saved locally.", "Save", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void loadSavedStateIntoUI() {
+        try {
+            this.completedCourses = store.loadCoursesTaken();
+            String last = store.loadLastInterests();
+            interestsArea.setText(last);
+        } catch (Exception e) {
+            System.err.println("Failed to load saved state: " + e.getMessage());
+        }
+    }
+
+    // ==========================================================
+    // DIALOG HELPERS
+    // ==========================================================
+
+    private void openApiKeyDialog() {
+        ApiKeyDialog d = new ApiKeyDialog(this, store);
+        d.setVisible(true);
+    }
+
+    private void openCoursesTakenDialog() {
+        CoursesTakenDialog dialog = new CoursesTakenDialog(this, completedCourses);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+        if (dialog.isConfirmed()) {
+            completedCourses = dialog.getCourses();
+        }
+    }
+
+    private void openPreferenceAssistant() {
+        PreferenceDialog dialog = new PreferenceDialog(this, keywordGenerator);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+        List<String> kws = dialog.getResultKeywords();
+        if (kws != null && !kws.isEmpty()) {
+            interestsArea.setText(String.join(", ", kws));
+        }
     // =======================
     // Loading helpers (NEW)
     // =======================
