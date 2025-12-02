@@ -87,24 +87,4 @@ public class AppStateStore {
                 p.getProperty("api_salt") != null &&
                 p.getProperty("api_iv") != null;
     }
-
-    public void saveEncryptedApiKey(String apiKey, char[] passphrase) throws Exception {
-        SimpleCrypto.Encrypted enc = SimpleCrypto.encrypt(apiKey, passphrase);
-        Properties p = loadProps();
-        p.setProperty("api_ct", enc.ciphertextB64);
-        p.setProperty("api_salt", enc.saltB64);
-        p.setProperty("api_iv", enc.ivB64);
-        saveProps(p);
-    }
-
-    public String decryptApiKey(char[] passphrase) throws Exception {
-        Properties p = loadProps();
-        String ct = p.getProperty("api_ct", "");
-        String salt = p.getProperty("api_salt", "");
-        String iv = p.getProperty("api_iv", "");
-        if (ct.isEmpty() || salt.isEmpty() || iv.isEmpty()) {
-            throw new IllegalStateException("No API key saved yet.");
-        }
-        return SimpleCrypto.decrypt(new SimpleCrypto.Encrypted(ct, salt, iv), passphrase);
-    }
 }

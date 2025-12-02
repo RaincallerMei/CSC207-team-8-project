@@ -59,6 +59,45 @@ public class CourseResultPanel extends JPanel implements PropertyChangeListener 
         add(buttons, BorderLayout.SOUTH);
 
         // ===== Button actions =====
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+public class CourseResultPanel extends JPanel {
+    private final JTextArea descriptionArea;
+    private boolean isExpanded = false;
+
+    public CourseResultPanel(Course course) {
+        // Layout: Header (North), Description (Center)
+        this.setLayout(new BorderLayout());
+        this.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        this.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // 1. Header Panel (Clickable)
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        headerPanel.setBackground(new Color(245, 245, 245));
+        headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Use new fields: Code, Name, Rank
+        String headerText = String.format("<html><b>%s</b>: %s <span style='color:gray;font-size:10px;'>(Rank %d)</span></html>",
+                course.getCourseCode(), course.getCourseName(), course.getCourseRank());
+
+        JLabel codeLabel = new JLabel(headerText);
+        codeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JLabel arrowLabel = new JLabel("▼");
+
+        headerPanel.add(codeLabel, BorderLayout.CENTER);
+        headerPanel.add(arrowLabel, BorderLayout.EAST);
+
+        // 2. Content Area (Hidden by default)
+        // We include Description + Prerequisites + Relevance + Keywords
+        String details = String.format(
+                "Description: %s%n%nPrerequisites: %s%n%nRelevance: %s%n%nKeywords: %s",
+                course.getDescription(),
+                course.getPrerequisiteCodes(),
+                course.getCourseDescription(),
+                course.getCourseKeywords()
+        );
 
         // Simple “Details” dialog (no why text yet)
         detailsButton.addActionListener(e -> {
