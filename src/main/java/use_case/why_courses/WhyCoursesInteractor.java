@@ -13,14 +13,14 @@ public class WhyCoursesInteractor implements WhyCoursesInputBoundary {
     @Override
     public void execute(WhyCoursesInputData inputData) {
         String code = inputData.getCourseCode();
-        if (code == null or code.isEmpty()) {
+        if (code == null || code.isEmpty()) {
             outputBoundary.prepareFailView("Invalid course code.");
             return;
         }
 
         String rationale = dataAccessObject.getRationaleForCourse(code);
 
-        if (rationale == null or rationale.isEmpty()) {
+        if (rationale == null || rationale.isEmpty()) {
             outputBoundary.prepareFailView("No rationale available for " + code);
         } else {
             WhyCoursesOutputData outputData = new WhyCoursesOutputData(code, rationale);
