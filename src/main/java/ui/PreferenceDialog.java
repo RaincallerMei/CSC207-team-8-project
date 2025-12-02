@@ -1,6 +1,6 @@
 package ui;
 
-import entity.KeywordGenerator;
+import use_case.interest_survey.KeywordGenerator;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
