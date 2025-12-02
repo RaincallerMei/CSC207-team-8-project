@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
-      <change afterPath="$PROJECT_DIR$/src/test/java/use_case/WhyCourses/WhyCoursesInteractorTest.java" afterDir="false" />
+    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="added test cases for WhyCourseInteractor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gemini_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/gemini_debug.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="arthur3" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -68,13 +65,15 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Main.executor": "Run",
+    "JUnit.WhyCoursesInteractorTest.executor": "Coverage",
+    "JUnit.use_case.WhyCourses in TeamProject.executor": "Coverage",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "git-widget-placeholder": "#22 on arthur3",
+    "git-widget-placeholder": "arthur3",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -109,12 +108,33 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="use_case.WhyCourses.*" />
-          <option name="ENABLED" value="true" />
+          <option name="ENABLED" value="false" />
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="use_case.WhyCourses" />
       <option name="MAIN_CLASS_NAME" value="use_case.WhyCourses.WhyCoursesInteractorTest" />
+      <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="use_case.WhyCourses in TeamProject" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="TeamProject" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="use_case.WhyCourses.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+        <pattern>
+          <option name="PATTERN" value="use_case.WhyCourses.WhyCoursesInteractorTest" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="use_case.WhyCourses" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -133,7 +153,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.WhyCoursesInteractorTest" />
+        <item itemvalue="JUnit.use_case.WhyCourses in TeamProject" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="JUnit.WhyCoursesInteractorTest" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -199,7 +221,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764701628566</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="added test cases for WhyCourseInteractor">
+      <option name="closed" value="true" />
+      <created>1764714532424</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764714532424</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -210,7 +240,8 @@
     <MESSAGE value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
     <MESSAGE value="Changed private variable api_key to apiKey and private method gApi_key to getApiKey to follow naming conventions" />
     <MESSAGE value="Lil edits" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lil edits" />
+    <MESSAGE value="added test cases for WhyCourseInteractor" />
+    <option name="LAST_COMMIT_MESSAGE" value="added test cases for WhyCourseInteractor" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -226,5 +257,12 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/CSC207_team_8_project$use_case_WhyCourses_in_TeamProject.ic" NAME="use_case.WhyCourses in TeamProject Coverage Results" MODIFIED="1764716568405" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>use_case.WhyCourses.*</FILTER>
+      <FILTER>use_case.WhyCourses.WhyCoursesInteractorTest</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/CSC207_team_8_project$WhyCoursesInteractorTest.ic" NAME="WhyCoursesInteractorTest Coverage Results" MODIFIED="1764716770417" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true" />
   </component>
 </project>
