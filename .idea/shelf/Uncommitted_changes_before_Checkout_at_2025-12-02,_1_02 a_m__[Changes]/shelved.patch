@@ -1,0 +1,23 @@
+Index: src/main/java/ui/CourseResultPanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\n\nimport entity.Course;\nimport interface_adapter.why_courses.WhyCoursesController;\n\nimport javax.swing.*;\nimport javax.swing.border.EmptyBorder;\nimport java.awt;\n\n/**\n * One row in the \"Recommended Courses\" list.\n * Shows course code/name, a collapsible description,\n * and buttons for Details / Why this course.\n */\npublic class CourseResultPanel extends JPanel {\n\n    private final Course course;\n    private final WhyCoursesController whyController;\n\n    private final JLabel headerLabel = new JLabel();\n    private final JTextArea descriptionArea = new JTextArea();\n\n    private final JButton detailsButton = new JButton(\"Details\");\n    private final JButton whyButton = new JButton(\"Why this course?\");\n\n    private boolean isExpanded = false;\n\n    public CourseResultPanel(Course course, WhyCoursesController whyController) {\n        this.course = course;\n        this.whyController = whyController;\n\n        setLayout(new BorderLayout());\n        setBorder(new EmptyBorder(10, 10, 10, 10));\n\n        // ===== Header (code + name + buttons) =====\n        headerLabel.setText(course.getCourseCode() + \" – \" + course.getCourseName());\n        headerLabel.setFont(headerLabel.getFont().deriveFont(Font.BOLD, 14f));\n\n        JPanel header = new JPanel(new BorderLayout());\n        header.add(headerLabel, BorderLayout.WEST);\n\n        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));\n        buttons.add(detailsButton);\n        buttons.add(whyButton);\n        header.add(buttons, BorderLayout.EAST);\n\n        add(header, BorderLayout.NORTH);\n\n        // ===== Description area (collapsed by default) =====\n        descriptionArea.setLineWrap(true);\n        descriptionArea.setWrapStyleWord(true);\n        descriptionArea.setEditable(false);\n        descriptionArea.setText(course.getDescription());\n        descriptionArea.setBackground(UIManager.getColor(\"TextField.inactiveBackground\"));\n        descriptionArea.setBorder(new EmptyBorder(8, 8, 8, 8));\n        descriptionArea.setVisible(false);  // start collapsed\n\n        add(descriptionArea, BorderLayout.CENTER);\n\n        // ===== Listeners =====\n\n        detailsButton.addActionListener(e -> {\n            CourseDetailsDialog dialog = new CourseDetailsDialog(\n                    this,\n                    course.getCourseCode(),\n                    course.getDescription()\n            );\n            dialog.setLocationRelativeTo(this);\n            dialog.setVisible(true);\n        });\n\n        whyButton.addActionListener(e ->\n                whyController.execute(course.getCourseCode())\n        );\n\n        java.awt.event.MouseAdapter toggleListener = new java.awt.event.MouseAdapter() {\n            @Override\n            public void mouseClicked(java.awt.event.MouseEvent e) {\n                toggleDescription();\n            }\n        };\n        header.addMouseListener(toggleListener);\n        headerLabel.addMouseListener(toggleListener);\n    }\n\n    private void toggleDescription() {\n        isExpanded = !isExpanded;\n        descriptionArea.setVisible(isExpanded);\n        revalidate();\n        repaint();\n    }\n\n    public Course getCourse() {\n        return course;\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ui/CourseResultPanel.java b/src/main/java/ui/CourseResultPanel.java
+--- a/src/main/java/ui/CourseResultPanel.java	(revision 1119bace5898fc30e6cdb251616b35f170e4d470)
++++ b/src/main/java/ui/CourseResultPanel.java	(date 1764655313736)
+@@ -1,11 +1,7 @@
+ package ui;
+ 
+-import entity.Course;
+-import interface_adapter.why_courses.WhyCoursesController;
+-
++import java.awt.*;
+ import javax.swing.*;
+-import javax.swing.border.EmptyBorder;
+-import java.awt;
+ 
+ /**
+  * One row in the "Recommended Courses" list.
