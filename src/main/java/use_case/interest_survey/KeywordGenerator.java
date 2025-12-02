@@ -1,4 +1,4 @@
-package entity;
+package use_case.interest_survey;
 
 import java.util.List;
 
