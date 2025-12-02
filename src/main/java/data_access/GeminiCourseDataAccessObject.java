@@ -2,6 +2,7 @@ package data_access;
 
 import entity.Course;
 import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+import use_case.why_courses.WhyCoursesDataAccessInterface;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,19 +12,18 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessInterface {
+public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessInterface, WhyCoursesDataAccessInterface {
 
     private static final String GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
     private final HttpClient httpClient;
 
-    // No API Key in constructor anymore!
+    // Cache for explanations: CourseCode -> Explanation
+    private final Map<String, String> explanationCache = new HashMap<>();
+
     public GeminiCourseDataAccessObject() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(60))
@@ -32,7 +32,9 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     @Override
     public List<Course> getRecommendations(String interests, List<String> completedCourses, String apiKey) {
-        // Validate Key at runtime when the button is clicked
+        // Clear cache on new search to keep memory clean and relevant
+        explanationCache.clear();
+
         if (apiKey == null || apiKey.trim().isEmpty()) {
             throw new IllegalArgumentException("API Key is missing. Please set it in the settings.");
         }
@@ -45,7 +47,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
             String prompt = buildPrompt(interests, completedCourses);
             String requestBody = buildRequestBody(prompt);
 
-            // Use the passed 'apiKey' argument here
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(GEMINI_ENDPOINT + "?key=" + apiKey))
                     .header("Content-Type", "application/json")
@@ -77,6 +78,12 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
     }
 
+    // New method for WhyCoursesDataAccessInterface
+    @Override
+    public String getRationaleForCourse(String courseCode) {
+        return explanationCache.get(courseCode);
+    }
+
     private List<Course> parseJsonToCourseList(String jsonString) {
         List<Course> courses = new ArrayList<>();
         Set<String> seenCodes = new HashSet<>();
@@ -97,12 +104,16 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                 String explanation = extractValue(objStr, "explanation");
                 String prereqs = extractValue(objStr, "prerequisite_codes");
 
+                // Store explanation in cache
+                explanationCache.put(code, explanation);
+
                 int rank = 1;
                 try {
                     String rankStr = extractValue(objStr, "course_rank");
                     rank = Integer.parseInt(rankStr);
                 } catch (NumberFormatException e) { /* default */ }
 
+                // Note: passing explanation to Course object too, as before
                 Course course = new Course(code, name, desc, prereqs, rank, "", explanation);
                 courses.add(course);
 
@@ -127,7 +138,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     private String buildPrompt(String interests, List<String> completedCourses) {
         String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
-        // Using String.format for Java 11 compatibility as requested previously
         return String.format(
                 "You are a course recommendation assistant for UofT.\n" +
                         "Interests: %s\n" +
