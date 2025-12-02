@@ -1,8 +1,8 @@
 package ui;
 
 import entity.Course;
-import entity.KeywordGenerator;
-import entity.WeightedKeywordGenerator;
+import use_case.interest_survey.KeywordGenerator;
+import use_case.interest_survey.WeightedKeywordGenerator;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;

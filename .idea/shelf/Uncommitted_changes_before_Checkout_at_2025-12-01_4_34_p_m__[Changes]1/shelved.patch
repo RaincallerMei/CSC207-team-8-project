@@ -1,0 +1,32 @@
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"VcsDirectoryMappings\">\r\n    <mapping directory=\"\" vcs=\"Git\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+--- a/.idea/vcs.xml	(revision 0ca9e7dba548eb04a9183e573777abf7d230991a)
++++ b/.idea/vcs.xml	(date 1764624463026)
+@@ -2,5 +2,6 @@
+ <project version="4">
+   <component name="VcsDirectoryMappings">
+     <mapping directory="" vcs="Git" />
++    <mapping directory="$PROJECT_DIR$/m5-regex" vcs="Git" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>GEMINI_API_KEY=
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision 0ca9e7dba548eb04a9183e573777abf7d230991a)
++++ b/.env	(date 1764624802261)
+@@ -1,1 +1,1 @@
+-GEMINI_API_KEY=
+\ No newline at end of file
++GEMINI_API_KEY=AIzaSyBSCCE-TrdgcTDNEfR6KkfK0KJCSECPNns

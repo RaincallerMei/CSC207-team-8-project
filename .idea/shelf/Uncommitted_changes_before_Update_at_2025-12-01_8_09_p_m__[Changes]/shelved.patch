@@ -1,0 +1,387 @@
+Index: gemini_debug.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\r\n  \"candidates\": [\r\n    {\r\n      \"content\": {\r\n        \"parts\": [\r\n          {\r\n            \"text\": \"Okay, I will recommend 3-5 valid UofT courses related to Chinese Culture Studies for a second or third-year student, verifying their existence in the 2024-2025 calendar and summarizing the descriptions. I will present the output as a JSON array.\\n\\n\"\r\n          },\r\n          {\r\n            \"text\": \"```json\\n[\\n  {\\n    \\\"course_code\\\": \\\"EAS209H1\\\",\\n    \\\"course_name\\\": \\\"Approaches to East Asia\\\",\\n    \\\"course_description\\\": \\\"This course is required for East Asian Studies specialists and majors. It introduces different approaches, theories, and methodologies for studying East Asian societies and cultures, serving as a foundation for upper-level EAS courses. It should be taken as early as possible, preferably in the second year.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"This course is foundational for East Asian Studies, providing necessary theoretical background.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS241H1\\\",\\n    \\\"course_name\\\": \\\"Introduction to Chinese Philosophy\\\",\\n    \\\"course_description\\\": \\\"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"An ideal course for understanding the philosophical underpinnings of Chinese culture.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS289H1\\\",\\n    \\\"course_name\\\": \\\"Environment and East Asia\\\",\\n    \\\"course_description\\\": \\\"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 3,\\n    \\\"explanation\\\": \\\"Explores the intersection of environmental concerns and East Asian contexts.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS307H1\\\",\\n    \\\"course_name\\\": \\\"Traditional Chinese Political Philosophy\\\",\\n    \\\"course_description\\\": \\\"Explores traditional Chinese political philosophy. Most courses will involve both lecture-based content and classroom discussion.\\\",\\n    \\\"prerequisite_codes\\\": [\\\"EAS105\\\"],\\n    \\\"course_rank\\\": 4,\\n    \\\"explanation\\\": \\\"For a deeper understanding of Chinese political thought; note the prerequisite.\\\"\\n  },\\n    {\\n    \\\"course_code\\\": \\\"HPS200H1\\\",\\n    \\\"course_name\\\": \\\"Science and Values\\\",\\n    \\\"course_description\\\": \\\"An introduction to issues at the interface of science and society, including the reciprocal influence of science and social norms, the relation of science and religion, dissemination of scientific knowledge, and science and policy. Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 5,\\n    \\\"explanation\\\": \\\"While not exclusively focused on Chinese culture, it offers a broader perspective on science and its societal impact, which can be relevant to understanding cultural contexts.\\\"\\n  }\\n]\\n```\"\r\n          }\r\n        ],\r\n        \"role\": \"model\"\r\n      },\r\n      \"finishReason\": \"STOP\",\r\n      \"citationMetadata\": {\r\n        \"citationSources\": [\r\n          {\r\n            \"startIndex\": 2201,\r\n            \"endIndex\": 2404,\r\n            \"uri\": \"https://www.newcollege.utoronto.ca/bpmh-requirements/\"\r\n          },\r\n          {\r\n            \"startIndex\": 2201,\r\n            \"endIndex\": 2404,\r\n            \"uri\": \"https://ihpst.utoronto.ca/undergraduate/curriculum-course-information/current-undergraduate-courses/summer-courses-2025\"\r\n          }\r\n        ]\r\n      },\r\n      \"groundingMetadata\": {\r\n        \"searchEntryPoint\": {\r\n          \"renderedContent\": \"\\u003cstyle\\u003e\\n.container {\\n  align-items: center;\\n  border-radius: 8px;\\n  display: flex;\\n  font-family: Google Sans, Roboto, sans-serif;\\n  font-size: 14px;\\n  line-height: 20px;\\n  padding: 8px 12px;\\n}\\n.chip {\\n  display: inline-block;\\n  border: solid 1px;\\n  border-radius: 16px;\\n  min-width: 14px;\\n  padding: 5px 16px;\\n  text-align: center;\\n  user-select: none;\\n  margin: 0 8px;\\n  -webkit-tap-highlight-color: transparent;\\n}\\n.carousel {\\n  overflow: auto;\\n  scrollbar-width: none;\\n  white-space: nowrap;\\n  margin-right: -12px;\\n}\\n.headline {\\n  display: flex;\\n  margin-right: 4px;\\n}\\n.gradient-container {\\n  position: relative;\\n}\\n.gradient {\\n  position: absolute;\\n  transform: translate(3px, -9px);\\n  height: 36px;\\n  width: 9px;\\n}\\n@media (prefers-color-scheme: light) {\\n  .container {\\n    background-color: #fafafa;\\n    box-shadow: 0 0 0 1px #0000000f;\\n  }\\n  .headline-label {\\n    color: #1f1f1f;\\n  }\\n  .chip {\\n    background-color: #ffffff;\\n    border-color: #d2d2d2;\\n    color: #5e5e5e;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:focus {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:active {\\n    background-color: #d8d8d8;\\n    border-color: #b6b6b6;\\n  }\\n  .logo-dark {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\\n  }\\n}\\n@media (prefers-color-scheme: dark) {\\n  .container {\\n    background-color: #1f1f1f;\\n    box-shadow: 0 0 0 1px #ffffff26;\\n  }\\n  .headline-label {\\n    color: #fff;\\n  }\\n  .chip {\\n    background-color: #2c2c2c;\\n    border-color: #3c4043;\\n    color: #fff;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #353536;\\n  }\\n  .chip:focus {\\n    background-color: #353536;\\n  }\\n  .chip:active {\\n    background-color: #464849;\\n    border-color: #53575b;\\n  }\\n  .logo-light {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\\n  }\\n}\\n\\u003c/style\\u003e\\n\\u003cdiv class=\\\"container\\\"\\u003e\\n  \\u003cdiv class=\\\"headline\\\"\\u003e\\n    \\u003csvg class=\\\"logo-light\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"9 9 35 35\\\" fill=\\\"none\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003csvg class=\\\"logo-dark\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"0 0 48 48\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003ccircle cx=\\\"24\\\" cy=\\\"23\\\" fill=\\\"#FFF\\\" r=\\\"22\\\"/\\u003e\\n      \\u003cpath d=\\\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath d=\\\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003cdiv class=\\\"gradient-container\\\"\\u003e\\u003cdiv class=\\\"gradient\\\"\\u003e\\u003c/div\\u003e\\u003c/div\\u003e\\n  \\u003c/div\\u003e\\n  \\u003cdiv class=\\\"carousel\\\"\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEuWoS7fhabxXE-_GnGS21NRHKZZxzrfTO2UB4GVLHiZ5s3RMpZrsjsgU-AFasE9jZQon9qugh1WZ5jPDoxk0ImhXXNpVN9d44A3DarfPF0T2jEzj_3fA3DySRWZGNxUj05MWsC9GnKw1QB5KoJKAbehq9oVGuPz3CJWhmSR9Ea0YM7q0q6xu87Z8Jft9hvSl7KcJCafXr7Op3gkDo=\\\"\\u003eUofT EAS courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEk-bro-1CfWiGHS8xDQhPTH5q3SR08MD-HDZPiwYaE8dUlKlVZVsJro8eCXi3SX3rIeEe2ifDKZFModswJ4CGj-1BHG4-IOVJzCO3sifqC84qxdGXfVHQsWUvxICJqCiEgBnnPcBnjpnfo0Dr0Cb2t_to6FP2Xiek3NMoqoG6HSgOkW2WypSwD2OWMc0i9pH0-13WbPJjfd9VXiDPbbIboyVwAL6QzYuU=\\\"\\u003eUofT Chinese culture courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFS6eE0vKWO5oBJQRET5PdTKehHQpWZ2Qlorr6JSOa7bR2Z7aN9VUuUGZzRSabzFQy7jvc0I8mNtEHbtwJftsrP5mshlFIz2CDyaYsMsKHeSUyzjcJbEl6eVPk-Qqu0TWm957DL4MjkKTf_5ZK4tL4P-HemKO7j9xMh3zgzrBK00_kjV1vqcAbrBi5ekd7QYpUt16-TMlWhKYp5PcVGbCyGoNTkIuSLYFxdna0=\\\"\\u003eUofT East Asian Studies courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHNEDn7kx9lTAAW8ZYR36lYgFLUvY26oYIQXDlobK7ZSK0VNkG8bbln-T842yYEaJOFy2pk3h1GhspY87m7uosY8wOmFOkJng_59e9mgL25l2NYiY-wtUhXy7kXCmewG3C2EhshzItN6CRWTJufPenlI6yfahHskdMlMMfBwTiu4XmJE1BAUjk4xK1XBmB5EyWtSNyvX0XXdF1WnI8=\\\"\\u003eUofT HPS courses 2024-2025\\u003c/a\\u003e\\n  \\u003c/div\\u003e\\n\\u003c/div\\u003e\\n\"\r\n        },\r\n        \"groundingChunks\": [\r\n          {\r\n            \"web\": {\r\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfgbzZz7gKzX_doWEQ2SKKKpBc2aiZ8Cm-oXsL7GB4j-90ZZfxQk3Dvac5OXsjrPCLdj5nEEzMmVtxPHrAovC0bQ_7b2FQxqGmQET0wM8HlhwfX7iseRnQsrpHO5Hp4nWsAd5aug21MTOLS4QyTN7h1zwPQ7b_0MA=\",\r\n              \"title\": \"utoronto.ca\"\r\n            }\r\n          },\r\n          {\r\n            \"web\": {\r\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGStPQdqhPyT-OwE9PiTS5gdVf5TZ5q3CejMOwp7FsWOO3y-kLnOQxM1sxYFME-t7g4l4pZAcDGGelVzuj_qqgrtkAR5sWlFzHkzIhM5fA0PcUGtbApe99FMO2sY7ocBcCm9V5xSgc3IpQLRvmhLRM3qZM_347j1P1wMitN4g5sVvZw61201A2zuWvmmQ==\",\r\n              \"title\": \"utoronto.ca\"\r\n            }\r\n          },\r\n          {\r\n            \"web\": {\r\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGymLYbFj_CpeXEJcZgrrxPbZHDty-5uALjqqaS-HQN2KO_0Gesn6mbux-bj0P2HDD-ymDaDf3-ROhi_ibVWDSyU22EvCFKNok0XASW5Vof7EBoV3JVReaZBys6-djxzoJNadyQIIRudNFcVOnqspSAyNi-XiRbtbYvAPPUUyHp4GqhurH_cyteAeujhg6-cKv0TdRxQY=\",\r\n              \"title\": \"utoronto.ca\"\r\n            }\r\n          }\r\n        ],\r\n        \"groundingSupports\": [\r\n          {\r\n            \"segment\": {\r\n              \"startIndex\": 601,\r\n              \"endIndex\": 671,\r\n              \"text\": \"It should be taken as early as possible, preferably in the second year\"\r\n            },\r\n            \"groundingChunkIndices\": [\r\n              0\r\n            ],\r\n            \"confidenceScores\": [\r\n              0.008658046\r\n            ]\r\n          },\r\n          {\r\n            \"segment\": {\r\n              \"startIndex\": 672,\r\n              \"endIndex\": 1176,\r\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"This course is foundational for East Asian Studies, providing necessary theoretical background.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS241H1\\\",\\n    \\\"course_name\\\": \\\"Introduction to Chinese Philosophy\\\",\\n    \\\"course_description\\\": \\\"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought\"\r\n            },\r\n            \"groundingChunkIndices\": [\r\n              1\r\n            ],\r\n            \"confidenceScores\": [\r\n              0.031609338\r\n            ]\r\n          },\r\n          {\r\n            \"segment\": {\r\n              \"startIndex\": 1177,\r\n              \"endIndex\": 1721,\r\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"An ideal course for understanding the philosophical underpinnings of Chinese culture.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS289H1\\\",\\n    \\\"course_name\\\": \\\"Environment and East Asia\\\",\\n    \\\"course_description\\\": \\\"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises\"\r\n            },\r\n            \"groundingChunkIndices\": [\r\n              0\r\n            ],\r\n            \"confidenceScores\": [\r\n              0.14333108\r\n            ]\r\n          },\r\n          {\r\n            \"segment\": {\r\n              \"startIndex\": 2056,\r\n              \"endIndex\": 2133,\r\n              \"text\": \"Most courses will involve both lecture-based content and classroom discussion\"\r\n            },\r\n            \"groundingChunkIndices\": [\r\n              1\r\n            ],\r\n            \"confidenceScores\": [\r\n              0.008335124\r\n            ]\r\n          },\r\n          {\r\n            \"segment\": {\r\n              \"startIndex\": 2640,\r\n              \"endIndex\": 2767,\r\n              \"text\": \"Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change\"\r\n            },\r\n            \"groundingChunkIndices\": [\r\n              2\r\n            ],\r\n            \"confidenceScores\": [\r\n              0.9302797\r\n            ]\r\n          }\r\n        ],\r\n        \"retrievalMetadata\": {},\r\n        \"webSearchQueries\": [\r\n          \"UofT HPS courses 2024-2025\",\r\n          \"UofT East Asian Studies courses 2024-2025\",\r\n          \"UofT Chinese culture courses 2024-2025\",\r\n          \"UofT EAS courses 2024-2025\"\r\n        ]\r\n      }\r\n    }\r\n  ],\r\n  \"usageMetadata\": {\r\n    \"promptTokenCount\": 132,\r\n    \"candidatesTokenCount\": 709,\r\n    \"totalTokenCount\": 841,\r\n    \"promptTokensDetails\": [\r\n      {\r\n        \"modality\": \"TEXT\",\r\n        \"tokenCount\": 132\r\n      }\r\n    ],\r\n    \"candidatesTokensDetails\": [\r\n      {\r\n        \"modality\": \"TEXT\",\r\n        \"tokenCount\": 709\r\n      }\r\n    ]\r\n  },\r\n  \"modelVersion\": \"gemini-2.0-flash\",\r\n  \"responseId\": \"01gqaYegF_2zjrEPs4eVoAE\"\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gemini_debug.json b/gemini_debug.json
+--- a/gemini_debug.json	(revision 58a120179776a9131f67ab5f0a393ffccf6d534f)
++++ b/gemini_debug.json	(date 1764625046450)
+@@ -4,49 +4,44 @@
+       "content": {
+         "parts": [
+           {
+-            "text": "Okay, I will recommend 3-5 valid UofT courses related to Chinese Culture Studies for a second or third-year student, verifying their existence in the 2024-2025 calendar and summarizing the descriptions. I will present the output as a JSON array.\n\n"
+-          },
+-          {
+-            "text": "```json\n[\n  {\n    \"course_code\": \"EAS209H1\",\n    \"course_name\": \"Approaches to East Asia\",\n    \"course_description\": \"This course is required for East Asian Studies specialists and majors. It introduces different approaches, theories, and methodologies for studying East Asian societies and cultures, serving as a foundation for upper-level EAS courses. It should be taken as early as possible, preferably in the second year.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"This course is foundational for East Asian Studies, providing necessary theoretical background.\"\n  },\n  {\n    \"course_code\": \"EAS241H1\",\n    \"course_name\": \"Introduction to Chinese Philosophy\",\n    \"course_description\": \"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"An ideal course for understanding the philosophical underpinnings of Chinese culture.\"\n  },\n  {\n    \"course_code\": \"EAS289H1\",\n    \"course_name\": \"Environment and East Asia\",\n    \"course_description\": \"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Explores the intersection of environmental concerns and East Asian contexts.\"\n  },\n  {\n    \"course_code\": \"EAS307H1\",\n    \"course_name\": \"Traditional Chinese Political Philosophy\",\n    \"course_description\": \"Explores traditional Chinese political philosophy. Most courses will involve both lecture-based content and classroom discussion.\",\n    \"prerequisite_codes\": [\"EAS105\"],\n    \"course_rank\": 4,\n    \"explanation\": \"For a deeper understanding of Chinese political thought; note the prerequisite.\"\n  },\n    {\n    \"course_code\": \"HPS200H1\",\n    \"course_name\": \"Science and Values\",\n    \"course_description\": \"An introduction to issues at the interface of science and society, including the reciprocal influence of science and social norms, the relation of science and religion, dissemination of scientific knowledge, and science and policy. Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"While not exclusively focused on Chinese culture, it offers a broader perspective on science and its societal impact, which can be relevant to understanding cultural contexts.\"\n  }\n]\n```"
++            "text": "```json\n[\n  {\n    \"course_code\": \"CSC311\",\n    \"course_name\": \"Introduction to Machine Learning\",\n    \"course_description\": \"This course introduces fundamental machine learning algorithms, covering topics from nearest neighbors to linear and logistic regression, neural networks, unsupervised learning, and reinforcement learning. It emphasizes the mathematical underpinnings and practical implementation of these algorithms, requiring students to be comfortable with multivariate probability, multivariable calculus, and linear algebra.\",\n    \"prerequisite_codes\": [\n      \"CSC207\",\n      \"APS105\",\n      \"APS106\",\n      \"ESC180\",\n      \"CSC180\",\n      \"MAT235\",\n      \"MAT237\",\n      \"MAT257\",\n      \"MAT221\",\n      \"MAT223\",\n      \"MAT240\",\n      \"MAT185\",\n      \"MAT188\",\n      \"STA237\",\n      \"STA247\",\n      \"STA255\",\n      \"STA257\",\n      \"STA286\",\n      \"CHE223\",\n      \"CME263\",\n      \"MIE231\",\n      \"MIE236\",\n      \"MSE238\",\n      \"ECE286\"\n    ],\n    \"course_rank\": 1,\n    \"explanation\": \"Given your interest in machine learning, this course provides a solid foundation in the core algorithms and mathematical concepts of the field.\"\n  },\n  {\n    \"course_code\": \"STA492H1\",\n    \"course_name\": \"Seminar in Statistical Science\",\n    \"course_description\": \"This seminar course allows students to explore current research topics in statistics through readings, discussions, and presentations. It is designed for students in the Statistical Science: Theory and Methods Specialist program or other statistics programs interested in research. Course content varies each semester.\",\n    \"prerequisite_codes\": [\n      \"STA355H1\"\n    ],\n    \"course_rank\": 2,\n    \"explanation\": \"As you are interested in data analysis and statistics, this seminar offers an opportunity to delve into advanced statistical concepts and research.\"\n  },\n  {\n    \"course_code\": \"ENT392\",\n    \"course_name\": \"Creating New Ventures\",\n    \"course_description\": \"This hands-on course allows students to develop a venture idea into a complete business model and pitch it to experienced entrepreneurs. It provides practical experience in innovation and entrepreneurship.\",\n    \"prerequisite_codes\": [\n      \"ENT200H1\",\n      \"RSM100H1\",\n      \"MGT100H1\"\n    ],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in innovation, this course offers hands-on experience in developing a business model and pitching it to entrepreneurs.\"\n  },\n  {\n    \"course_code\": \"CSC413\",\n    \"course_name\": \"Neural Networks and Deep Learning\",\n    \"course_description\": \"This course provides an overview of neural networks and deep learning algorithms. The course covers supervised learning, unsupervised learning, and reinforcement learning.\",\n    \"prerequisite_codes\": [\n      \"CSC311\",\n      \"STA314\",\n      \"ECE421\"\n    ],\n    \"course_rank\": 4,\n    \"explanation\": \"This course builds upon the foundations of machine learning and allows you to explore more advanced topics such as neural networks.\"\n  },\n  {\n    \"course_code\": \"MIE1626H\",\n    \"course_name\": \"Data Science Methods and Statistical Learning\",\n    \"course_description\": \"This course focuses on data science methods and statistical learning. It is one of the core courses for the Data Analytics and Machine Learning emphasis in the MEng program.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"This course is relevant to your interests in data analysis, statistics, and machine learning. It is part of a program that produces sought-after engineers with AI and data science skills.\"\n  }\n]\n```"
+           }
+         ],
+         "role": "model"
+       },
+       "finishReason": "STOP",
+-      "citationMetadata": {
+-        "citationSources": [
+-          {
+-            "startIndex": 2201,
+-            "endIndex": 2404,
+-            "uri": "https://www.newcollege.utoronto.ca/bpmh-requirements/"
+-          },
+-          {
+-            "startIndex": 2201,
+-            "endIndex": 2404,
+-            "uri": "https://ihpst.utoronto.ca/undergraduate/curriculum-course-information/current-undergraduate-courses/summer-courses-2025"
+-          }
+-        ]
+-      },
+       "groundingMetadata": {
+         "searchEntryPoint": {
+-          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEuWoS7fhabxXE-_GnGS21NRHKZZxzrfTO2UB4GVLHiZ5s3RMpZrsjsgU-AFasE9jZQon9qugh1WZ5jPDoxk0ImhXXNpVN9d44A3DarfPF0T2jEzj_3fA3DySRWZGNxUj05MWsC9GnKw1QB5KoJKAbehq9oVGuPz3CJWhmSR9Ea0YM7q0q6xu87Z8Jft9hvSl7KcJCafXr7Op3gkDo=\"\u003eUofT EAS courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEk-bro-1CfWiGHS8xDQhPTH5q3SR08MD-HDZPiwYaE8dUlKlVZVsJro8eCXi3SX3rIeEe2ifDKZFModswJ4CGj-1BHG4-IOVJzCO3sifqC84qxdGXfVHQsWUvxICJqCiEgBnnPcBnjpnfo0Dr0Cb2t_to6FP2Xiek3NMoqoG6HSgOkW2WypSwD2OWMc0i9pH0-13WbPJjfd9VXiDPbbIboyVwAL6QzYuU=\"\u003eUofT Chinese culture courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFS6eE0vKWO5oBJQRET5PdTKehHQpWZ2Qlorr6JSOa7bR2Z7aN9VUuUGZzRSabzFQy7jvc0I8mNtEHbtwJftsrP5mshlFIz2CDyaYsMsKHeSUyzjcJbEl6eVPk-Qqu0TWm957DL4MjkKTf_5ZK4tL4P-HemKO7j9xMh3zgzrBK00_kjV1vqcAbrBi5ekd7QYpUt16-TMlWhKYp5PcVGbCyGoNTkIuSLYFxdna0=\"\u003eUofT East Asian Studies courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHNEDn7kx9lTAAW8ZYR36lYgFLUvY26oYIQXDlobK7ZSK0VNkG8bbln-T842yYEaJOFy2pk3h1GhspY87m7uosY8wOmFOkJng_59e9mgL25l2NYiY-wtUhXy7kXCmewG3C2EhshzItN6CRWTJufPenlI6yfahHskdMlMMfBwTiu4XmJE1BAUjk4xK1XBmB5EyWtSNyvX0XXdF1WnI8=\"\u003eUofT HPS courses 2024-2025\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
++          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHG_Po1-haTB8MGARiHEujyaov_aoXyiVOUxuzJg3qTUH2K-ddSCPWE3Zi2hmgngUskbr7QNVPhYWj1ZdiFtwWQ-BGKEOGuAIPv6VwHKfE68WbqnisztfCy8iFyC0Nbz8qSBsfYIQ8e8A0ZvtrK933hpPo-X9MNYj_WDRVJM6ZuiiaK5eF_Yn2CpebyJDWWQwLkLAdbonaTrPt7XX_EjqvWA2uYXQ==\"\u003eUofT statistics courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGNOhTBcmgj6VqHeHL7zZVc0q2FrWX_bZEMalDKNsk7DMOLvC5i6uLPr-iw6UsICXBA5kmY2oS5UAFOqi-2iluzCEpc8w4nQ-HoOY4YrSRuC-ZIfefcPNw1Vjb0uNMHcVpIVVg_8uaHY3szWWYokGCP_ipiJIKj6di4D4BspT-6juj618-7SChyh-90pud8_7t7APN-hYM2WX5AuTFfLA0e\"\u003eUofT design courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEEQ1bdpp-VWA-mwEE3_gNZ5RirFHLDrRROfhM6a4suR0sypVn7iFyCpzZFPt7dmzEGxwZoGHw_VzGbIymzO4SblupiZPnnYM7BY42mRr5VYCOD0Qv1V4dAwhbSXeLvyFvIAyQUWu2cXbn0M4mdU-JmIL_aMBoB6S2Ay46a2Tojzc_C1XBOYaGSbK4yqRiMar4-1u8LhWir-JDP5zhktvvoLPaem_YcFA==\"\u003eUofT data analysis courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEHJq7Wj17k65xDJ6P34LFWEezTXdfadiDHb5YS3OKqcqeXtvf4oO08EaeiNQz0cQJauArKXkE8Ck0kFLAvEkBca1u2G1u6ErSOi_KUXRlOziHh_RvpDyCAeBGryzBbORC8xWZMgv14tx7VEYm7rXUvOzHVgfcfT8I-IOv2WKscvPYXXqb-h40pys7Cx1qATo9S4EurnEt40qAJ1oZZM9sOhw==\"\u003eUofT science courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGRE8XUS_QOsh-DmquNh80mCF-M3QDA14N1YJuGykqs7D46Snbi_Iuos_jIKp_ULy-K3mSmRdLfIEnr6fxKw7xfbXbiBDUkphY2REMy3cLOJGoaz66oEpNO_9vs1NAjxfkhV6qrJyPjx1mwULdH1dNU0EayvDboS0Y75PdK_RdI2G8Z25IS4W9yON3i-7LputW2jK7eVBekAXS8xGEm2ZpKWq_bxQ==\"\u003eUofT innovation courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFhIzU7sDSYQ1WnkctsvoG81jQpvrwbB78Qo69yiPiTfeIsoH92oHwn8COhQixwhxY1i6kyx00qeorTpMmdHeWdG913sXYspS8FgYMIXPQJ9-p5_oRMio5urVl-rMlSMZggLd1SH157ski6CRXg1UyuU_Z_wtJhsE3WsWUPpBnVNFAZwhlVsE6E3gmlUZx_606OgFxkHpFGkY2Ip835sBdebmlfQCDIpuX0sA==\"\u003eUofT machine learning courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGo6qB7BF3h0znHcn4DK6qkpD7IFUVTR6p06CiZLQXGfjMIL6XoySoG3h6E-YuRmqkDofkaBF80VTwfjjbuumbJLp9FAUlZhNFtYT1H8CG2EoA45pYFUDB6sXhwjaRNYVtblxDiIe03H0BRM2UJ-IgQSnlwhDC7qN57cucbd-eNg6puYsbmEMwET8MkzWpIPNefJmQ2-h-QDcqt33POmV7gCB87\"\u003eUofT CSC108 prerequisite courses\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+         },
+         "groundingChunks": [
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfgbzZz7gKzX_doWEQ2SKKKpBc2aiZ8Cm-oXsL7GB4j-90ZZfxQk3Dvac5OXsjrPCLdj5nEEzMmVtxPHrAovC0bQ_7b2FQxqGmQET0wM8HlhwfX7iseRnQsrpHO5Hp4nWsAd5aug21MTOLS4QyTN7h1zwPQ7b_0MA=",
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQG1YW-RXFEZVRwAvMEq78tmeCs3Nn5c0og9ogooNuGenSkjhFOWVABwzqpSQao3SAIxR2-MlfNZIYrDTE3UtnE-MPwN0XE_mm8xI_M69hvl9GoCNBjnyVPwuGnd7YpDnfOc8XWF2OYMTNeeQ3qWY4Q3d4LGvEQrCjmi7jP0",
++              "title": "toronto.edu"
++            }
++          },
++          {
++            "web": {
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHr-hliYz6FOLZFWzKO-SWmx0KkukN8g2qTjUrIYhOegtT2AiIkW3caZU-UyiBFOwMeqXZ4znGstFs8gyqqMqmCtufmW7TaEsxMRIgxjPTuIXoVZ685W2eGCDBQGiAD-YzxgiZIMgzr9GWXubc-EN1l6jla",
++              "title": "toronto.edu"
++            }
++          },
++          {
++            "web": {
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEAfUsvaMdYlpJh8rebhkq5mTt3AOSznHawv81_RCCMK8t0MH1YUfArETLdRXAtoLtiFy1n82tFZ8Q1opVBHfbzKEsPlpMCKcbh_8VzSiwMlRVgh_ziIZyw1SaSfOx6L1W9qu9eEjCPxcPcMQhanG8Ls5jhLBkFjUqg1MAchrVoFIj7m0B4M91PzPXM5ugV",
+               "title": "utoronto.ca"
+             }
+           },
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGStPQdqhPyT-OwE9PiTS5gdVf5TZ5q3CejMOwp7FsWOO3y-kLnOQxM1sxYFME-t7g4l4pZAcDGGelVzuj_qqgrtkAR5sWlFzHkzIhM5fA0PcUGtbApe99FMO2sY7ocBcCm9V5xSgc3IpQLRvmhLRM3qZM_347j1P1wMitN4g5sVvZw61201A2zuWvmmQ==",
+-              "title": "utoronto.ca"
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGaF2yX8vI4cGgrwjBw87jOc02rgy8w0lcz4Wre0D0mSCUpPl8DKZ3ckfEmuMhOSN8PGMTyF6YrysyOgZOCLaiwLcBkpkkPd9w4nSGRk9rYi-AFT3tDOO7s-3U=",
++              "title": "notion.site"
+             }
+           },
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGymLYbFj_CpeXEJcZgrrxPbZHDty-5uALjqqaS-HQN2KO_0Gesn6mbux-bj0P2HDD-ymDaDf3-ROhi_ibVWDSyU22EvCFKNok0XASW5Vof7EBoV3JVReaZBys6-djxzoJNadyQIIRudNFcVOnqspSAyNi-XiRbtbYvAPPUUyHp4GqhurH_cyteAeujhg6-cKv0TdRxQY=",
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGWyuaCME8V2dG0dOy6QiStswaxG9riBHFW8UnYbwVgyPJyTG0he84vgWEQQF62OMARjQ2-l8KjRz2SirVIWCN4-wBzBmifF72UaDA64kQHwLNnyMkf_W59R2n9l_rPMHR_Z6MMN3kJyOcDkfWGLGCs0tHfawPPx5f4OuqSlDh0wgAs3xu8jMxvqXYSSKSaoQagaw0oOP-HOw==",
+               "title": "utoronto.ca"
+             }
+           }
+@@ -54,97 +49,165 @@
+         "groundingSupports": [
+           {
+             "segment": {
+-              "startIndex": 601,
+-              "endIndex": 671,
+-              "text": "It should be taken as early as possible, preferably in the second year"
++              "startIndex": 331,
++              "endIndex": 536,
++              "text": "It emphasizes the mathematical underpinnings and practical implementation of these algorithms, requiring students to be comfortable with multivariate probability, multivariable calculus, and linear algebra"
++            },
++            "groundingChunkIndices": [
++              0
++            ],
++            "confidenceScores": [
++              0.009994567
++            ]
++          },
++          {
++            "segment": {
++              "startIndex": 537,
++              "endIndex": 1142,
++              "text": "\",\n    \"prerequisite_codes\": [\n      \"CSC207\",\n      \"APS105\",\n      \"APS106\",\n      \"ESC180\",\n      \"CSC180\",\n      \"MAT235\",\n      \"MAT237\",\n      \"MAT257\",\n      \"MAT221\",\n      \"MAT223\",\n      \"MAT240\",\n      \"MAT185\",\n      \"MAT188\",\n      \"STA237\",\n      \"STA247\",\n      \"STA255\",\n      \"STA257\",\n      \"STA286\",\n      \"CHE223\",\n      \"CME263\",\n      \"MIE231\",\n      \"MIE236\",\n      \"MSE238\",\n      \"ECE286\"\n    ],\n    \"course_rank\": 1,\n    \"explanation\": \"Given your interest in machine learning, this course provides a solid foundation in the core algorithms and mathematical concepts of the field"
++            },
++            "groundingChunkIndices": [
++              0
++            ],
++            "confidenceScores": [
++              0.5482649
++            ]
++          },
++          {
++            "segment": {
++              "startIndex": 1547,
++              "endIndex": 1582,
++              "text": "Course content varies each semester"
+             },
+             "groundingChunkIndices": [
+-              0
++              1
+             ],
+             "confidenceScores": [
+-              0.008658046
++              0.009179887
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 672,
+-              "endIndex": 1176,
+-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"This course is foundational for East Asian Studies, providing necessary theoretical background.\"\n  },\n  {\n    \"course_code\": \"EAS241H1\",\n    \"course_name\": \"Introduction to Chinese Philosophy\",\n    \"course_description\": \"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought"
++              "startIndex": 1583,
++              "endIndex": 1826,
++              "text": "\",\n    \"prerequisite_codes\": [\n      \"STA355H1\"\n    ],\n    \"course_rank\": 2,\n    \"explanation\": \"As you are interested in data analysis and statistics, this seminar offers an opportunity to delve into advanced statistical concepts and research"
+             },
+             "groundingChunkIndices": [
+               1
+             ],
+             "confidenceScores": [
+-              0.031609338
++              0.17659608
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 1177,
+-              "endIndex": 1721,
+-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"An ideal course for understanding the philosophical underpinnings of Chinese culture.\"\n  },\n  {\n    \"course_code\": \"EAS289H1\",\n    \"course_name\": \"Environment and East Asia\",\n    \"course_description\": \"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises"
++              "startIndex": 2075,
++              "endIndex": 2142,
++              "text": "It provides practical experience in innovation and entrepreneurship"
+             },
+             "groundingChunkIndices": [
+-              0
++              2
+             ],
+             "confidenceScores": [
+-              0.14333108
++              0.67459846
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 2056,
+-              "endIndex": 2133,
+-              "text": "Most courses will involve both lecture-based content and classroom discussion"
++              "startIndex": 2143,
++              "endIndex": 2413,
++              "text": "\",\n    \"prerequisite_codes\": [\n      \"ENT200H1\",\n      \"RSM100H1\",\n      \"MGT100H1\"\n    ],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in innovation, this course offers hands-on experience in developing a business model and pitching it to entrepreneurs"
+             },
+             "groundingChunkIndices": [
+-              1
++              2
+             ],
+             "confidenceScores": [
+-              0.008335124
++              0.07734604
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 2640,
+-              "endIndex": 2767,
+-              "text": "Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change"
++              "startIndex": 2619,
++              "endIndex": 2707,
++              "text": "The course covers supervised learning, unsupervised learning, and reinforcement learning"
+             },
+             "groundingChunkIndices": [
+-              2
++              3
+             ],
+             "confidenceScores": [
+-              0.9302797
++              0.861661
++            ]
++          },
++          {
++            "segment": {
++              "startIndex": 2708,
++              "endIndex": 2965,
++              "text": "\",\n    \"prerequisite_codes\": [\n      \"CSC311\",\n      \"STA314\",\n      \"ECE421\"\n    ],\n    \"course_rank\": 4,\n    \"explanation\": \"This course builds upon the foundations of machine learning and allows you to explore more advanced topics such as neural networks"
++            },
++            "groundingChunkIndices": [
++              3
++            ],
++            "confidenceScores": [
++              0.4382191
++            ]
++          },
++          {
++            "segment": {
++              "startIndex": 3173,
++              "endIndex": 3275,
++              "text": "It is one of the core courses for the Data Analytics and Machine Learning emphasis in the MEng program"
++            },
++            "groundingChunkIndices": [
++              4
++            ],
++            "confidenceScores": [
++              0.049527798
++            ]
++          },
++          {
++            "segment": {
++              "startIndex": 3445,
++              "endIndex": 3537,
++              "text": "It is part of a program that produces sought-after engineers with AI and data science skills"
++            },
++            "groundingChunkIndices": [
++              4
++            ],
++            "confidenceScores": [
++              0.7582225
+             ]
+           }
+         ],
+         "retrievalMetadata": {},
+         "webSearchQueries": [
+-          "UofT HPS courses 2024-2025",
+-          "UofT East Asian Studies courses 2024-2025",
+-          "UofT Chinese culture courses 2024-2025",
+-          "UofT EAS courses 2024-2025"
++          "UofT design courses 2024-2025",
++          "UofT statistics courses 2024-2025",
++          "UofT science courses 2024-2025",
++          "UofT machine learning courses 2024-2025",
++          "UofT innovation courses 2024-2025",
++          "UofT CSC108 prerequisite courses",
++          "UofT data analysis courses 2024-2025"
+         ]
+       }
+     }
+   ],
+   "usageMetadata": {
+-    "promptTokenCount": 132,
+-    "candidatesTokenCount": 709,
+-    "totalTokenCount": 841,
++    "promptTokenCount": 139,
++    "candidatesTokenCount": 942,
++    "totalTokenCount": 1081,
+     "promptTokensDetails": [
+       {
+         "modality": "TEXT",
+-        "tokenCount": 132
++        "tokenCount": 139
+       }
+     ],
+     "candidatesTokensDetails": [
+       {
+         "modality": "TEXT",
+-        "tokenCount": 709
++        "tokenCount": 942
+       }
+     ]
+   },
+   "modelVersion": "gemini-2.0-flash",
+-  "responseId": "01gqaYegF_2zjrEPs4eVoAE"
++  "responseId": "igouaZOMBLWj_uMP-7vo0AU"
+ }
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"VcsDirectoryMappings\">\r\n    <mapping directory=\"\" vcs=\"Git\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+--- a/.idea/vcs.xml	(revision 58a120179776a9131f67ab5f0a393ffccf6d534f)
++++ b/.idea/vcs.xml	(date 1764624995662)
+@@ -2,5 +2,6 @@
+ <project version="4">
+   <component name="VcsDirectoryMappings">
+     <mapping directory="" vcs="Git" />
++    <mapping directory="$PROJECT_DIR$/m5-regex" vcs="Git" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;customColor&quot;: &quot;&quot;,\r\n  &quot;associatedIndex&quot;: 2\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"36Aek2bmBQg2nnzmlJRM9lt6zKH\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"Application.Main.executor\": \"Run\",\r\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\r\n    \"RunOnceActivity.git.unshallow\": \"true\",\r\n    \"git-widget-placeholder\": \"interest-survey__izay\",\r\n    \"ignore.virus.scanning.warn.message\": \"true\",\r\n    \"kotlin-language-version-configured\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/izaya/CSC207-team-8-project\",\r\n    \"node.js.detected.package.eslint\": \"true\",\r\n    \"node.js.detected.package.tslint\": \"true\",\r\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\r\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\r\n    \"vue.rearranger.settings.migration\": \"true\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"app.Main\" />\r\n      <module name=\"TeamProject\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"app.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\r\n      <module name=\"CSC207-team-8-project\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\r\n      <module name=\"CSC207-team-8-project\" />\r\n      <option name=\"filePath\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Application.Main\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"\" />\r\n      <created>1764453944603</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1764453944603</updated>\r\n      <workItem from=\"1764453947764\" duration=\"303000\" />\r\n      <workItem from=\"1764454332389\" duration=\"80000\" />\r\n      <workItem from=\"1764454543951\" duration=\"5000\" />\r\n      <workItem from=\"1764458128284\" duration=\"796000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 58a120179776a9131f67ab5f0a393ffccf6d534f)
++++ b/.idea/workspace.xml	(date 1764637795138)
+@@ -5,9 +5,10 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="">
+-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/gemini_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/gemini_debug.json" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -16,6 +17,7 @@
+   </component>
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
++    <option name="ROOT_SYNC" value="SYNC" />
+   </component>
+   <component name="ProjectColorInfo">{
+   &quot;customColor&quot;: &quot;&quot;,
+@@ -26,24 +28,24 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.Main.executor": "Run",
+-    "ModuleVcsDetector.initialDetectionPerformed": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "git-widget-placeholder": "interest-survey__izay",
+-    "ignore.virus.scanning.warn.message": "true",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "C:/Users/izaya/CSC207-team-8-project",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "vue.rearranger.settings.migration": "true"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
++    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
++    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/izaya/CSC207-team-8-project&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager">
+     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+       <option name="MAIN_CLASS_NAME" value="app.Main" />
+@@ -94,6 +96,7 @@
+       <workItem from="1764454332389" duration="80000" />
+       <workItem from="1764454543951" duration="5000" />
+       <workItem from="1764458128284" duration="796000" />
++      <workItem from="1764624959305" duration="4866000" />
+     </task>
+     <servers />
+   </component>
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision 58a120179776a9131f67ab5f0a393ffccf6d534f)
++++ b/.env	(date 1764625019045)
+@@ -1,0 +1,1 @@
++GEMINI_API_KEY=AIzaSyBSCCE-TrdgcTDNEfR6KkfK0KJCSECPNns

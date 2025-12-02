@@ -1,4 +1,4 @@
-package entity;
+package use_case.recommend_courses;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,7 +1,6 @@
-package entity;
+package use_case.interest_survey;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DefaultKeywordSuggester implements KeywordGenerator {
 
