@@ -4,11 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
+    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/why_courses/WhyCoursesController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/interface_adapter/why_courses/WhyCoursesPresenter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesAccessInterface.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInputData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInteractor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesOutputBoundary.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesOutputData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ui/CourseDetailsDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/CourseDetailsDialog.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -61,7 +80,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "arthur3",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -160,5 +179,16 @@
     <MESSAGE value="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet." />
     <MESSAGE value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
     <option name="LAST_COMMIT_MESSAGE" value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/LLMs.java</url>
+          <line>276</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
