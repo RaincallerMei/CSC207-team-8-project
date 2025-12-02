@@ -1,13 +1,22 @@
 package app;
 
 import data_access.InMemoryCourseDataAccessObject;
-import entity.Course;
-import entity.RecommendCoursesUseCase;
+import data_access.WhyCoursesDataAccessObject;
+
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
+
+import interface_adapter.why_courses.WhyCoursesController;
+import interface_adapter.why_courses.WhyCoursesPresenter;
+import interface_adapter.why_courses.WhyCoursesViewModel;
+
 import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
 import use_case.recommend_courses.RecommendCoursesInteractor;
+
+import use_case.why_courses.WhyCoursesDataAccessInterface;
+import use_case.why_courses.WhyCoursesInteractor;
+
 import ui.CourseExplorerPanel;
 
 import javax.swing.*;
@@ -15,33 +24,43 @@ import javax.swing.*;
 public class Main {
 
     private static void createAndShowGUI() {
-        // 1. Create the Data Access Object (Frameworks & Drivers)
-        // Switch to Real/Gemini DAO here later when ready
-        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
+        // ====== RecommendCourses wiring ======
+        RecommendCoursesDataAccessInterface recommendDao =
+                new InMemoryCourseDataAccessObject();
+        RecommendCoursesViewModel recommendViewModel =
+                new RecommendCoursesViewModel();
+        RecommendCoursesPresenter recommendPresenter =
+                new RecommendCoursesPresenter(recommendViewModel);
+        RecommendCoursesInteractor recommendInteractor =
+                new RecommendCoursesInteractor(recommendDao, recommendPresenter);
+        RecommendCoursesController recommendController =
+                new RecommendCoursesController(recommendInteractor);
 
-        // 2. Create the View Model (Interface Adapter)
-        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
+        // ====== WhyCourses wiring ======
+        WhyCoursesDataAccessInterface whyDao = new WhyCoursesDataAccessObject();
+        WhyCoursesViewModel whyViewModel = new WhyCoursesViewModel();
+        WhyCoursesPresenter whyPresenter = new WhyCoursesPresenter(whyViewModel);
+        WhyCoursesInteractor whyInteractor =
+                new WhyCoursesInteractor(whyDao, whyPresenter);
+        WhyCoursesController whyController =
+                new WhyCoursesController(whyInteractor);
 
-        // 3. Create the Presenter (Interface Adapter)
-        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
-
-        // 4. Create the Interactor (Application Business Rules)
-        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
-
-        // 5. Create the Controller (Interface Adapter)
-        RecommendCoursesController controller = new RecommendCoursesController(interactor);
-
-        // 6. Create the Main View (Frameworks & Drivers)
-        // Inject Controller and ViewModel into the UI
+        // ====== UI ======
         JFrame frame = new JFrame("UofT Course Explorer & Planner");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+        CourseExplorerPanel mainPanel =
+                new CourseExplorerPanel(
+                        recommendController,
+                        recommendViewModel,
+                        whyController,
+                        whyViewModel
+                );
         frame.add(mainPanel);
 
         frame.pack();
-        frame.setSize(1000, 650); // Set a reasonable default size
-        frame.setLocationRelativeTo(null); // Center on screen
+        frame.setSize(1000, 650);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 

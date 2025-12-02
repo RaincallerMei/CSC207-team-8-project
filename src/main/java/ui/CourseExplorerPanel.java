@@ -5,24 +5,32 @@ import entity.DefaultKeywordSuggester;
 import entity.KeywordGenerator;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
+import interface_adapter.why_courses.WhyCoursesController;
+import interface_adapter.why_courses.WhyCoursesViewModel;
 import storage.AppStateStore;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main UI panel: left = interest survey, right = recommended courses (accordion).
+ * Listens to RecommendCoursesViewModel. “Why this course?” is handled in CourseResultPanel.
+ */
 public class CourseExplorerPanel extends JPanel implements PropertyChangeListener {
 
     // ==== Clean Architecture Dependencies ====
     private final RecommendCoursesController controller;
     private final RecommendCoursesViewModel viewModel;
     private final KeywordGenerator keywordGenerator;
+
+    // NEW: Why use case wiring
+    private final WhyCoursesController whyController;
+    private final WhyCoursesViewModel whyViewModel;
 
     // ==== Local Storage / DB ====
     private final AppStateStore store = new AppStateStore();
@@ -36,7 +44,8 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final CardLayout recommendedCardLayout = new CardLayout();
     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
     private final JLabel placeholderLabel = new JLabel(
-            "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>recommended courses will appear here!</i></div></html>",
+            "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>" +
+                    "recommended courses will appear here!</i></div></html>",
             SwingConstants.CENTER
     );
 
@@ -46,21 +55,42 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     // Buttons tracked for default button setting
     private JButton submitButton;
 
-    /**
-     * Primary Constructor.
-     * Integrates Clean Architecture (Controller/ViewModel) with the Survey UI.
-     */
+    // =======================
+    // Constructors
+    // =======================
+
+    // Old 2-arg constructor (for tests or simple wiring)
     public CourseExplorerPanel(RecommendCoursesController controller,
                                RecommendCoursesViewModel viewModel) {
-        this(controller, viewModel, new DefaultKeywordSuggester());
+        this(controller, viewModel, new DefaultKeywordSuggester(), null, null);
     }
 
+    // Old 3-arg constructor (if someone wants custom KeywordGenerator)
     public CourseExplorerPanel(RecommendCoursesController controller,
                                RecommendCoursesViewModel viewModel,
                                KeywordGenerator keywordGenerator) {
+        this(controller, viewModel, keywordGenerator, null, null);
+    }
+
+    // NEW: full injection including Why use case
+    public CourseExplorerPanel(RecommendCoursesController controller,
+                               RecommendCoursesViewModel viewModel,
+                               WhyCoursesController whyController,
+                               WhyCoursesViewModel whyViewModel) {
+        this(controller, viewModel, new DefaultKeywordSuggester(), whyController, whyViewModel);
+    }
+
+    // Canonical constructor
+    private CourseExplorerPanel(RecommendCoursesController controller,
+                                RecommendCoursesViewModel viewModel,
+                                KeywordGenerator keywordGenerator,
+                                WhyCoursesController whyController,
+                                WhyCoursesViewModel whyViewModel) {
         this.controller = controller;
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
+        this.whyController = whyController;
+        this.whyViewModel = whyViewModel;
 
         // Register as an observer to update the view when the use case finishes
         this.viewModel.addPropertyChangeListener(this);
@@ -92,7 +122,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // ==========================================================
-    // LEFT PANEL: Survey & User Inputs (From CourseExplorerPanel)
+    // LEFT PANEL: Survey & User Inputs
     // ==========================================================
     private JPanel createSurveyPanel() {
         JPanel panel = new JPanel();
@@ -164,7 +194,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // ==========================================================
-    // RIGHT PANEL: Results (From MainFrame / CourseResultPanel)
+    // RIGHT PANEL: Results (Accordion)
     // ==========================================================
     private JPanel createRecommendedPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -204,6 +234,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS)) {
             // Update the UI with the list of Course entities
+            @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
             updateResultsView(courses);
         } else if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_ERROR)) {
@@ -219,7 +250,8 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         } else {
             // Create accordion panels
             for (Course c : courses) {
-                CourseResultPanel itemPanel = new CourseResultPanel(c);
+                CourseResultPanel itemPanel =
+                        new CourseResultPanel(c, whyController, whyViewModel);
                 coursesContainer.add(itemPanel);
             }
             // Refresh layout
