@@ -39,3 +39,6 @@ build/
 
 ### Environment Variables ###
 .env
+
+### Gemini Debug File ###
+gemini_debug.json
