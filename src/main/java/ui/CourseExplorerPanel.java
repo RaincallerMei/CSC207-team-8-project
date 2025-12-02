@@ -31,10 +31,13 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final JPanel coursesContainer = new JPanel();
     private final CardLayout recommendedCardLayout = new CardLayout();
     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
-    private JButton submitButton; // Tracked for default button setting
+
+    // Track submit for enabling/disabling
+    private JButton submitButton;
 
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_RESULTS = "results";
+    private static final String CARD_LOADING = "loading"; // NEW
 
     /**
      * Primary Constructor with Dependency Injection
@@ -54,18 +57,17 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
 
-        // 1. Observe the ViewModel (Reactive UI)
+        // Observe the ViewModel
         this.viewModel.addPropertyChangeListener(this);
 
-        // 2. Build UI (slim left panel)
+        // Build UI (slim left panel)
         setLayout(new BorderLayout());
 
         JPanel leftPanel = createSurveyPanel();
         JPanel rightPanel = createRecommendedPanel();
 
-        // Keep left slim and stable
-        leftPanel.setPreferredSize(new Dimension(300, 1)); // ~300px wide initially
-        leftPanel.setMinimumSize(new Dimension(240, 1));   // don't let it collapse
+        leftPanel.setPreferredSize(new Dimension(300, 1));
+        leftPanel.setMinimumSize(new Dimension(240, 1));
 
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
@@ -73,15 +75,11 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
                 rightPanel
         );
         splitPane.setDividerSize(4);
-        // Extra space goes to the RIGHT when resizing (left stays slim)
         splitPane.setResizeWeight(1.0);
-
         add(splitPane, BorderLayout.CENTER);
-
-        // Set the initial divider after layout to ensure a slim left pane
         SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(300));
 
-        // 3. Trigger Initial Data Load via Controller
+        // Initial data load
         profileController.loadProfile();
     }
 
@@ -93,24 +91,22 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // =======================
-    // VIEW LOGIC: Reacting to State Changes
+    // VIEW LOGIC: React to VM
     // =======================
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String prop = evt.getPropertyName();
 
         if (RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS.equals(prop)) {
-            // Update the Accordion List
             @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
+            restoreIdle(); // NEW: stop loading
             updateResultsView(courses);
-        }
-        else if (RecommendCoursesViewModel.PROPERTY_PROFILE_LOADED.equals(prop)) {
-            // Update Inputs from Loaded State
+        } else if (RecommendCoursesViewModel.PROPERTY_PROFILE_LOADED.equals(prop)) {
             this.completedCourses = viewModel.getCompletedCoursesState();
             this.interestsArea.setText(viewModel.getInterestsState());
-        }
-        else if (RecommendCoursesViewModel.PROPERTY_ERROR.equals(prop)) {
+        } else if (RecommendCoursesViewModel.PROPERTY_ERROR.equals(prop)) {
+            restoreIdle(); // NEW: stop loading on error too
             JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -130,7 +126,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // =======================
-    // USER ACTIONS (Forward to Controllers)
+    // USER ACTIONS
     // =======================
     private void handleSubmit() {
         String interests = interestsArea.getText().trim();
@@ -138,6 +134,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
             JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        showLoading(); // NEW: show loader immediately
         recommendController.execute(interests, completedCourses);
     }
 
@@ -147,7 +144,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // =======================
-    // UI CONSTRUCTION HELPERS
+    // UI BUILDERS
     // =======================
     private JPanel createSurveyPanel() {
         JPanel panel = new JPanel();
@@ -172,7 +169,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         apiKeyButton.addActionListener(e -> {
-            // ApiKeyDialog hooked to ProfileController
             ApiKeyDialog d = new ApiKeyDialog(this, profileController);
             d.setVisible(true);
         });
@@ -236,6 +232,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
         panel.add(title, BorderLayout.NORTH);
 
+        // Placeholder
         JLabel placeholderLabel = new JLabel(
                 "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>recommended courses will appear here!</i></div></html>",
                 SwingConstants.CENTER
@@ -243,6 +240,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         JPanel placeholderPanel = new JPanel(new BorderLayout());
         placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);
 
+        // Results container
         coursesContainer.setLayout(new BoxLayout(coursesContainer, BoxLayout.Y_AXIS));
         JPanel scrollWrapper = new JPanel(new BorderLayout());
         scrollWrapper.add(coursesContainer, BorderLayout.NORTH);
@@ -250,11 +248,41 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
+        // NEW: Loading card
+        JPanel loadingPanel = new JPanel();
+        loadingPanel.setLayout(new BoxLayout(loadingPanel, BoxLayout.Y_AXIS));
+        loadingPanel.setBorder(new EmptyBorder(40, 20, 40, 20));
+        JLabel loadingText = new JLabel("Loading recommendations…", SwingConstants.CENTER);
+        loadingText.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JProgressBar bar = new JProgressBar();
+        bar.setIndeterminate(true);
+        bar.setAlignmentX(Component.CENTER_ALIGNMENT);
+        loadingPanel.add(loadingText);
+        loadingPanel.add(Box.createVerticalStrut(12));
+        loadingPanel.add(bar);
+
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
         recommendedCardPanel.add(scrollPane, CARD_RESULTS);
+        recommendedCardPanel.add(loadingPanel, CARD_LOADING); // NEW
         recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
 
         panel.add(recommendedCardPanel, BorderLayout.CENTER);
         return panel;
+    }
+
+    // =======================
+    // Loading helpers (NEW)
+    // =======================
+    private void showLoading() {
+        if (submitButton != null) submitButton.setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        recommendedCardLayout.show(recommendedCardPanel, CARD_LOADING);
+        recommendedCardPanel.revalidate();
+        recommendedCardPanel.repaint();
+    }
+
+    private void restoreIdle() {
+        setCursor(Cursor.getDefaultCursor());
+        if (submitButton != null) submitButton.setEnabled(true);
     }
 }
