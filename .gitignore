@@ -42,3 +42,6 @@ build/
 
 ### Gemini Debug File ###
 gemini_debug.json
+
+### IDEA Workspace ###
+.idea/workspace.xml
