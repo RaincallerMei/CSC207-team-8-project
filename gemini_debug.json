@@ -4,7 +4,10 @@
       "content": {
         "parts": [
           {
-            "text": "```json\n[\n  {\n    \"course_code\": \"ENT200H1\",\n    \"course_name\": \"Introduction to Entrepreneurship\",\n    \"course_description\": \"This course, offered by the Centre for Entrepreneurship, is designed for students from across the Faculty of Arts & Science. It provides an introduction to the fundamentals of entrepreneurship, combining scholarly and experiential learning.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"This course provides a broad introduction to entrepreneurship, which aligns with your interests in entrepreneurship and management. It is open to students from diverse backgrounds.\"\n  },\n  {\n    \"course_code\": \"RSM100H1\",\n    \"course_name\": \"Introduction to Management\",\n    \"course_description\": \"An introductory course to management principles.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in management, this introductory course will provide a solid foundation in core management concepts.\"\n  },\n  {\n    \"course_code\": \"MIE1624H\",\n    \"course_name\": \"Introduction to Data Science and Analytics\",\n    \"course_description\": \"This course introduces graduate students to scientific data analysis, statistical inference, and machine learning tools to gain insights from data sets. Topics include Python and R programming, version control, automation, modular programming, and scientific visualization.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Addresses your interests in data analysis and machine learning. Note that this is a graduate course, and auditing may be an option.\"\n  },\n  {\n    \"course_code\": \"STA130H1\",\n    \"course_name\": \"Introduction to Statistical Reasoning and Data Science\",\n    \"course_description\": \"A first-year introductory course that introduces the field of Data Science, using logical thinking, mathematics, computer simulation, and discussion.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"Since you are interested in data analysis, this course provides an introduction to data science, statistical reasoning, and practical applications.\"\n  },\n  {\n    \"course_code\": \"4117\",\n    \"course_name\": \"Product Management Bootcamp\",\n    \"course_description\": \"A bootcamp that prepares you for a product management role in the tech industry. You'll learn about the entire product lifecycle, from ideation to launch, including strategic planning, agile execution, and data-driven optimization.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Given your interests in product and data analysis, this bootcamp offers comprehensive skills for product management, covering strategy, execution, and data-driven decision-making.\"\n  }\n]\n```"
+            "text": "Based on your interests (\"dd\" and \"popp\") and the requirement to recommend 3-5 valid UofT courses for the 2024-2025 academic year, here are some suggestions. I have summarized the course descriptions in my own words.\n\n"
+          },
+          {
+            "text": "```json\n[\n  {\n    \"course_code\": \"PPG301H1\",\n    \"course_name\": \"Introduction to Public Policy\",\n    \"course_description\": \"This course offers an introduction to the study of public policy, the policy-making process, and Canadian policy institutions. It explores how issues emerge, how ideas are framed, priorities are established, and agendas are managed. It also examines how formal and informal rules shape policy-making in Canada.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"This course provides a foundational understanding of public policy, which aligns with the 'policy' aspect potentially related to 'popp'. It also introduces the Canadian context.\"\n  },\n  {\n    \"course_code\": \"PPG410H1\",\n    \"course_name\": \"Advanced Topics in Public Policy\",\n    \"course_description\": \"This course delves into a specific advanced topic in public policy, which varies depending on the instructor's research interests. The topics and instructor are subject to change each time the course is offered.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"This course allows for exploration of current issues. The 'popp' interest could potentially be explored within the context of a specific policy topic if available.\"\n  },\n  {\n    \"course_code\": \"ANT194H1\",\n    \"course_name\": \"Human-nonhuman relations through Manga & Anime\",\n    \"course_description\": \"This course explores human relationships with non-human beings (animals, plants, technology, spirits) through the lens of Japanese manga and anime.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"This course may relate to 'dd' if interpreted as an interest in design and digital media, using popular visual culture as a medium for exploration.\"\n  },\n  {\n    \"course_code\": \"PPG1004H\",\n    \"course_name\": \"Quantitative Methods for Policy Analysis\",\n    \"course_description\": \"This course teaches quantitative methods used in policy analysis. It requires knowledge of high school mathematics, especially algebra and working with graphs and fractions. Students who don't pass this course may need to retake a math-stats prep course.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Develops analytical skills, which are broadly applicable. Public Policy courses align with the 'popp' interest.\"\n  },\n  {\n    \"course_code\": \"VIC162H1\",\n    \"course_name\": \"Cultural Forms and Science Fiction\",\n    \"course_description\": \"This course explores science fiction as a genre, media industry, and sociocultural phenomenon. It examines key themes, texts, creators, audiences, and its place in contemporary culture. Course content is chosen by both the class and the instructor. Open to first-year students only.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"If 'dd' is interpreted as an interest in design or dystopian themes, this course offers a relevant exploration through the science fiction genre.\"\n  }\n]\n```"
           }
         ],
         "role": "model"
@@ -12,192 +15,136 @@
       "finishReason": "STOP",
       "groundingMetadata": {
         "searchEntryPoint": {
-          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFb6O3xoqfvsT3L4TCwRUi4uIBdpA3jSCkkg6Jho4ClZSMy094eN5BkDHx_Z_p69w__QRdW49UcmMs3HEgD2CrFVYS0qWzXPbztMq0PNjV2Moc53zy85kmhokReE0WKr_Om5adOTI1iDK6kxUuCDq9lbWy89rrZTtrMNli9LddqX2m-KVG5jCta21NgQN288URStjFR_Q-6uSEXbo_PAlHB8FJRMcM5\"\u003eUofT data analysis courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFBETxwyWPU-5ncks8yIWxvGHHx5jHUqGzlqFp5pIOcyO3sJ1izSYgHiofpnSTxuFA5VimJpk9bDQhs4ARYcbV7OA5ZH336DBgsx9cNidPl4akdiJcIYZOlQmdY9GKThGsht8RigOxLg0tfzwPn8_vGXxY9l3C4DotafRrGg4vRv8OqvN-YPEsioDbvVXTEL0cM5R1mI2BulAgYQ7rMo9D2SSI0iiYK0_m3\"\u003eUofT entrepreneurship courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHwPiS1P_W-XP5dTiWQlqYO5GzPpRvVI9J42skGXVn-91oNFZKBhrolZYr7yHUeW8Uj0qxmCIjbBgg2lXeG-QtFtXBkujE3nEWH7BIn5zhy9Ey_irRSkUAA8uiT9OYlp6ITRiLDNfWLRM8ifoYUk56uk-bFJA1VrWZebq7KYbIbBTWK0TlNHOzqIjat1sSqb52mAVPFWsQlr7t7lScVO3zwFeblmjjTsgrFXsk=\"\u003eUofT product management courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGPtmX9LyZI1Z3GhFTAe-4ku-wNgmuYLJQbeMDJ5CeX5HmaBl-uZsQz2XqTKVTE5E0bjGdR0l4myCVuX6xhq2bTaidvSrgAu-2PBvknR0sv9jiBi8FOteg1pMRbPEEXJLyxf-PFWcTahOOzLr7C11XmfRObJmMg3w--fnxAg5GD43gFQFIC369rsbmYElksuSNXVKj8hLe_c79uzFCIG_W3mprNYYUDXEOxYsY=\"\u003eUofT science management courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFHwh8hnwCNEu4SCI3OrG-ayG7ksS-oxqwmd7uaBO2DZr-LOs3EDbAC68soQdrYw4xShXiD4G-JsqRp2EBkv0bHgB266-ak0aLsHRTMH-QX2N9Gcq8A7Oc3vV9RgdYgTuJym_7zOm7GvEfQ6koqDTVFmbTHI1I855nMZN4bDMeTlEE_v-gNbJHIRabinzEbVDSlcNC9\"\u003eUofT course finder\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHuPbD2kzc-GeEpk2gPq-bgmP0N8_PDrrClZNpSYEWRhWKqWRHTmgxVi08ktRe8lUmG2kawEOn2673_8Cy1gWOBp5NOpmas1dEIrNR_Knb6p0CxQiffy_adpx25nU6psctxdi8L1ed-V_z6ATHdyxgKrp4whPG6-wjuoeJO9F961vawX4Dt7D9tcbIYccXMfflH2_dvNDrIMScxguPYk8DcMHhY\"\u003eUofT leadership courses 2024-2025\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGHc41PZLzap9OzVudt3mz6RatWnHdHlMEuSYT8QyDAH5XiSDf8MjVqxvMQifS4juaI-zN54-GyZcypeeYQLrnPjbmp4ZVm0UAkjOXfe_22FFtts4D_77AT0dPl5JJ1xg1wRra8Yv6obMIkhSvlvmLx_ZaDIWQFEPfqtawpnuGPagnrWYRnirdQQUrg7bK0hLYKzVNtCpxfZnl9vei9yk7D\"\u003eUofT course calendar 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGNjZrMEYX0C_Zxpy7lft2Qza7XEeXcyNMwOcTWTaUw399m8zYKvYN6nRzWFAp9lHy0dxnYPs9uxKsW597YmG9OcbIhPw5V2Q0DEXM3JPELZQ02vRM_cxuKbwTp_bPnoldx7ZUnYodh5R5pmp8Vi9oP34rCab7uG7tY49nkKzdNKrEyyoI2tCvXWHcTNcs=\"\u003e &quot;popp&quot;\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEgf3qkrOAufLZZSxMiA-KPZUJ3kcvUzySqRcMllphWwaUBYQJSXhya74nmv-q2VgNJfjLlgqH0iriwZUZlBopgU3kffCSgFZsdR9VocNqRCPPkqVz4qUIWyulfXQ4JoTK7X7aMFIrtUfDcgQdbzKTMJOfWfTxzj0prZ3U4l5Ivh0775cP8Bz7XlVI3\"\u003e &quot;dd&quot;\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGjMJnKAvn31cV3sjSn_Fyi8PVtOUuNdcyflDOgDP77YmCwiV3dUMsN6q88CRGerIWbOYxl358dQJuxOzGsqiXGC4B73zJhDdQF_shcJC_MKZfnQYYXfDiyU7Mq9mUxqQqV1zB9ZWIAYKQCpMAh778qLCF4AJclHIwPEDb2VSGSyVWMsUFi0Rv00aZdlYWXPq3\"\u003eUofT courses dd\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHnSSF394xH-Wu7Zw-GqGHs2Yyak-JRXoEyCbLZPzDVQkUyYb58j9xFc4PvdwpP7ZtPACR2fq2DB22PztC3KEdeM_P_LUnuhAgzB_64eeftyxxr6hHwXq4vbtX-_Of-77eWdyQspk-SFVBhaE32IL_wV52voJdf22UIU8IflCwW2IkYP1Gl63_8s_hXqCjw3JfoWfo=\"\u003eUofT courses popp\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
         },
         "groundingChunks": [
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQERMFsOqGLxiqpcRehG8awTGUzfXMtcjSmJieMJUBLyAAqx8mlAqqjXIN4xdFG9QNy4PhYR7gsKchYu2SlCQHOHRS64L0WFVb8epr8KgThfu6uAOPBqo4vv_HcWcXrBPs0g_4n34tNERZx-kOr2q6ZAQnTTW8T1sdPDQo0Chcnzpd_mU_vRDF3oMAo0btk=",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFygiEaR82dMT24vXRYzPu2SC2Ka7qitcwkAZLAM2InYgRgI8lE-60KiK5LVk1_7yY-nzCvodU4FPzRyz9vgJ0fwI9MWpuh8wRt7ZCJp8DL6pm56HTzOwEueAkrTAl2e3SJVpEnGVDrL3W4mG9IIZDPrp4H",
               "title": "utoronto.ca"
             }
           },
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGcCQfj34UqXdD9UdhFECyFsvRGWjymu55Z8PD0zi0ZfOHkqgsN_FopJgtasowsBRvc7zAVqT2Whv0pftzDCoKuvjULrHt_eTZvEFg9y37Tit4ZZvp3mqbP6L8KNzcpz_d8amK5Fzg3huTGBCY_mA==",
-              "title": "scinethpc.ca"
-            }
-          },
-          {
-            "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFlJ9p1tVfmsSgP36PRoXiCCXTDWM7CbL5y9sGMUQL7QEzD7ggTlFUcm2lqwGcSioycCKXiixz3E6Kze5prKRnTNkWAqoJlCn3GrHDqXQ1n_wZkxdQWe2Vrnasoy34bvjferrJf8PVbYtSIZEMJlCI1LQI=",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHyAiB5FQ4eWaCSrBxZgVOym0lb0CJ1ouZph9Ytimic8ekpcibzOkkxFEf4ScKd72fmQtqkO8QPXpjgdl_lIjnsh_Q0cTIl_o--EBqYXLTcZVEEOLu4T8RCoF0Cn_IbopO5e1wqLQOz2LFoNPShFMq20f8jpmlY3eMC6j41",
               "title": "utoronto.ca"
             }
           },
           {
             "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH4h53yCLIZoNb0HSLY8MizQgyGfhjo3yh0dlv1-3xEdnhG7smdotbkdNABWWWBjV5NqxRjyhrp7uULSd_-oZYCubUb8XJT9rDHwP1vRONaGwJ6csZGDaeJF6W8eDVLk0kHcj8k8Agxg9NwW4E2NYbI2OGl6lOaUp9TwDvCNmMQcb9kKXVlPA9IOw9Ewf8=",
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFhshCAvGumk_w7VmKoiThu8ZeE3t5wPEesna0yKrVB0fNKgm6CvM2d4_IOoSlLmxi-r82H3cQeu4x0im-TyGgiwUFc4Jr1BO-zZplL52gW0CMsOLxkUH_5l9_RQSWUwmR1OwoJ",
               "title": "utoronto.ca"
-            }
-          },
-          {
-            "web": {
-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFU_R12b53JPgvogFD38tjNVNRHy1taXu8Iaco1udCkQJMvTVQDTjYYoFa_o1EWiMUzBkbSXDAQvk0WgZwtvJcwSGDfs3ZN-1_30GbVv4NDO-CsuGy3c-Vj1I925CK5uWFCz1HQVNToCB1ApEI=",
-              "title": "xrcourse.com"
             }
           }
         ],
         "groundingSupports": [
           {
             "segment": {
-              "startIndex": 252,
-              "endIndex": 366,
-              "text": "It provides an introduction to the fundamentals of entrepreneurship, combining scholarly and experiential learning"
+              "startIndex": 575,
+              "endIndex": 651,
+              "text": "It also examines how formal and informal rules shape policy-making in Canada"
             },
             "groundingChunkIndices": [
               0
             ],
             "confidenceScores": [
-              0.38977024
+              0.57329637
             ]
           },
           {
             "segment": {
-              "startIndex": 574,
-              "endIndex": 621,
-              "text": "It is open to students from diverse backgrounds"
+              "startIndex": 1159,
+              "endIndex": 1238,
+              "text": "The topics and instructor are subject to change each time the course is offered"
             },
             "groundingChunkIndices": [
               0
             ],
             "confidenceScores": [
-              0.84371835
+              0.8810482
             ]
           },
           {
             "segment": {
-              "startIndex": 621,
-              "endIndex": 1268,
-              "text": ".\"\n  },\n  {\n    \"course_code\": \"RSM100H1\",\n    \"course_name\": \"Introduction to Management\",\n    \"course_description\": \"An introductory course to management principles.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in management, this introductory course will provide a solid foundation in core management concepts.\"\n  },\n  {\n    \"course_code\": \"MIE1624H\",\n    \"course_name\": \"Introduction to Data Science and Analytics\",\n    \"course_description\": \"This course introduces graduate students to scientific data analysis, statistical inference, and machine learning tools to gain insights from data sets"
+              "startIndex": 1368,
+              "endIndex": 1761,
+              "text": "The 'popp' interest could potentially be explored within the context of a specific policy topic if available.\"\n  },\n  {\n    \"course_code\": \"ANT194H1\",\n    \"course_name\": \"Human-nonhuman relations through Manga & Anime\",\n    \"course_description\": \"This course explores human relationships with non-human beings (animals, plants, technology, spirits) through the lens of Japanese manga and anime"
             },
             "groundingChunkIndices": [
               1
             ],
             "confidenceScores": [
-              0.5694708
+              0.14821503
             ]
           },
           {
             "segment": {
-              "startIndex": 1270,
-              "endIndex": 1389,
-              "text": "Topics include Python and R programming, version control, automation, modular programming, and scientific visualization"
-            },
-            "groundingChunkIndices": [
-              1
-            ],
-            "confidenceScores": [
-              0.9626807
-            ]
-          },
-          {
-            "segment": {
-              "startIndex": 1529,
-              "endIndex": 1595,
-              "text": "Note that this is a graduate course, and auditing may be an option"
-            },
-            "groundingChunkIndices": [
-              1
-            ],
-            "confidenceScores": [
-              0.61713606
-            ]
-          },
-          {
-            "segment": {
-              "startIndex": 1595,
-              "endIndex": 1890,
-              "text": ".\"\n  },\n  {\n    \"course_code\": \"STA130H1\",\n    \"course_name\": \"Introduction to Statistical Reasoning and Data Science\",\n    \"course_description\": \"A first-year introductory course that introduces the field of Data Science, using logical thinking, mathematics, computer simulation, and discussion"
+              "startIndex": 1762,
+              "endIndex": 2180,
+              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"This course may relate to 'dd' if interpreted as an interest in design and digital media, using popular visual culture as a medium for exploration.\"\n  },\n  {\n    \"course_code\": \"PPG1004H\",\n    \"course_name\": \"Quantitative Methods for Policy Analysis\",\n    \"course_description\": \"This course teaches quantitative methods used in policy analysis"
             },
             "groundingChunkIndices": [
               2
             ],
             "confidenceScores": [
-              0.046313386
+              0.31575888
             ]
           },
           {
             "segment": {
-              "startIndex": 1891,
-              "endIndex": 2307,
-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"Since you are interested in data analysis, this course provides an introduction to data science, statistical reasoning, and practical applications.\"\n  },\n  {\n    \"course_code\": \"4117\",\n    \"course_name\": \"Product Management Bootcamp\",\n    \"course_description\": \"A bootcamp that prepares you for a product management role in the tech industry"
+              "startIndex": 2290,
+              "endIndex": 2369,
+              "text": "Students who don't pass this course may need to retake a math-stats prep course"
             },
             "groundingChunkIndices": [
-              3
+              2
             ],
             "confidenceScores": [
-              0.43729553
+              0.0047545545
             ]
           },
           {
             "segment": {
-              "startIndex": 2309,
-              "endIndex": 2458,
-              "text": "You'll learn about the entire product lifecycle, from ideation to launch, including strategic planning, agile execution, and data-driven optimization"
+              "startIndex": 2931,
+              "endIndex": 2963,
+              "text": "Open to first-year students only"
             },
             "groundingChunkIndices": [
-              3,
-              4
+              1
             ],
             "confidenceScores": [
-              0.07398,
-              0.109307066
-            ]
-          },
-          {
-            "segment": {
-              "startIndex": 2459,
-              "endIndex": 2712,
-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Given your interests in product and data analysis, this bootcamp offers comprehensive skills for product management, covering strategy, execution, and data-driven decision-making"
-            },
-            "groundingChunkIndices": [
-              3,
-              4
-            ],
-            "confidenceScores": [
-              0.3025375,
-              0.5689801
+              0.08319971
             ]
           }
         ],
         "retrievalMetadata": {},
         "webSearchQueries": [
-          "UofT science management courses 2024-2025",
-          "UofT entrepreneurship courses 2024-2025",
-          "UofT leadership courses 2024-2025",
-          "UofT product management courses 2024-2025",
-          "UofT data analysis courses 2024-2025",
-          "UofT course finder"
+          " \"popp\"",
+          " \"dd\"",
+          "UofT course calendar 2024-2025",
+          "UofT courses popp",
+          "UofT courses dd"
         ]
       }
     }
   ],
   "usageMetadata": {
-    "promptTokenCount": 137,
-    "candidatesTokenCount": 637,
-    "totalTokenCount": 774,
+    "promptTokenCount": 125,
+    "candidatesTokenCount": 779,
+    "totalTokenCount": 904,
     "promptTokensDetails": [
       {
         "modality": "TEXT",
-        "tokenCount": 137
+        "tokenCount": 125
       }
     ],
     "candidatesTokensDetails": [
       {
         "modality": "TEXT",
-        "tokenCount": 637
+        "tokenCount": 779
       }
     ]
   },
   "modelVersion": "gemini-2.0-flash",
-  "responseId": "jGMuaaefF-bY_uMPr9Pa6AU"
+  "responseId": "yDYvadK-FOfV_uMPkt7qgAQ"
 }
