@@ -1,0 +1,10 @@
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision eb9adec8125b02a0bad360c483262623eb94ee2c)
++++ b/.env	(date 1764464343611)
+@@ -1,0 +1,1 @@
++GEMINI_API_KEY=AIzaSyCfkR4o0i0ir92QwpBDZ5cxe4fNZVIUtMQ

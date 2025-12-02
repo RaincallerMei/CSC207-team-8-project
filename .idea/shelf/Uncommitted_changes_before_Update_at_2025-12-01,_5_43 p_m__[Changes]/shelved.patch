@@ -1,0 +1,14 @@
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>GEMINI_API_KEY=
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision 60c027817d98c6d61d00d89771c724eafe1ca8d3)
++++ b/.env	(date 1764629003363)
+@@ -1,1 +1,2 @@
++GEMINI_API_KEY=AIzaSyCfkR4o0i0ir92QwpBDZ5cxe4fNZVIUtMQ
+ GEMINI_API_KEY=
+\ No newline at end of file
