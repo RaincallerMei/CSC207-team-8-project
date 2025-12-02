@@ -27,6 +27,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final JTextArea interestsArea = new JTextArea();
     private List<String> completedCourses = new ArrayList<>();
 
+    // Gate submit until API key is confirmed saved
+    private boolean apiKeyEntered = false;
+
     // ==== UI Components ====
     private final JPanel coursesContainer = new JPanel();
     private final CardLayout recommendedCardLayout = new CardLayout();
@@ -37,7 +40,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_RESULTS = "results";
-    private static final String CARD_LOADING = "loading"; // NEW
+    private static final String CARD_LOADING = "loading";
 
     /**
      * Primary Constructor with Dependency Injection
@@ -100,13 +103,14 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         if (RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS.equals(prop)) {
             @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
-            restoreIdle(); // NEW: stop loading
+            restoreIdle(); // stop loading
             updateResultsView(courses);
         } else if (RecommendCoursesViewModel.PROPERTY_PROFILE_LOADED.equals(prop)) {
             this.completedCourses = viewModel.getCompletedCoursesState();
             this.interestsArea.setText(viewModel.getInterestsState());
+            // (Optional future enhancement: enable submit if a stored API key exists)
         } else if (RecommendCoursesViewModel.PROPERTY_ERROR.equals(prop)) {
-            restoreIdle(); // NEW: stop loading on error too
+            restoreIdle(); // stop loading on error too
             JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -129,12 +133,21 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     // USER ACTIONS
     // =======================
     private void handleSubmit() {
+        // Guard: require API key first
+        if (!apiKeyEntered) {
+            JOptionPane.showMessageDialog(this,
+                    "Please set your API Key first (click \"Set API Key\").",
+                    "API Key required",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         String interests = interestsArea.getText().trim();
         if (interests.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        showLoading(); // NEW: show loader immediately
+        showLoading(); // show loader immediately
         recommendController.execute(interests, completedCourses);
     }
 
@@ -169,7 +182,14 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         apiKeyButton.addActionListener(e -> {
-            ApiKeyDialog d = new ApiKeyDialog(this, profileController);
+            // Use the dialog's success callback to enable submit only after a verified+saved key
+            ApiKeyDialog d = new ApiKeyDialog(this, profileController, () -> {
+                apiKeyEntered = true;
+                if (submitButton != null) {
+                    submitButton.setEnabled(true);
+                    submitButton.setToolTipText(null);
+                }
+            });
             d.setVisible(true);
         });
 
@@ -198,6 +218,9 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         saveButton.addActionListener(e -> handleSave());
 
         submitButton = new JButton("Get Recommendations");
+        // start disabled until API key is entered successfully
+        submitButton.setEnabled(apiKeyEntered);
+        submitButton.setToolTipText("Set API Key first");
         submitButton.addActionListener(e -> handleSubmit());
 
         JPanel actionsRow = new JPanel(new GridLayout(1, 2, 10, 0));
@@ -248,7 +271,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // NEW: Loading card
+        // Loading card
         JPanel loadingPanel = new JPanel();
         loadingPanel.setLayout(new BoxLayout(loadingPanel, BoxLayout.Y_AXIS));
         loadingPanel.setBorder(new EmptyBorder(40, 20, 40, 20));
@@ -263,7 +286,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
         recommendedCardPanel.add(scrollPane, CARD_RESULTS);
-        recommendedCardPanel.add(loadingPanel, CARD_LOADING); // NEW
+        recommendedCardPanel.add(loadingPanel, CARD_LOADING);
         recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
 
         panel.add(recommendedCardPanel, BorderLayout.CENTER);
@@ -271,7 +294,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // =======================
-    // Loading helpers (NEW)
+    // Loading helpers
     // =======================
     private void showLoading() {
         if (submitButton != null) submitButton.setEnabled(false);
@@ -283,6 +306,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
     private void restoreIdle() {
         setCursor(Cursor.getDefaultCursor());
-        if (submitButton != null) submitButton.setEnabled(true);
+        if (submitButton != null) submitButton.setEnabled(apiKeyEntered);
     }
 }
