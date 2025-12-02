@@ -51,7 +51,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     // Buttons tracked for default button setting
     private JButton submitButton;
 
-    // ============= 构造函数：推荐 + why 一起注入 =============
     public CourseExplorerPanel(RecommendCoursesController recommendController,
                                RecommendCoursesViewModel recommendViewModel,
                                WhyCoursesController whyController,
@@ -62,7 +61,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         this.whyViewModel = whyViewModel;
         this.keywordGenerator = new DefaultKeywordSuggester();
 
-        // 注册监听
         this.recommendViewModel.addPropertyChangeListener(this);
         if (this.whyViewModel != null) {
             this.whyViewModel.addPropertyChangeListener(this);
