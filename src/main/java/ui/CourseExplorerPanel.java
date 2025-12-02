@@ -12,12 +12,25 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
+/**
+ * Left = survey/actions, right = results (placeholder/loading).
+ * Minimal guard: if user clicks "Get Recommendations" and we can't find an API key
+ * in env / .env, we warn and stop. No disabled/grey button.
+ */
 public class CourseExplorerPanel extends JPanel implements PropertyChangeListener {
 
-    // ==== Dependencies (Clean Architecture: Controllers & ViewModel) ====
+    // ==== Dependencies ====
     private final RecommendCoursesController recommendController;
     private final ProfileController profileController;
     private final RecommendCoursesViewModel viewModel;
@@ -32,16 +45,22 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private final CardLayout recommendedCardLayout = new CardLayout();
     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
 
-    // Track submit for enabling/disabling
-    private JButton submitButton;
+    private JButton submitButton; // tracked for default + loading state
 
     private static final String CARD_PLACEHOLDER = "placeholder";
     private static final String CARD_RESULTS = "results";
-    private static final String CARD_LOADING = "loading"; // NEW
+    private static final String CARD_LOADING = "loading";
 
-    /**
-     * Primary Constructor with Dependency Injection
-     */
+    // Common env var names used for Gemini/Google GenAI keys
+    private static final Set<String> KEY_NAMES = new HashSet<>();
+    static {
+        KEY_NAMES.add("API_KEY");
+        KEY_NAMES.add("GOOGLE_API_KEY");
+        KEY_NAMES.add("GOOGLE_GENAI_API_KEY");
+        KEY_NAMES.add("GEMINI_API_KEY");
+        KEY_NAMES.add("GENAI_API_KEY");
+    }
+
     public CourseExplorerPanel(RecommendCoursesController recommendController,
                                ProfileController profileController,
                                RecommendCoursesViewModel viewModel) {
@@ -57,10 +76,8 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         this.viewModel = viewModel;
         this.keywordGenerator = keywordGenerator;
 
-        // Observe the ViewModel
         this.viewModel.addPropertyChangeListener(this);
 
-        // Build UI (slim left panel)
         setLayout(new BorderLayout());
 
         JPanel leftPanel = createSurveyPanel();
@@ -79,7 +96,6 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         add(splitPane, BorderLayout.CENTER);
         SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(300));
 
-        // Initial data load
         profileController.loadProfile();
     }
 
@@ -100,13 +116,13 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         if (RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS.equals(prop)) {
             @SuppressWarnings("unchecked")
             List<Course> courses = (List<Course>) evt.getNewValue();
-            restoreIdle(); // NEW: stop loading
+            restoreIdle();
             updateResultsView(courses);
         } else if (RecommendCoursesViewModel.PROPERTY_PROFILE_LOADED.equals(prop)) {
             this.completedCourses = viewModel.getCompletedCoursesState();
             this.interestsArea.setText(viewModel.getInterestsState());
         } else if (RecommendCoursesViewModel.PROPERTY_ERROR.equals(prop)) {
-            restoreIdle(); // NEW: stop loading on error too
+            restoreIdle();
             JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -129,12 +145,24 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     // USER ACTIONS
     // =======================
     private void handleSubmit() {
+        // Guard: require API key present (env or .env)
+        if (!hasStoredApiKey()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "API key not found in environment/.env.\nClick \"Set API Key\" to add it before getting recommendations.",
+                    "API Key required",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+
         String interests = interestsArea.getText().trim();
         if (interests.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        showLoading(); // NEW: show loader immediately
+
+        showLoading();
         recommendController.execute(interests, completedCourses);
     }
 
@@ -248,7 +276,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // NEW: Loading card
+        // Loading card
         JPanel loadingPanel = new JPanel();
         loadingPanel.setLayout(new BoxLayout(loadingPanel, BoxLayout.Y_AXIS));
         loadingPanel.setBorder(new EmptyBorder(40, 20, 40, 20));
@@ -263,7 +291,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
 
         recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);
         recommendedCardPanel.add(scrollPane, CARD_RESULTS);
-        recommendedCardPanel.add(loadingPanel, CARD_LOADING); // NEW
+        recommendedCardPanel.add(loadingPanel, CARD_LOADING);
         recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
 
         panel.add(recommendedCardPanel, BorderLayout.CENTER);
@@ -271,7 +299,7 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     }
 
     // =======================
-    // Loading helpers (NEW)
+    // Loading helpers
     // =======================
     private void showLoading() {
         if (submitButton != null) submitButton.setEnabled(false);
@@ -284,5 +312,56 @@ public class CourseExplorerPanel extends JPanel implements PropertyChangeListene
     private void restoreIdle() {
         setCursor(Cursor.getDefaultCursor());
         if (submitButton != null) submitButton.setEnabled(true);
+    }
+
+    // =======================
+    // API key presence (env / .env)
+    // =======================
+    private boolean hasStoredApiKey() {
+        try {
+            // 1) Dotenv (uses working dir .env by default)
+            try {
+                Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+                for (String name : KEY_NAMES) {
+                    String v = dotenv.get(name);
+                    if (v != null && !v.isBlank()) return true;
+                }
+            } catch (Throwable ignore) { /* Dotenv not available or failed */ }
+
+            // 2) System environment variables
+            for (String name : KEY_NAMES) {
+                String v = System.getenv(name);
+                if (v != null && !v.isBlank()) return true;
+            }
+
+            // 3) Fallback: parse ~/.course_explorer/.env and ./ .env manually
+            Path homeEnv = Paths.get(System.getProperty("user.home"), ".course_explorer", ".env");
+            if (Files.exists(homeEnv) && fileHasAnyKey(homeEnv)) return true;
+
+            Path localEnv = Paths.get(".env");
+            return Files.exists(localEnv) && fileHasAnyKey(localEnv);
+
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private boolean fileHasAnyKey(Path envPath) {
+        try {
+            for (String line : Files.readAllLines(envPath, StandardCharsets.UTF_8)) {
+                String t = line.trim();
+                if (t.isEmpty() || t.startsWith("#")) continue;
+                int eq = t.indexOf('=');
+                if (eq <= 0) continue;
+                String key = t.substring(0, eq).trim();
+                String val = t.substring(eq + 1).trim();
+                if ((val.startsWith("\"") && val.endsWith("\"")) || (val.startsWith("'") && val.endsWith("'"))) {
+                    val = val.substring(1, val.length() - 1);
+                }
+                if (KEY_NAMES.contains(key) && !val.isBlank()) return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 }
