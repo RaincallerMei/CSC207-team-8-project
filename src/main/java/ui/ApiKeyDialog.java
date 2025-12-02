@@ -1,7 +1,5 @@
 package ui;
 
-import storage.AppStateStore;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -15,12 +13,21 @@ import okhttp3.Response;
 public class ApiKeyDialog extends JDialog {
 
     private final JTextField apiKeyField = new JTextField();
-    private final JPasswordField passField = new JPasswordField();
+    private final JPasswordField passField = new JPasswordField(); // kept if you use later
 
     private static final OkHttpClient HTTP = new OkHttpClient();
+    private final Runnable onSaved; // NEW: notify caller only on successful save
 
+    // Backward-compatible ctor
     public ApiKeyDialog(Component parent, ProfileController controller) {
+        this(parent, controller, null);
+    }
+
+    // NEW: caller can pass a callback to enable submit only after success
+    public ApiKeyDialog(Component parent, ProfileController controller, Runnable onSaved) {
         super(SwingUtilities.getWindowAncestor(parent), "Set API Key", Dialog.ModalityType.APPLICATION_MODAL);
+        this.onSaved = onSaved;
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
@@ -56,7 +63,7 @@ public class ApiKeyDialog extends JDialog {
                 return;
             }
             try {
-                // Minimal format sanity-check for Google-style keys
+                // Minimal sanity check
                 if (!apiKey.startsWith("AIza") || apiKey.length() < 30) {
                     JOptionPane.showMessageDialog(this,
                             "That doesn't look like a valid Google API key (should start with \"AIza...\").",
@@ -64,8 +71,7 @@ public class ApiKeyDialog extends JDialog {
                             JOptionPane.WARNING_MESSAGE);
                     return;
                 }
-
-                // Quick online verification against Generative Language API
+                // Online verify against Generative Language API
                 if (!verifyApiKeyOnline(apiKey)) {
                     JOptionPane.showMessageDialog(this,
                             "API key appears invalid or not authorized for Generative Language API.",
@@ -75,6 +81,7 @@ public class ApiKeyDialog extends JDialog {
                 }
 
                 controller.saveApiKey(apiKey);
+                if (onSaved != null) SwingUtilities.invokeLater(onSaved); // ← notify success
                 JOptionPane.showMessageDialog(this, "API key saved.", "Saved", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } catch (Exception ex) {
@@ -95,11 +102,9 @@ public class ApiKeyDialog extends JDialog {
                     .build();
             Request req = new Request.Builder().url(url).get().build();
             try (Response res = HTTP.newCall(req).execute()) {
-                // 200 OK indicates the key is valid for listing models
-                return res.isSuccessful();
+                return res.isSuccessful(); // 200 OK => valid
             }
         } catch (Exception e) {
-            // Network or other transient issues — treat as failure so user can retry
             return false;
         }
     }
