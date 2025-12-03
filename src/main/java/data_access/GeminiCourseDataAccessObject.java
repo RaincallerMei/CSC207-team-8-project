@@ -78,6 +78,7 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
     }
 
+    // New method for WhyCoursesDataAccessInterface
     @Override
     public String getRationaleForCourse(String courseCode) {
         return explanationCache.get(courseCode);
@@ -101,13 +102,7 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                 String name = extractValue(objStr, "course_name");
                 String desc = extractValue(objStr, "course_description");
                 String explanation = extractValue(objStr, "explanation");
-
-                // Extract the prerequisites (which are now grounded by search)
                 String prereqs = extractValue(objStr, "prerequisite_codes");
-
-                // Extract keywords (added to fix the empty display)
-                String keywords = extractValue(objStr, "course_keywords");
-                if (keywords.equals("N/A")) keywords = "General Interest";
 
                 // Store explanation in cache
                 explanationCache.put(code, explanation);
@@ -118,8 +113,8 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                     rank = Integer.parseInt(rankStr);
                 } catch (NumberFormatException e) { /* default */ }
 
-                // Pass the extracted keywords and prereqs to the Course entity
-                Course course = new Course(code, name, desc, prereqs, rank, keywords, explanation);
+                // Note: passing explanation to Course object too, as before
+                Course course = new Course(code, name, desc, prereqs, rank, "", explanation);
                 courses.add(course);
 
             } catch (Exception e) {
@@ -130,12 +125,10 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
     }
 
     private String extractValue(String source, String key) {
-        // Regex to handle standard JSON string values
         Pattern pattern = Pattern.compile("\"" + key + "\":\\s*\"(.*?)\"");
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) return matcher.group(1);
 
-        // Regex to handle integers (like course_rank)
         Pattern numPattern = Pattern.compile("\"" + key + "\":\\s*(\\d+)");
         Matcher numMatcher = numPattern.matcher(source);
         if (numMatcher.find()) return numMatcher.group(1);
@@ -145,27 +138,16 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     private String buildPrompt(String interests, List<String> completedCourses) {
         String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
-
-        // UPDATED PROMPT:
-        // 1. Added STRICT instructions to use Google Search for prerequisites.
-        // 2. Added instructions to generate 'course_keywords'.
         return String.format(
                 "You are a course recommendation assistant for UofT.\n" +
                         "Interests: %s\n" +
                         "Completed: %s\n" +
                         "Task: Recommend 3-5 valid UofT courses.\n" +
-                        "STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.\n" +
-                        "STRICT VERIFICATION: Use Google Search tool to find the EXACT prerequisites for each course in the 2024-2025 calendar. Do NOT guess.\n\n" +
+                        "STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.\n\n" +
                         "CRITICAL: Summarize course descriptions in your own words.\n" +
                         "DO NOT copy text verbatim from the web to avoid copyright blocks.\n\n" +
-                        "Output JSON Array ONLY. Keys:\n" +
-                        "1. course_code (string)\n" +
-                        "2. course_name (string)\n" +
-                        "3. course_description (string)\n" +
-                        "4. prerequisite_codes (string: exact prerequisites found via search)\n" +
-                        "5. course_rank (integer)\n" +
-                        "6. course_keywords (string: comma-separated keywords)\n" +
-                        "7. explanation (string)\n" +
+                        "Output JSON Array ONLY. Keys: course_code, course_name,\n" +
+                        "course_description, prerequisite_codes, course_rank, explanation.\n" +
                         "Do NOT use Markdown formatting.",
                 interests, completedText
         );
@@ -173,7 +155,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     private String buildRequestBody(String prompt) {
         String escapedPrompt = prompt.replace("\"", "\\\"").replace("\n", "\\n");
-        // Ensure the tool definition is present so the prompt instructions can actually work
         return "{"
                 + "\"contents\":[{\"parts\":[{\"text\":\"" + escapedPrompt + "\"}]}],"
                 + "\"tools\": [{\"google_search\": {}}]"
@@ -190,8 +171,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         if (endQuote <= startQuote) return "[]";
 
         String rawContent = responseBody.substring(startQuote + 1, endQuote);
-
-        // Clean up escaped characters
         String unescaped = rawContent.replace("\\\"", "\"").replace("\\n", " ");
 
         if (unescaped.contains("```")) {
