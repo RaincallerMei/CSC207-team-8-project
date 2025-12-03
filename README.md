@@ -9,7 +9,7 @@ Key features include:
 - **Deep Insights:** Provides AI-generated rationales explaining *why* a specific course was recommended for that specific user.
 - **Local Persistence:** Securely saves user profiles, course history, and API Keys.
 
-## 📝 User Stories & Responsibilities
+## User Stories & Responsibilities
 
 | Team Member | User Story | Implementation |
 | :--- | :--- | :--- |
@@ -45,7 +45,7 @@ This project utilizes the **Google Gemini Developer API** (Model: `gemini-2.5-fl
 ### 2. Course Recommendations (Accordion View)
 *The results panel showing a list of recommended courses. Clicking a course expands it to reveal details, prerequisites, and the AI's relevance explanation.*
 
-<img width="689" height="610" alt="Left Panel" src="https://github.com/user-attachments/assets/ea3d1bda-1624-4f8e-bb2e-ed2cccc88a56" />
+<img width="684" height="601" alt="Screenshot 2025-12-03 at 12 27 49 AM" src="https://github.com/user-attachments/assets/5b81693a-5886-41ab-9689-0001e0a508d0" />
 
 ---
 
