@@ -1,7 +1,230 @@
 {
-  "error": {
-    "code": 403,
-    "message": "Your API key was reported as leaked. Please use another API key.",
-    "status": "PERMISSION_DENIED"
-  }
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```json\n[\n  {\n    \"course_code\": \"STA302H1\",\n    \"course_name\": \"Methods of Data Analysis I\",\n    \"course_description\": \"An introduction to data analysis with a focus on regression. It covers initial data examination, correlation, simple and multiple regression models using least squares. Also includes inference for regression parameters, confidence and prediction intervals, diagnostics and remedial measures, interactions and dummy variables, and variable selection. Least squares estimation and inference for non-linear regression is also covered.\",\n    \"prerequisite_codes\": \"STA257H1 or ECO227Y1 or STAB52H3\",\n    \"course_rank\": 2,\n    \"course_keywords\": \"data analysis, regression, statistics\",\n    \"explanation\": \"This course provides a solid foundation in data analysis techniques, especially regression, which is essential for understanding and applying machine learning algorithms. It builds upon your existing knowledge and aligns with your interest in data analysis and machine learning.\"\n  },\n  {\n    \"course_code\": \"CSC311H1\",\n    \"course_name\": \"Introduction to Machine Learning\",\n    \"course_description\": \"This course introduces methods for automated learning of relationships using empirical data. Topics include classification and regression using nearest neighbor methods, decision trees, linear models, and neural networks. It also covers clustering algorithms and the problems of overfitting and assessing accuracy. The course also covers the basics of reinforcement learning and focuses on implementing, understanding and debugging software programs for building machine learning models from data.\",\n    \"prerequisite_codes\": \"Programming Basics: CSC207/ APS105/ APS106/ ESC180/ CSC180. Multi-Variable Calculus: MAT235/ MAT237/ MAT257 / (77%+ in MAT135, MAT136)/ (77%+ in MAT137)/ (67%+ in MAT157)/ MAT291/ MAT294 / (77%+ in MAT186, MAT187)/ (73%+ in MAT194, ESC195) Programming Basics: CSC207/ APS105/ APS106/ ESC180/ CSC180. Linear Algebra: MAT221/ MAT223/ MAT240/ MAT185/ MAT188. Probability: STA237/ STA247/ STA255/ STA257/ STA286/ CHE223/ CME263/ MIE231/ MIE236/ MSE238/ ECE286\",\n    \"course_rank\": 1,\n    \"course_keywords\": \"machine learning, neural networks, algorithms\",\n    \"explanation\": \"Given your interest in machine learning, this course is a natural fit. It provides a broad introduction to machine learning algorithms and principles, and it builds upon your completed courses.\"\n  },\n  {\n    \"course_code\": \"STA256H1\",\n    \"course_name\": \"Probability and Statistics I\",\n    \"course_description\": \"This course covers probability and its role in statistical modeling. Topics include probability distributions, expectation, discrete and continuous random variables and vectors, distribution functions, distributions of functions of random variables, limit theorems, and the central limit theorem.\",\n    \"prerequisite_codes\": \"MAT134H5 or MAT136H5 or MAT137Y5 or MAT139H5 or MAT157Y5 or MAT159H5 or a minimum 65% in MAT133Y5.\",\n    \"course_rank\": 3,\n    \"course_keywords\": \"probability, statistics, distributions\",\n    \"explanation\": \"This course is fundamental to both data analysis and machine learning as it provides the necessary statistical background for understanding many algorithms and models.\"\n  },\n  {\n    \"course_code\": \"PHY293H1\",\n    \"course_name\": \"Waves and Modern Physics\",\n    \"course_description\": \"This course covers waves and modern physics.\",\n    \"prerequisite_codes\": \"PHY151H1/PHY131H1 and MAT136H1/MAT138H1/MAT136H5/MAT137Y1/MAT157Y1\",\n    \"course_rank\": 4,\n    \"course_keywords\": \"physics, waves, modern physics\",\n    \"explanation\": \"Since you have an interest in physics this might be a good choice to broaden your knowledge in the area. The course covers fundamental concepts in waves and modern physics.\"\n  }\n]\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "groundingMetadata": {
+        "searchEntryPoint": {
+          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHZ5EWazHk6Uj4mBBlMIm0kwy1HIGGkdt3CgeYnrfHmFkImLDZJU25R84WuAj8kqqepnpDKmpyvzK85WYtUPMKYq-2ruoaqNUkMOPQq9T-KWOksdvqOWWFDRpSwtfLyS6RmigX6qaESWB6DfOC_bUUJyiASDve_TfxjdrWqeGp0EkJL7H4ROYIy4vQunH5kHMLzhS6aQDcqYrDDMiSgEdLQ\"\u003eUofT Machine learning courses\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFQUKg83LfoAl9l0vuU5ZjEc6HKtyrEuIft5J4zkalCvVs3S_9HJHRpWRN5bubPMbpIIfkSmjIlA_dMG--mM5nrlCGE32bXsY55YeGBbjr--DTk0IPyMN_l1XTLnDaHyeAdqZISaWzJQnwBoC6rowvXUY3xVsCtlhOi07Joeofu4NGq3_ZCW-3DdnlQ8wbtFDZNCdA=\"\u003eUofT BBQ courses\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEhsUc7_lLdubqmxJhPaoFqQ3w5R89p6hU7K7GqtAJfgw-qEmRQWLbHl8HeRZrInCz8nigC6QV1V0h_5zhKilpr_a4I7qIHNwa4y_uKDus3ZjJoZedoqDPILyVEpfAT2c5C-Fve54dkc_OVL1_CybeSfgjNoMhhsaJpRpndiRuBY3SINonu3-pdsWxTp3PCSFEdB5mxNhaI7fYbwaYWd3SgkZ9ius0LDic=\"\u003eUofT CSC311 2024-2025 course calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHSKtck8xmApapZoVnZ5MI6Vt7ys01bmnh8x0NZkjoVSWCNgaDMab--L8pjW7g9mayR6DD00R2mEyKTJQ80CnPWlqKz5sOYYpNAt915xjZvrAv_uapx9A-MTyuWqPIIYG56rlYWw4coD1KHVvVescw2wRXDI6GbX-TraHl-b0tOQTCkOtd4xOFp38QuJVEoZPSd6DlN9aFJLREXaYk776Y3ct2ZtHTX-_k=\"\u003eUofT STA256 2024-2025 course calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGf2p0bqnCqgGDeQpdigo4zhosmWktjP9E1q4B7By9xYvqcV61sbaH21959jMb1Yx6pDSo69vV0dqyr1olPk_-7ENa8vvta2vsVXaTgOmcVDjYQfzjDqAzXag-HM3HXFmUdDST1N0FBeHQbssLVPunRtdvcnPbgFyIAspflE8F11CA0QltSjCpUFFQQGa0YLnWVtUbCC3ecWFQ7F-4RHhRzvuen4m45kRE=\"\u003eUofT PHY293 2024-2025 course calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGj66UujvMsd0VbEokyT_DFhhU-H0q0e2IJnTwlG1InE86cqOuRNAAD1D-d6-AtdmZG29_Hl2jc7LD_JkcEACW5l3ucfBtID-oTpFPfBeCRGzrSyDMQpuS0AXv6N0DS-PKqCalz8kLIru-VMMJPUb13uB8TQFKSWZ5zgaR2GnUuvJa6EF0JCsPJtkbL40VaxjmxtCal2N3mqCOkywCmNellt4gnplNKfPlcfAPmNe2v22uQmQyyK0Q=\"\u003eUofT APS105 2024-2025 course calendar prerequisites\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEh9lcUP4WjxduM0Z5GoWlPKxVkaS0ZCOcvbaIgLuS7HHG7J3gqKcfAmN0iVsf14l9noDNeJfAQYKD8izAm_LTI4EQP3B-vRVv4d5KVRjj-53BLLVe7kwyWXEwrDVMEZJg-9tnJi6WpArasqnRthUzsOdgqJYMdNbG4nz3d_keb7-MgCel3ZYJK0dA8o1iJ-xeG49RSSk8uoZd-QFqMk6MIimosf3npd0T5oABVfs8Im9mwdjTb0lI=\"\u003eUofT CSC207 2024-2025 course calendar prerequisites\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEur_9Sr6dOoYaZTuSu7S7cph0fF9ih4aWYBqkgnSxRHxG7MvEeeeetPSdC6KXOCcTQeBbwI43i7eVQYPHaR-DTJcIefRoJT8WAlYXB-Gd4MSR8ZE3hYMp_hKemMBipXc92W6CP-zEmwz5R1gcMoDey71ZhpPJqoUdf4zkAkUGx2j9dV4mF2xn8djKLl8vLsAS35WzM6Bx1Ok8Ia_SsGokPj8ZcYE-Mg6M=\"\u003eUofT STA302 2024-2025 course calendar\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH1YZQb7vk47oZGz258j3e4XCqubBgn8lDVi8SbUUyJceHp1a-qNYGJGGvCZg-JFK5Tcl25yG2QeT05WO9-KeAC8s6Yw0wo23CsD2ygYNwOzVdG1apfgJw1Rzxnpu1-O_wbkLdQeNLqj8xKUfAo8bSBuuFpIHKkwA6WujuwC4Y6E8FzA6e6IWxHhTJWeXqWhueDYHPUXC6rr8K9PP_2\"\u003eUofT data analysis courses\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+        },
+        "groundingChunks": [
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEs7OMwdjaxEE6ad6y9qL7VHKfxQaiaXOURvI7Ew06ewU8RA4NNom9koCzLDSIG_51i0RctIKc4jPV38Vt854V2P-qQN-1LpCo0sLczFO39FYwXWOfOwCgAruhiARWV16wPJKhhPIFQDFf6EU4EYg==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGkV811Zv21vvT2XfQdcOQSZftnnUhxce1K6ZWVYx2IVbp_k9W6wUrCSi8kp6DoKChx7PcUTp3bDHVO_HKMFck5pITI4K5-rXGlp73iyLtPvK_ZEzqYUyvMGkKzreBhFrHJ9YpZv2Dr_BWZSN7mYg==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE-abnefZk5QiPeJAWxciGyqPMlgkPAF4GFXZrxzYsVVrEIEEBFny4bXyOkoSptX9gnjyWwURnAQnhTx1qJGQuRnpnR2RZFPBEROulPhIx3rr4V9oZ19O3cpq9VVVqXVCrgiew2EszW1h-QPqsIBg_3lE8getcqGXYHhpOd",
+              "title": "toronto.edu"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVRC7sWOoBh2pOKrB7udnS0u6MeTgEjY_Dz6v-ykJDo-ZhZpRNLn0ItXByTqlxt2lIeX6cJ7MO2owse1Jv0XlCYSSXOcPhYXT4C1nTG-1pUFkn-roKBLwSkn4siqnbBZPz2WNcPtd87SVztA==",
+              "title": "utoronto.ca"
+            }
+          },
+          {
+            "web": {
+              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFvEfuBc_9_AUN_S9DWP14a7s0FEvb9RGHc983txbsRq0Suyz0ovKwZv67SKekoXVLYJpT22qf4M6rXq4I5H-7eoCv7lEi-t4iNPA8iFGEmQFubfMYtt5BKHdoDDNK498_64NhZ18iYvpAlvOdwq3mzGBpNE8x1wST3nu4PcVgWzfnIxRdbMVG_zfHAeADOg0wg-dcKQ9qlp2iWozhPxBCoAA==",
+              "title": "skule.ca"
+            }
+          }
+        ],
+        "groundingSupports": [
+          {
+            "segment": {
+              "startIndex": 290,
+              "endIndex": 469,
+              "text": "Also includes inference for regression parameters, confidence and prediction intervals, diagnostics and remedial measures, interactions and dummy variables, and variable selection"
+            },
+            "groundingChunkIndices": [
+              0
+            ],
+            "confidenceScores": [
+              0.82816887
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 471,
+              "endIndex": 551,
+              "text": "Least squares estimation and inference for non-linear regression is also covered"
+            },
+            "groundingChunkIndices": [
+              0
+            ],
+            "confidenceScores": [
+              0.9203624
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 894,
+              "endIndex": 1000,
+              "text": "It builds upon your existing knowledge and aligns with your interest in data analysis and machine learning"
+            },
+            "groundingChunkIndices": [
+              0
+            ],
+            "confidenceScores": [
+              0.023200572
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1347,
+              "endIndex": 1438,
+              "text": "It also covers clustering algorithms and the problems of overfitting and assessing accuracy"
+            },
+            "groundingChunkIndices": [
+              1,
+              2
+            ],
+            "confidenceScores": [
+              0.9136129,
+              0.005794832
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 1440,
+              "endIndex": 1621,
+              "text": "The course also covers the basics of reinforcement learning and focuses on implementing, understanding and debugging software programs for building machine learning models from data"
+            },
+            "groundingChunkIndices": [
+              2
+            ],
+            "confidenceScores": [
+              0.9272057
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2295,
+              "endIndex": 2416,
+              "text": "It provides a broad introduction to machine learning algorithms and principles, and it builds upon your completed courses"
+            },
+            "groundingChunkIndices": [
+              2
+            ],
+            "confidenceScores": [
+              0.26625642
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2416,
+              "endIndex": 2604,
+              "text": ".\"\n  },\n  {\n    \"course_code\": \"STA256H1\",\n    \"course_name\": \"Probability and Statistics I\",\n    \"course_description\": \"This course covers probability and its role in statistical modeling"
+            },
+            "groundingChunkIndices": [
+              3
+            ],
+            "confidenceScores": [
+              0.27217677
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2606,
+              "endIndex": 2832,
+              "text": "Topics include probability distributions, expectation, discrete and continuous random variables and vectors, distribution functions, distributions of functions of random variables, limit theorems, and the central limit theorem"
+            },
+            "groundingChunkIndices": [
+              3
+            ],
+            "confidenceScores": [
+              0.9292379
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 2833,
+              "endIndex": 3237,
+              "text": "\",\n    \"prerequisite_codes\": \"MAT134H5 or MAT136H5 or MAT137Y5 or MAT139H5 or MAT157Y5 or MAT159H5 or a minimum 65% in MAT133Y5.\",\n    \"course_rank\": 3,\n    \"course_keywords\": \"probability, statistics, distributions\",\n    \"explanation\": \"This course is fundamental to both data analysis and machine learning as it provides the necessary statistical background for understanding many algorithms and models"
+            },
+            "groundingChunkIndices": [
+              3
+            ],
+            "confidenceScores": [
+              0.017433481
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 3237,
+              "endIndex": 3397,
+              "text": ".\"\n  },\n  {\n    \"course_code\": \"PHY293H1\",\n    \"course_name\": \"Waves and Modern Physics\",\n    \"course_description\": \"This course covers waves and modern physics"
+            },
+            "groundingChunkIndices": [
+              4
+            ],
+            "confidenceScores": [
+              0.74564767
+            ]
+          },
+          {
+            "segment": {
+              "startIndex": 3701,
+              "endIndex": 3767,
+              "text": "The course covers fundamental concepts in waves and modern physics"
+            },
+            "groundingChunkIndices": [
+              4
+            ],
+            "confidenceScores": [
+              0.20049652
+            ]
+          }
+        ],
+        "retrievalMetadata": {},
+        "webSearchQueries": [
+          "UofT STA302 2024-2025 course calendar",
+          "UofT CSC207 2024-2025 course calendar prerequisites",
+          "UofT Machine learning courses",
+          "UofT STA256 2024-2025 course calendar",
+          "UofT data analysis courses",
+          "UofT APS105 2024-2025 course calendar prerequisites",
+          "UofT PHY293 2024-2025 course calendar",
+          "UofT CSC311 2024-2025 course calendar",
+          "UofT BBQ courses"
+        ]
+      }
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 229,
+    "candidatesTokenCount": 1031,
+    "totalTokenCount": 1260,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 229
+      }
+    ],
+    "candidatesTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 1031
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.0-flash",
+  "responseId": "nJEvaZLyO7zi_uMPlLaxkQ0"
 }
