@@ -4,16 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
+    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
+      <change afterPath="$PROJECT_DIR$/src/test/java/use_case/WhyCourses/WhyCoursesInteractorTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gemini_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/gemini_debug.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="arthur3" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -61,7 +74,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "#22 on arthur3",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -70,11 +83,14 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JUnit.WhyCoursesInteractorTest">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="app.Main" />
       <module name="TeamProject" />
@@ -84,6 +100,21 @@
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WhyCoursesInteractorTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="TeamProject" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="use_case.WhyCourses.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="use_case.WhyCourses" />
+      <option name="MAIN_CLASS_NAME" value="use_case.WhyCourses.WhyCoursesInteractorTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -101,6 +132,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.WhyCoursesInteractorTest" />
+        <item itemvalue="Application.Main" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -150,7 +183,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764627071492</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Changed private variable api_key to apiKey and private method gApi_key to getApiKey to follow naming conventions">
+      <option name="closed" value="true" />
+      <created>1764701500144</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764701500144</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Lil edits">
+      <option name="closed" value="true" />
+      <created>1764701628566</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1764701628566</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,6 +208,23 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet." />
     <MESSAGE value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
-    <option name="LAST_COMMIT_MESSAGE" value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
+    <MESSAGE value="Changed private variable api_key to apiKey and private method gApi_key to getApiKey to follow naming conventions" />
+    <MESSAGE value="Lil edits" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lil edits" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/LLMs.java</url>
+          <line>276</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
