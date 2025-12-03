@@ -1,0 +1,1713 @@
+Index: src/main/java/ui/ApiKeyDialog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\n\nimport storage.AppStateStore;\n\nimport javax.swing.*;\nimport javax.swing.border.EmptyBorder;\nimport java.awt.*;\nimport interface_adapter.profile.ProfileController;\n\nimport okhttp3.HttpUrl;\nimport okhttp3.OkHttpClient;\nimport okhttp3.Request;\nimport okhttp3.Response;\n\npublic class ApiKeyDialog extends JDialog {\n\n    private final JTextField apiKeyField = new JTextField();\n    private final JPasswordField passField = new JPasswordField();\n\n    private static final OkHttpClient HTTP = new OkHttpClient();\n\n    public ApiKeyDialog(Component parent, ProfileController controller) {\n        super(SwingUtilities.getWindowAncestor(parent), \"Set API Key\", Dialog.ModalityType.APPLICATION_MODAL);\n        setDefaultCloseOperation(DISPOSE_ON_CLOSE);\n        setLayout(new BorderLayout(10, 10));\n\n        JPanel content = new JPanel();\n        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));\n        content.setBorder(new EmptyBorder(12, 12, 12, 12));\n\n        JLabel apiLabel = new JLabel(\"API Key:\");\n        apiLabel.setAlignmentX(Component.LEFT_ALIGNMENT);\n        apiKeyField.setAlignmentX(Component.LEFT_ALIGNMENT);\n\n        JButton saveBtn = new JButton(\"Save\");\n        JButton cancelBtn = new JButton(\"Cancel\");\n\n        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));\n        buttons.add(cancelBtn);\n        buttons.add(saveBtn);\n\n        content.add(apiLabel);\n        content.add(apiKeyField);\n        content.add(Box.createVerticalStrut(10));\n\n        add(content, BorderLayout.CENTER);\n        add(buttons, BorderLayout.SOUTH);\n        pack();\n        setLocationRelativeTo(parent);\n\n        cancelBtn.addActionListener(e -> dispose());\n        saveBtn.addActionListener(e -> {\n            String apiKey = apiKeyField.getText().trim();\n            if (apiKey.isEmpty()) {\n                JOptionPane.showMessageDialog(this, \"Enter API key.\", \"Missing input\", JOptionPane.WARNING_MESSAGE);\n                return;\n            }\n            try {\n                // Minimal format sanity-check for Google-style keys\n                if (!apiKey.startsWith(\"AIza\") || apiKey.length() < 30) {\n                    JOptionPane.showMessageDialog(this,\n                            \"That doesn't look like a valid Google API key (should start with \\\"AIza...\\\").\",\n                            \"Invalid format\",\n                            JOptionPane.WARNING_MESSAGE);\n                    return;\n                }\n\n                // Quick online verification against Generative Language API\n                if (!verifyApiKeyOnline(apiKey)) {\n                    JOptionPane.showMessageDialog(this,\n                            \"API key appears invalid or not authorized for Generative Language API.\",\n                            \"Verification failed\",\n                            JOptionPane.ERROR_MESSAGE);\n                    return;\n                }\n\n                controller.saveApiKey(apiKey);\n                JOptionPane.showMessageDialog(this, \"API key saved.\", \"Saved\", JOptionPane.INFORMATION_MESSAGE);\n                dispose();\n            } catch (Exception ex) {\n                JOptionPane.showMessageDialog(this, \"Failed to save API key: \" + ex.getMessage(), \"Error\", JOptionPane.ERROR_MESSAGE);\n            }\n        });\n\n        pack();\n        setMinimumSize(new Dimension(520, getHeight()));\n        setLocationRelativeTo(parent);\n    }\n\n    private boolean verifyApiKeyOnline(String apiKey) {\n        try {\n            HttpUrl url = HttpUrl.parse(\"https://generativelanguage.googleapis.com/v1/models\")\n                    .newBuilder()\n                    .addQueryParameter(\"key\", apiKey)\n                    .build();\n            Request req = new Request.Builder().url(url).get().build();\n            try (Response res = HTTP.newCall(req).execute()) {\n                // 200 OK indicates the key is valid for listing models\n                return res.isSuccessful();\n            }\n        } catch (Exception e) {\n            // Network or other transient issues — treat as failure so user can retry\n            return false;\n        }\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ui/ApiKeyDialog.java b/src/main/java/ui/ApiKeyDialog.java
+--- a/src/main/java/ui/ApiKeyDialog.java	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/src/main/java/ui/ApiKeyDialog.java	(date 1764654489049)
+@@ -1,7 +1,5 @@
+ package ui;
+ 
+-import storage.AppStateStore;
+-
+ import javax.swing.*;
+ import javax.swing.border.EmptyBorder;
+ import java.awt.*;
+@@ -15,12 +13,21 @@
+ public class ApiKeyDialog extends JDialog {
+ 
+     private final JTextField apiKeyField = new JTextField();
+-    private final JPasswordField passField = new JPasswordField();
++    private final JPasswordField passField = new JPasswordField(); // kept if you use later
+ 
+     private static final OkHttpClient HTTP = new OkHttpClient();
++    private final Runnable onSaved; // NEW: notify caller only on successful save
+ 
++    // Backward-compatible ctor
+     public ApiKeyDialog(Component parent, ProfileController controller) {
++        this(parent, controller, null);
++    }
++
++    // NEW: caller can pass a callback to enable submit only after success
++    public ApiKeyDialog(Component parent, ProfileController controller, Runnable onSaved) {
+         super(SwingUtilities.getWindowAncestor(parent), "Set API Key", Dialog.ModalityType.APPLICATION_MODAL);
++        this.onSaved = onSaved;
++
+         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+         setLayout(new BorderLayout(10, 10));
+ 
+@@ -56,7 +63,7 @@
+                 return;
+             }
+             try {
+-                // Minimal format sanity-check for Google-style keys
++                // Minimal sanity check
+                 if (!apiKey.startsWith("AIza") || apiKey.length() < 30) {
+                     JOptionPane.showMessageDialog(this,
+                             "That doesn't look like a valid Google API key (should start with \"AIza...\").",
+@@ -64,8 +71,7 @@
+                             JOptionPane.WARNING_MESSAGE);
+                     return;
+                 }
+-
+-                // Quick online verification against Generative Language API
++                // Online verify against Generative Language API
+                 if (!verifyApiKeyOnline(apiKey)) {
+                     JOptionPane.showMessageDialog(this,
+                             "API key appears invalid or not authorized for Generative Language API.",
+@@ -75,6 +81,7 @@
+                 }
+ 
+                 controller.saveApiKey(apiKey);
++                if (onSaved != null) SwingUtilities.invokeLater(onSaved); // ← notify success
+                 JOptionPane.showMessageDialog(this, "API key saved.", "Saved", JOptionPane.INFORMATION_MESSAGE);
+                 dispose();
+             } catch (Exception ex) {
+@@ -95,11 +102,9 @@
+                     .build();
+             Request req = new Request.Builder().url(url).get().build();
+             try (Response res = HTTP.newCall(req).execute()) {
+-                // 200 OK indicates the key is valid for listing models
+-                return res.isSuccessful();
++                return res.isSuccessful(); // 200 OK => valid
+             }
+         } catch (Exception e) {
+-            // Network or other transient issues — treat as failure so user can retry
+             return false;
+         }
+     }
+Index: src/main/java/ui/CourseExplorerPanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\n\nimport entity.Course;\nimport entity.KeywordGenerator;\nimport entity.WeightedKeywordGenerator;\nimport interface_adapter.profile.ProfileController;\nimport interface_adapter.recommend_courses.RecommendCoursesController;\nimport interface_adapter.recommend_courses.RecommendCoursesViewModel;\n\nimport javax.swing.*;\nimport javax.swing.border.EmptyBorder;\nimport java.awt.*;\nimport java.beans.PropertyChangeEvent;\nimport java.beans.PropertyChangeListener;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class CourseExplorerPanel extends JPanel implements PropertyChangeListener {\n\n    // ==== Dependencies (Clean Architecture: Controllers & ViewModel) ====\n    private final RecommendCoursesController recommendController;\n    private final ProfileController profileController;\n    private final RecommendCoursesViewModel viewModel;\n    private final KeywordGenerator keywordGenerator;\n\n    // ==== View State ====\n    private final JTextArea interestsArea = new JTextArea();\n    private List<String> completedCourses = new ArrayList<>();\n\n    // ==== UI Components ====\n    private final JPanel coursesContainer = new JPanel();\n    private final CardLayout recommendedCardLayout = new CardLayout();\n    private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);\n\n    // Track submit for enabling/disabling\n    private JButton submitButton;\n\n    private static final String CARD_PLACEHOLDER = \"placeholder\";\n    private static final String CARD_RESULTS = \"results\";\n    private static final String CARD_LOADING = \"loading\"; // NEW\n\n    /**\n     * Primary Constructor with Dependency Injection\n     */\n    public CourseExplorerPanel(RecommendCoursesController recommendController,\n                               ProfileController profileController,\n                               RecommendCoursesViewModel viewModel) {\n        this(recommendController, profileController, viewModel, new WeightedKeywordGenerator());\n    }\n\n    public CourseExplorerPanel(RecommendCoursesController controller,\n                               ProfileController profileController,\n                               RecommendCoursesViewModel viewModel,\n                               KeywordGenerator keywordGenerator) {\n        this.recommendController = controller;\n        this.profileController = profileController;\n        this.viewModel = viewModel;\n        this.keywordGenerator = keywordGenerator;\n\n        // Observe the ViewModel\n        this.viewModel.addPropertyChangeListener(this);\n\n        // Build UI (slim left panel)\n        setLayout(new BorderLayout());\n\n        JPanel leftPanel = createSurveyPanel();\n        JPanel rightPanel = createRecommendedPanel();\n\n        leftPanel.setPreferredSize(new Dimension(300, 1));\n        leftPanel.setMinimumSize(new Dimension(240, 1));\n\n        JSplitPane splitPane = new JSplitPane(\n                JSplitPane.HORIZONTAL_SPLIT,\n                leftPanel,\n                rightPanel\n        );\n        splitPane.setDividerSize(4);\n        splitPane.setResizeWeight(1.0);\n        add(splitPane, BorderLayout.CENTER);\n        SwingUtilities.invokeLater(() -> splitPane.setDividerLocation(300));\n\n        // Initial data load\n        profileController.loadProfile();\n    }\n\n    @Override\n    public void addNotify() {\n        super.addNotify();\n        JRootPane root = SwingUtilities.getRootPane(this);\n        if (root != null && submitButton != null) root.setDefaultButton(submitButton);\n    }\n\n    // =======================\n    // VIEW LOGIC: React to VM\n    // =======================\n    @Override\n    public void propertyChange(PropertyChangeEvent evt) {\n        String prop = evt.getPropertyName();\n\n        if (RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS.equals(prop)) {\n            @SuppressWarnings(\"unchecked\")\n            List<Course> courses = (List<Course>) evt.getNewValue();\n            restoreIdle(); // NEW: stop loading\n            updateResultsView(courses);\n        } else if (RecommendCoursesViewModel.PROPERTY_PROFILE_LOADED.equals(prop)) {\n            this.completedCourses = viewModel.getCompletedCoursesState();\n            this.interestsArea.setText(viewModel.getInterestsState());\n        } else if (RecommendCoursesViewModel.PROPERTY_ERROR.equals(prop)) {\n            restoreIdle(); // NEW: stop loading on error too\n            JOptionPane.showMessageDialog(this, evt.getNewValue(), \"Error\", JOptionPane.ERROR_MESSAGE);\n        }\n    }\n\n    private void updateResultsView(List<Course> courses) {\n        coursesContainer.removeAll();\n        if (courses == null || courses.isEmpty()) {\n            recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);\n        } else {\n            for (Course c : courses) {\n                coursesContainer.add(new CourseResultPanel(c));\n            }\n            coursesContainer.revalidate();\n            coursesContainer.repaint();\n            recommendedCardLayout.show(recommendedCardPanel, CARD_RESULTS);\n        }\n    }\n\n    // =======================\n    // USER ACTIONS\n    // =======================\n    private void handleSubmit() {\n        String interests = interestsArea.getText().trim();\n        if (interests.isEmpty()) {\n            JOptionPane.showMessageDialog(this, \"Please enter some interests first!\", \"Missing Input\", JOptionPane.WARNING_MESSAGE);\n            return;\n        }\n        showLoading(); // NEW: show loader immediately\n        recommendController.execute(interests, completedCourses);\n    }\n\n    private void handleSave() {\n        profileController.saveProfile(completedCourses, interestsArea.getText());\n        JOptionPane.showMessageDialog(this, \"Saved locally.\", \"Save\", JOptionPane.INFORMATION_MESSAGE);\n    }\n\n    // =======================\n    // UI BUILDERS\n    // =======================\n    private JPanel createSurveyPanel() {\n        JPanel panel = new JPanel();\n        panel.setBorder(new EmptyBorder(20, 20, 20, 20));\n        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));\n\n        JLabel title = new JLabel(\"Interest Survey\");\n        title.setFont(new Font(\"SansSerif\", Font.BOLD, 20));\n        title.setAlignmentX(Component.LEFT_ALIGNMENT);\n\n        JButton coursesButton = new JButton(\"Courses I've taken\");\n        coursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);\n        coursesButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));\n        coursesButton.addActionListener(e -> {\n            CoursesTakenDialog d = new CoursesTakenDialog(this, completedCourses);\n            d.setLocationRelativeTo(this);\n            d.setVisible(true);\n            if (d.isConfirmed()) completedCourses = d.getCourses();\n        });\n\n        JButton apiKeyButton = new JButton(\"Set API Key\");\n        apiKeyButton.setAlignmentX(Component.LEFT_ALIGNMENT);\n        apiKeyButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));\n        apiKeyButton.addActionListener(e -> {\n            ApiKeyDialog d = new ApiKeyDialog(this, profileController);\n            d.setVisible(true);\n        });\n\n        JLabel interestsLabel = new JLabel(\"What are your interests?\");\n        interestsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);\n\n        JButton notSureButton = new JButton(\"Not sure…\");\n        notSureButton.setAlignmentX(Component.LEFT_ALIGNMENT);\n        notSureButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));\n        notSureButton.addActionListener(e -> {\n            PreferenceDialog d = new PreferenceDialog(this, keywordGenerator);\n            d.setLocationRelativeTo(this);\n            d.setVisible(true);\n            List<String> kws = d.getResultKeywords();\n            if (kws != null && !kws.isEmpty()) interestsArea.setText(String.join(\", \", kws));\n        });\n\n        interestsArea.setLineWrap(true);\n        interestsArea.setWrapStyleWord(true);\n        JScrollPane interestsScroll = new JScrollPane(interestsArea);\n        interestsScroll.setAlignmentX(Component.LEFT_ALIGNMENT);\n        interestsScroll.setPreferredSize(new Dimension(200, 200));\n        interestsScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 250));\n\n        JButton saveButton = new JButton(\"Save State\");\n        saveButton.addActionListener(e -> handleSave());\n\n        submitButton = new JButton(\"Get Recommendations\");\n        submitButton.addActionListener(e -> handleSubmit());\n\n        JPanel actionsRow = new JPanel(new GridLayout(1, 2, 10, 0));\n        actionsRow.setAlignmentX(Component.LEFT_ALIGNMENT);\n        actionsRow.add(saveButton);\n        actionsRow.add(submitButton);\n        actionsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));\n\n        panel.add(title);\n        panel.add(Box.createVerticalStrut(20));\n        panel.add(coursesButton);\n        panel.add(Box.createVerticalStrut(10));\n        panel.add(apiKeyButton);\n        panel.add(Box.createVerticalStrut(20));\n        panel.add(interestsLabel);\n        panel.add(Box.createVerticalStrut(8));\n        panel.add(notSureButton);\n        panel.add(Box.createVerticalStrut(8));\n        panel.add(interestsScroll);\n        panel.add(Box.createVerticalGlue());\n        panel.add(Box.createVerticalStrut(16));\n        panel.add(actionsRow);\n\n        return panel;\n    }\n\n    private JPanel createRecommendedPanel() {\n        JPanel panel = new JPanel(new BorderLayout());\n        panel.setBorder(new EmptyBorder(20, 20, 20, 20));\n\n        JLabel title = new JLabel(\"Recommended Courses\");\n        title.setFont(new Font(\"SansSerif\", Font.BOLD, 20));\n        panel.add(title, BorderLayout.NORTH);\n\n        // Placeholder\n        JLabel placeholderLabel = new JLabel(\n                \"<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>recommended courses will appear here!</i></div></html>\",\n                SwingConstants.CENTER\n        );\n        JPanel placeholderPanel = new JPanel(new BorderLayout());\n        placeholderPanel.add(placeholderLabel, BorderLayout.CENTER);\n\n        // Results container\n        coursesContainer.setLayout(new BoxLayout(coursesContainer, BoxLayout.Y_AXIS));\n        JPanel scrollWrapper = new JPanel(new BorderLayout());\n        scrollWrapper.add(coursesContainer, BorderLayout.NORTH);\n        JScrollPane scrollPane = new JScrollPane(scrollWrapper);\n        scrollPane.setBorder(null);\n        scrollPane.getVerticalScrollBar().setUnitIncrement(16);\n\n        // NEW: Loading card\n        JPanel loadingPanel = new JPanel();\n        loadingPanel.setLayout(new BoxLayout(loadingPanel, BoxLayout.Y_AXIS));\n        loadingPanel.setBorder(new EmptyBorder(40, 20, 40, 20));\n        JLabel loadingText = new JLabel(\"Loading recommendations…\", SwingConstants.CENTER);\n        loadingText.setAlignmentX(Component.CENTER_ALIGNMENT);\n        JProgressBar bar = new JProgressBar();\n        bar.setIndeterminate(true);\n        bar.setAlignmentX(Component.CENTER_ALIGNMENT);\n        loadingPanel.add(loadingText);\n        loadingPanel.add(Box.createVerticalStrut(12));\n        loadingPanel.add(bar);\n\n        recommendedCardPanel.add(placeholderPanel, CARD_PLACEHOLDER);\n        recommendedCardPanel.add(scrollPane, CARD_RESULTS);\n        recommendedCardPanel.add(loadingPanel, CARD_LOADING); // NEW\n        recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);\n\n        panel.add(recommendedCardPanel, BorderLayout.CENTER);\n        return panel;\n    }\n\n    // =======================\n    // Loading helpers (NEW)\n    // =======================\n    private void showLoading() {\n        if (submitButton != null) submitButton.setEnabled(false);\n        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));\n        recommendedCardLayout.show(recommendedCardPanel, CARD_LOADING);\n        recommendedCardPanel.revalidate();\n        recommendedCardPanel.repaint();\n    }\n\n    private void restoreIdle() {\n        setCursor(Cursor.getDefaultCursor());\n        if (submitButton != null) submitButton.setEnabled(true);\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ui/CourseExplorerPanel.java b/src/main/java/ui/CourseExplorerPanel.java
+--- a/src/main/java/ui/CourseExplorerPanel.java	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/src/main/java/ui/CourseExplorerPanel.java	(date 1764654491663)
+@@ -6,6 +6,9 @@
+ import interface_adapter.profile.ProfileController;
+ import interface_adapter.recommend_courses.RecommendCoursesController;
+ import interface_adapter.recommend_courses.RecommendCoursesViewModel;
++import interface_adapter.why_courses.WhyCoursesController;
++import interface_adapter.why_courses.WhyCoursesViewModel;
++import storage.AppStateStore;
+ 
+ import javax.swing.*;
+ import javax.swing.border.EmptyBorder;
+@@ -15,6 +18,10 @@
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++/**
++ * Main UI panel: left = interest survey, right = recommended courses (accordion).
++ * Listens to RecommendCoursesViewModel. “Why this course?” is handled in CourseResultPanel.
++ */
+ public class CourseExplorerPanel extends JPanel implements PropertyChangeListener {
+ 
+     // ==== Dependencies (Clean Architecture: Controllers & ViewModel) ====
+@@ -23,6 +30,14 @@
+     private final RecommendCoursesViewModel viewModel;
+     private final KeywordGenerator keywordGenerator;
+ 
++    // NEW: Why use case wiring
++    private final WhyCoursesController whyController;
++    private final WhyCoursesViewModel whyViewModel;
++
++    // ==== Local Storage / DB ====
++    private final AppStateStore store = new AppStateStore();
++
++    // ==== Survey State ====
+     // ==== View State ====
+     private final JTextArea interestsArea = new JTextArea();
+     private List<String> completedCourses = new ArrayList<>();
+@@ -31,6 +46,11 @@
+     private final JPanel coursesContainer = new JPanel();
+     private final CardLayout recommendedCardLayout = new CardLayout();
+     private final JPanel recommendedCardPanel = new JPanel(recommendedCardLayout);
++    private final JLabel placeholderLabel = new JLabel(
++            "<html><div style='text-align: center;'><i>Once you complete the interest survey,<br>" +
++                    "recommended courses will appear here!</i></div></html>",
++            SwingConstants.CENTER
++    );
+ 
+     // Track submit for enabling/disabling
+     private JButton submitButton;
+@@ -39,6 +59,14 @@
+     private static final String CARD_RESULTS = "results";
+     private static final String CARD_LOADING = "loading"; // NEW
+ 
++    // =======================
++    // Constructors
++    // =======================
++
++    // Old 2-arg constructor (for tests or simple wiring)
++    public CourseExplorerPanel(RecommendCoursesController controller,
++                               RecommendCoursesViewModel viewModel) {
++        this(controller, viewModel, new DefaultKeywordSuggester(), null, null);
+     /**
+      * Primary Constructor with Dependency Injection
+      */
+@@ -48,14 +76,35 @@
+         this(recommendController, profileController, viewModel, new WeightedKeywordGenerator());
+     }
+ 
++    // Old 3-arg constructor (if someone wants custom KeywordGenerator)
+     public CourseExplorerPanel(RecommendCoursesController controller,
+                                ProfileController profileController,
+                                RecommendCoursesViewModel viewModel,
+                                KeywordGenerator keywordGenerator) {
++        this(controller, viewModel, keywordGenerator, null, null);
++    }
++
++    // NEW: full injection including Why use case
++    public CourseExplorerPanel(RecommendCoursesController controller,
++                               RecommendCoursesViewModel viewModel,
++                               WhyCoursesController whyController,
++                               WhyCoursesViewModel whyViewModel) {
++        this(controller, viewModel, new DefaultKeywordSuggester(), whyController, whyViewModel);
++    }
++
++    // Canonical constructor
++    private CourseExplorerPanel(RecommendCoursesController controller,
++                                RecommendCoursesViewModel viewModel,
++                                KeywordGenerator keywordGenerator,
++                                WhyCoursesController whyController,
++                                WhyCoursesViewModel whyViewModel) {
++        this.controller = controller;
+         this.recommendController = controller;
+         this.profileController = profileController;
+         this.viewModel = viewModel;
+         this.keywordGenerator = keywordGenerator;
++        this.whyController = whyController;
++        this.whyViewModel = whyViewModel;
+ 
+         // Observe the ViewModel
+         this.viewModel.addPropertyChangeListener(this);
+@@ -125,6 +174,9 @@
+         }
+     }
+ 
++    // ==========================================================
++    // LEFT PANEL: Survey & User Inputs
++    // ==========================================================
+     // =======================
+     // USER ACTIONS
+     // =======================
+@@ -224,6 +276,9 @@
+         return panel;
+     }
+ 
++    // ==========================================================
++    // RIGHT PANEL: Results (Accordion)
++    // ==========================================================
+     private JPanel createRecommendedPanel() {
+         JPanel panel = new JPanel(new BorderLayout());
+         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+@@ -270,6 +325,97 @@
+         return panel;
+     }
+ 
++    // ==========================================================
++    // CLEAN ARCHITECTURE OBSERVER LOGIC
++    // ==========================================================
++    @Override
++    public void propertyChange(PropertyChangeEvent evt) {
++        if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_RECOMMENDATIONS)) {
++            // Update the UI with the list of Course entities
++            @SuppressWarnings("unchecked")
++            List<Course> courses = (List<Course>) evt.getNewValue();
++            updateResultsView(courses);
++        } else if (evt.getPropertyName().equals(RecommendCoursesViewModel.PROPERTY_ERROR)) {
++            JOptionPane.showMessageDialog(this, evt.getNewValue(), "Error", JOptionPane.ERROR_MESSAGE);
++        }
++    }
++
++    private void updateResultsView(List<Course> courses) {
++        coursesContainer.removeAll();
++
++        if (courses == null || courses.isEmpty()) {
++            recommendedCardLayout.show(recommendedCardPanel, CARD_PLACEHOLDER);
++        } else {
++            // Create accordion panels
++            for (Course c : courses) {
++                CourseResultPanel itemPanel =
++                        new CourseResultPanel(c, whyController, whyViewModel);
++                coursesContainer.add(itemPanel);
++            }
++            // Refresh layout
++            coursesContainer.revalidate();
++            coursesContainer.repaint();
++            recommendedCardLayout.show(recommendedCardPanel, CARD_RESULTS);
++        }
++    }
++
++    // ==========================================================
++    // CONTROLLER & HELPER LOGIC
++    // ==========================================================
++
++    private void handleSubmit() {
++        String interests = interestsArea.getText().trim();
++        if (interests.isEmpty()) {
++            JOptionPane.showMessageDialog(this, "Please enter some interests first!", "Missing Input", JOptionPane.WARNING_MESSAGE);
++            return;
++        }
++        // CLEAN ARCHITECTURE: Call Controller, not UseCase directly
++        controller.execute(interests, completedCourses);
++    }
++
++    private void handleSave() {
++        store.saveCoursesAndInterests(completedCourses, interestsArea.getText());
++        JOptionPane.showMessageDialog(this, "Saved locally.", "Save", JOptionPane.INFORMATION_MESSAGE);
++    }
++
++    private void loadSavedStateIntoUI() {
++        try {
++            this.completedCourses = store.loadCoursesTaken();
++            String last = store.loadLastInterests();
++            interestsArea.setText(last);
++        } catch (Exception e) {
++            System.err.println("Failed to load saved state: " + e.getMessage());
++        }
++    }
++
++    // ==========================================================
++    // DIALOG HELPERS
++    // ==========================================================
++
++    private void openApiKeyDialog() {
++        ApiKeyDialog d = new ApiKeyDialog(this, store);
++        d.setVisible(true);
++    }
++
++    private void openCoursesTakenDialog() {
++        CoursesTakenDialog dialog = new CoursesTakenDialog(this, completedCourses);
++        dialog.setLocationRelativeTo(this);
++        dialog.setVisible(true);
++
++        if (dialog.isConfirmed()) {
++            completedCourses = dialog.getCourses();
++        }
++    }
++
++    private void openPreferenceAssistant() {
++        PreferenceDialog dialog = new PreferenceDialog(this, keywordGenerator);
++        dialog.setLocationRelativeTo(this);
++        dialog.setVisible(true);
++
++        List<String> kws = dialog.getResultKeywords();
++        if (kws != null && !kws.isEmpty()) {
++            interestsArea.setText(String.join(", ", kws));
++        }
+     // =======================
+     // Loading helpers (NEW)
+     // =======================
+@@ -285,4 +431,4 @@
+         setCursor(Cursor.getDefaultCursor());
+         if (submitButton != null) submitButton.setEnabled(true);
+     }
+-}
+\ No newline at end of file
++}
+Index: src/main/java/entity/RecommendCoursesUseCase.java
+===================================================================
+diff --git a/src/main/java/entity/RecommendCoursesUseCase.java b/src/main/java/entity/RecommendCoursesUseCase.java
+deleted file mode 100644
+--- a/src/main/java/entity/RecommendCoursesUseCase.java	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ /dev/null	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
+@@ -1,47 +0,0 @@
+-package entity;
+-
+-import java.util.Arrays;
+-import java.util.List;
+-
+-public class RecommendCoursesUseCase {
+-
+-    /**
+-     * Domain interface.
+-     * In the real app this would call your LLM / backend.
+-     */
+-    public interface CourseRecommender {
+-        List<String> recommend(String interests, List<String> completedCourses);
+-    }
+-
+-    private final CourseRecommender recommender;
+-
+-    public RecommendCoursesUseCase(CourseRecommender recommender) {
+-        this.recommender = recommender;
+-    }
+-
+-    /**
+-     * Application use-case method.
+-     * UI calls this, but doesn't know how recommendations are produced.
+-     */
+-    public List<String> execute(String interests, List<String> completedCourses) {
+-        return recommender.recommend(interests, completedCourses);
+-    }
+-
+-    /**
+-     * Temporary dummy implementation so the UI works.
+-     * Replace this with a real implementation later.
+-     */
+-    public static class DummyCourseRecommender implements CourseRecommender {
+-        @Override
+-        public List<String> recommend(String interests, List<String> completedCourses) {
+-            // For now we ignore the inputs and return a fixed list.
+-            // This keeps the UI working while backend is under development.
+-            return Arrays.asList(
+-                    "CSC207 – Software Design",
+-                    "CSC165 – Mathematical Expression and Reasoning for CS",
+-                    "CSC240 – Enriched Introduction to the Theory of Computation",
+-                    "CSC301 – Introduction to Software Engineering"
+-            );
+-        }
+-    }
+-}
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491715)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch	(date 1764654491715)
+@@ -0,0 +1,18 @@
++Index: .idea/misc.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"openjdk-25\" project-jdk-type=\"JavaSDK\" />\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/misc.xml b/.idea/misc.xml
++--- a/.idea/misc.xml	(revision 3e8fbba255795a22c918058d5a3c3eea1537d4cc)
+++++ b/.idea/misc.xml	(date 1764366379528)
++@@ -8,5 +8,5 @@
++       </list>
++     </option>
++   </component>
++-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
+++  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
++ </project>
++\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491711)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch	(date 1764654491711)
+@@ -0,0 +1,477 @@
++Index: gemini_debug.json
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+>{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"parts\": [\n          {\n            \"text\": \"Okay, I will recommend 3-5 valid UofT courses related to Chinese Culture Studies for a second or third-year student, verifying their existence in the 2024-2025 calendar and summarizing the descriptions. I will present the output as a JSON array.\\n\\n\"\n          },\n          {\n            \"text\": \"```json\\n[\\n  {\\n    \\\"course_code\\\": \\\"EAS209H1\\\",\\n    \\\"course_name\\\": \\\"Approaches to East Asia\\\",\\n    \\\"course_description\\\": \\\"This course is required for East Asian Studies specialists and majors. It introduces different approaches, theories, and methodologies for studying East Asian societies and cultures, serving as a foundation for upper-level EAS courses. It should be taken as early as possible, preferably in the second year.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"This course is foundational for East Asian Studies, providing necessary theoretical background.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS241H1\\\",\\n    \\\"course_name\\\": \\\"Introduction to Chinese Philosophy\\\",\\n    \\\"course_description\\\": \\\"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"An ideal course for understanding the philosophical underpinnings of Chinese culture.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS289H1\\\",\\n    \\\"course_name\\\": \\\"Environment and East Asia\\\",\\n    \\\"course_description\\\": \\\"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 3,\\n    \\\"explanation\\\": \\\"Explores the intersection of environmental concerns and East Asian contexts.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS307H1\\\",\\n    \\\"course_name\\\": \\\"Traditional Chinese Political Philosophy\\\",\\n    \\\"course_description\\\": \\\"Explores traditional Chinese political philosophy. Most courses will involve both lecture-based content and classroom discussion.\\\",\\n    \\\"prerequisite_codes\\\": [\\\"EAS105\\\"],\\n    \\\"course_rank\\\": 4,\\n    \\\"explanation\\\": \\\"For a deeper understanding of Chinese political thought; note the prerequisite.\\\"\\n  },\\n    {\\n    \\\"course_code\\\": \\\"HPS200H1\\\",\\n    \\\"course_name\\\": \\\"Science and Values\\\",\\n    \\\"course_description\\\": \\\"An introduction to issues at the interface of science and society, including the reciprocal influence of science and social norms, the relation of science and religion, dissemination of scientific knowledge, and science and policy. Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change.\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 5,\\n    \\\"explanation\\\": \\\"While not exclusively focused on Chinese culture, it offers a broader perspective on science and its societal impact, which can be relevant to understanding cultural contexts.\\\"\\n  }\\n]\\n```\"\n          }\n        ],\n        \"role\": \"model\"\n      },\n      \"finishReason\": \"STOP\",\n      \"citationMetadata\": {\n        \"citationSources\": [\n          {\n            \"startIndex\": 2201,\n            \"endIndex\": 2404,\n            \"uri\": \"https://www.newcollege.utoronto.ca/bpmh-requirements/\"\n          },\n          {\n            \"startIndex\": 2201,\n            \"endIndex\": 2404,\n            \"uri\": \"https://ihpst.utoronto.ca/undergraduate/curriculum-course-information/current-undergraduate-courses/summer-courses-2025\"\n          }\n        ]\n      },\n      \"groundingMetadata\": {\n        \"searchEntryPoint\": {\n          \"renderedContent\": \"\\u003cstyle\\u003e\\n.container {\\n  align-items: center;\\n  border-radius: 8px;\\n  display: flex;\\n  font-family: Google Sans, Roboto, sans-serif;\\n  font-size: 14px;\\n  line-height: 20px;\\n  padding: 8px 12px;\\n}\\n.chip {\\n  display: inline-block;\\n  border: solid 1px;\\n  border-radius: 16px;\\n  min-width: 14px;\\n  padding: 5px 16px;\\n  text-align: center;\\n  user-select: none;\\n  margin: 0 8px;\\n  -webkit-tap-highlight-color: transparent;\\n}\\n.carousel {\\n  overflow: auto;\\n  scrollbar-width: none;\\n  white-space: nowrap;\\n  margin-right: -12px;\\n}\\n.headline {\\n  display: flex;\\n  margin-right: 4px;\\n}\\n.gradient-container {\\n  position: relative;\\n}\\n.gradient {\\n  position: absolute;\\n  transform: translate(3px, -9px);\\n  height: 36px;\\n  width: 9px;\\n}\\n@media (prefers-color-scheme: light) {\\n  .container {\\n    background-color: #fafafa;\\n    box-shadow: 0 0 0 1px #0000000f;\\n  }\\n  .headline-label {\\n    color: #1f1f1f;\\n  }\\n  .chip {\\n    background-color: #ffffff;\\n    border-color: #d2d2d2;\\n    color: #5e5e5e;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:focus {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:active {\\n    background-color: #d8d8d8;\\n    border-color: #b6b6b6;\\n  }\\n  .logo-dark {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\\n  }\\n}\\n@media (prefers-color-scheme: dark) {\\n  .container {\\n    background-color: #1f1f1f;\\n    box-shadow: 0 0 0 1px #ffffff26;\\n  }\\n  .headline-label {\\n    color: #fff;\\n  }\\n  .chip {\\n    background-color: #2c2c2c;\\n    border-color: #3c4043;\\n    color: #fff;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #353536;\\n  }\\n  .chip:focus {\\n    background-color: #353536;\\n  }\\n  .chip:active {\\n    background-color: #464849;\\n    border-color: #53575b;\\n  }\\n  .logo-light {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\\n  }\\n}\\n\\u003c/style\\u003e\\n\\u003cdiv class=\\\"container\\\"\\u003e\\n  \\u003cdiv class=\\\"headline\\\"\\u003e\\n    \\u003csvg class=\\\"logo-light\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"9 9 35 35\\\" fill=\\\"none\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003csvg class=\\\"logo-dark\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"0 0 48 48\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003ccircle cx=\\\"24\\\" cy=\\\"23\\\" fill=\\\"#FFF\\\" r=\\\"22\\\"/\\u003e\\n      \\u003cpath d=\\\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath d=\\\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003cdiv class=\\\"gradient-container\\\"\\u003e\\u003cdiv class=\\\"gradient\\\"\\u003e\\u003c/div\\u003e\\u003c/div\\u003e\\n  \\u003c/div\\u003e\\n  \\u003cdiv class=\\\"carousel\\\"\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEuWoS7fhabxXE-_GnGS21NRHKZZxzrfTO2UB4GVLHiZ5s3RMpZrsjsgU-AFasE9jZQon9qugh1WZ5jPDoxk0ImhXXNpVN9d44A3DarfPF0T2jEzj_3fA3DySRWZGNxUj05MWsC9GnKw1QB5KoJKAbehq9oVGuPz3CJWhmSR9Ea0YM7q0q6xu87Z8Jft9hvSl7KcJCafXr7Op3gkDo=\\\"\\u003eUofT EAS courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEk-bro-1CfWiGHS8xDQhPTH5q3SR08MD-HDZPiwYaE8dUlKlVZVsJro8eCXi3SX3rIeEe2ifDKZFModswJ4CGj-1BHG4-IOVJzCO3sifqC84qxdGXfVHQsWUvxICJqCiEgBnnPcBnjpnfo0Dr0Cb2t_to6FP2Xiek3NMoqoG6HSgOkW2WypSwD2OWMc0i9pH0-13WbPJjfd9VXiDPbbIboyVwAL6QzYuU=\\\"\\u003eUofT Chinese culture courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFS6eE0vKWO5oBJQRET5PdTKehHQpWZ2Qlorr6JSOa7bR2Z7aN9VUuUGZzRSabzFQy7jvc0I8mNtEHbtwJftsrP5mshlFIz2CDyaYsMsKHeSUyzjcJbEl6eVPk-Qqu0TWm957DL4MjkKTf_5ZK4tL4P-HemKO7j9xMh3zgzrBK00_kjV1vqcAbrBi5ekd7QYpUt16-TMlWhKYp5PcVGbCyGoNTkIuSLYFxdna0=\\\"\\u003eUofT East Asian Studies courses 2024-2025\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHNEDn7kx9lTAAW8ZYR36lYgFLUvY26oYIQXDlobK7ZSK0VNkG8bbln-T842yYEaJOFy2pk3h1GhspY87m7uosY8wOmFOkJng_59e9mgL25l2NYiY-wtUhXy7kXCmewG3C2EhshzItN6CRWTJufPenlI6yfahHskdMlMMfBwTiu4XmJE1BAUjk4xK1XBmB5EyWtSNyvX0XXdF1WnI8=\\\"\\u003eUofT HPS courses 2024-2025\\u003c/a\\u003e\\n  \\u003c/div\\u003e\\n\\u003c/div\\u003e\\n\"\n        },\n        \"groundingChunks\": [\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfgbzZz7gKzX_doWEQ2SKKKpBc2aiZ8Cm-oXsL7GB4j-90ZZfxQk3Dvac5OXsjrPCLdj5nEEzMmVtxPHrAovC0bQ_7b2FQxqGmQET0wM8HlhwfX7iseRnQsrpHO5Hp4nWsAd5aug21MTOLS4QyTN7h1zwPQ7b_0MA=\",\n              \"title\": \"utoronto.ca\"\n            }\n          },\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGStPQdqhPyT-OwE9PiTS5gdVf5TZ5q3CejMOwp7FsWOO3y-kLnOQxM1sxYFME-t7g4l4pZAcDGGelVzuj_qqgrtkAR5sWlFzHkzIhM5fA0PcUGtbApe99FMO2sY7ocBcCm9V5xSgc3IpQLRvmhLRM3qZM_347j1P1wMitN4g5sVvZw61201A2zuWvmmQ==\",\n              \"title\": \"utoronto.ca\"\n            }\n          },\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGymLYbFj_CpeXEJcZgrrxPbZHDty-5uALjqqaS-HQN2KO_0Gesn6mbux-bj0P2HDD-ymDaDf3-ROhi_ibVWDSyU22EvCFKNok0XASW5Vof7EBoV3JVReaZBys6-djxzoJNadyQIIRudNFcVOnqspSAyNi-XiRbtbYvAPPUUyHp4GqhurH_cyteAeujhg6-cKv0TdRxQY=\",\n              \"title\": \"utoronto.ca\"\n            }\n          }\n        ],\n        \"groundingSupports\": [\n          {\n            \"segment\": {\n              \"startIndex\": 601,\n              \"endIndex\": 671,\n              \"text\": \"It should be taken as early as possible, preferably in the second year\"\n            },\n            \"groundingChunkIndices\": [\n              0\n            ],\n            \"confidenceScores\": [\n              0.008658046\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 672,\n              \"endIndex\": 1176,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"This course is foundational for East Asian Studies, providing necessary theoretical background.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS241H1\\\",\\n    \\\"course_name\\\": \\\"Introduction to Chinese Philosophy\\\",\\n    \\\"course_description\\\": \\\"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought\"\n            },\n            \"groundingChunkIndices\": [\n              1\n            ],\n            \"confidenceScores\": [\n              0.031609338\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 1177,\n              \"endIndex\": 1721,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": [],\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"An ideal course for understanding the philosophical underpinnings of Chinese culture.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"EAS289H1\\\",\\n    \\\"course_name\\\": \\\"Environment and East Asia\\\",\\n    \\\"course_description\\\": \\\"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises\"\n            },\n            \"groundingChunkIndices\": [\n              0\n            ],\n            \"confidenceScores\": [\n              0.14333108\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 2056,\n              \"endIndex\": 2133,\n              \"text\": \"Most courses will involve both lecture-based content and classroom discussion\"\n            },\n            \"groundingChunkIndices\": [\n              1\n            ],\n            \"confidenceScores\": [\n              0.008335124\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 2640,\n              \"endIndex\": 2767,\n              \"text\": \"Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change\"\n            },\n            \"groundingChunkIndices\": [\n              2\n            ],\n            \"confidenceScores\": [\n              0.9302797\n            ]\n          }\n        ],\n        \"retrievalMetadata\": {},\n        \"webSearchQueries\": [\n          \"UofT HPS courses 2024-2025\",\n          \"UofT East Asian Studies courses 2024-2025\",\n          \"UofT Chinese culture courses 2024-2025\",\n          \"UofT EAS courses 2024-2025\"\n        ]\n      }\n    }\n  ],\n  \"usageMetadata\": {\n    \"promptTokenCount\": 132,\n    \"candidatesTokenCount\": 709,\n    \"totalTokenCount\": 841,\n    \"promptTokensDetails\": [\n      {\n        \"modality\": \"TEXT\",\n        \"tokenCount\": 132\n      }\n    ],\n    \"candidatesTokensDetails\": [\n      {\n        \"modality\": \"TEXT\",\n        \"tokenCount\": 709\n      }\n    ]\n  },\n  \"modelVersion\": \"gemini-2.0-flash\",\n  \"responseId\": \"01gqaYegF_2zjrEPs4eVoAE\"\n}\n
++===================================================================
++diff --git a/gemini_debug.json b/gemini_debug.json
++--- a/gemini_debug.json	(revision eb9adec8125b02a0bad360c483262623eb94ee2c)
+++++ b/gemini_debug.json	(date 1764464690910)
++@@ -4,147 +4,411 @@
++       "content": {
++         "parts": [
++           {
++-            "text": "Okay, I will recommend 3-5 valid UofT courses related to Chinese Culture Studies for a second or third-year student, verifying their existence in the 2024-2025 calendar and summarizing the descriptions. I will present the output as a JSON array.\n\n"
++-          },
++-          {
++-            "text": "```json\n[\n  {\n    \"course_code\": \"EAS209H1\",\n    \"course_name\": \"Approaches to East Asia\",\n    \"course_description\": \"This course is required for East Asian Studies specialists and majors. It introduces different approaches, theories, and methodologies for studying East Asian societies and cultures, serving as a foundation for upper-level EAS courses. It should be taken as early as possible, preferably in the second year.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"This course is foundational for East Asian Studies, providing necessary theoretical background.\"\n  },\n  {\n    \"course_code\": \"EAS241H1\",\n    \"course_name\": \"Introduction to Chinese Philosophy\",\n    \"course_description\": \"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"An ideal course for understanding the philosophical underpinnings of Chinese culture.\"\n  },\n  {\n    \"course_code\": \"EAS289H1\",\n    \"course_name\": \"Environment and East Asia\",\n    \"course_description\": \"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Explores the intersection of environmental concerns and East Asian contexts.\"\n  },\n  {\n    \"course_code\": \"EAS307H1\",\n    \"course_name\": \"Traditional Chinese Political Philosophy\",\n    \"course_description\": \"Explores traditional Chinese political philosophy. Most courses will involve both lecture-based content and classroom discussion.\",\n    \"prerequisite_codes\": [\"EAS105\"],\n    \"course_rank\": 4,\n    \"explanation\": \"For a deeper understanding of Chinese political thought; note the prerequisite.\"\n  },\n    {\n    \"course_code\": \"HPS200H1\",\n    \"course_name\": \"Science and Values\",\n    \"course_description\": \"An introduction to issues at the interface of science and society, including the reciprocal influence of science and social norms, the relation of science and religion, dissemination of scientific knowledge, and science and policy. Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"While not exclusively focused on Chinese culture, it offers a broader perspective on science and its societal impact, which can be relevant to understanding cultural contexts.\"\n  }\n]\n```"
+++            "text": "```json\n[\n  {\n    \"course_code\": \"CSC108H1\",\n    \"course_name\": \"Introduction to Computer Programming\",\n    \"course_description\": \"This course teaches fundamental computer programming concepts using Python. Topics include data types, control flow, functions, classes, objects, methods, algorithms, problem-solving, searching, sorting, and complexity. No prior programming experience is required. Emphasis is placed on good programming style and core computer science topics.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"A solid foundation for beginners. It introduces fundamental programming concepts using Python, which is widely used in various fields. It's a great starting point for students with no prior experience and covers essential topics like data types, control flow, and algorithms.\"\n  },\n  {\n    \"course_code\": \"CSC110Y1\",\n    \"course_name\": \"Foundations of Computer Science I\",\n    \"course_description\": \"An introductory course that combines programming techniques using Python with rigorous mathematical analysis and reasoning. Topics covered include data representations, program control flow, mathematical logic, algorithm analysis, and software engineering principles. No prior programming experience is needed. Restricted to students in the first-year Computer Science admission stream.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"CSC110Y1 is designed for students in the Computer Science admission stream and combines programming with mathematical analysis. While comprehensive, it is restricted to a specific group of students.\"\n  },\n  {\n    \"course_code\": \"ECE150\",\n    \"course_name\": \"Fundamentals of Programming\",\n    \"course_description\": \"An introductory programming course that uses C++. Students will learn fundamental programming concepts and problem-solving techniques. Topics include programming fundamentals, addresses, pointers, algorithms, and classes.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"ECE150 is offered by the Electrical and Computer Engineering department and uses C++. It covers fundamental programming concepts, but the focus on C++ might make it less immediately applicable to general programming tasks compared to Python-based courses.\"\n  },\n  {\n    \"course_code\": \"ESC180\",\n    \"course_name\": \"Introduction to Programming\",\n    \"course_description\": \"This course introduces computer programming and computer science concepts using Python. Students will learn problem-solving techniques and software engineering practices. Topics include algorithm efficiency and various research areas in computer science. No prior knowledge of programming is assumed.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"ESC180 provides a broad introduction to programming and computer science using Python. It covers problem-solving, software engineering, and algorithm efficiency, making it a well-rounded option for beginners.\"\n  }\n]\n```"
++           }
++         ],
++         "role": "model"
++       },
++       "finishReason": "STOP",
++-      "citationMetadata": {
++-        "citationSources": [
++-          {
++-            "startIndex": 2201,
++-            "endIndex": 2404,
++-            "uri": "https://www.newcollege.utoronto.ca/bpmh-requirements/"
++-          },
++-          {
++-            "startIndex": 2201,
++-            "endIndex": 2404,
++-            "uri": "https://ihpst.utoronto.ca/undergraduate/curriculum-course-information/current-undergraduate-courses/summer-courses-2025"
++-          }
++-        ]
++-      },
++       "groundingMetadata": {
++         "searchEntryPoint": {
++-          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEuWoS7fhabxXE-_GnGS21NRHKZZxzrfTO2UB4GVLHiZ5s3RMpZrsjsgU-AFasE9jZQon9qugh1WZ5jPDoxk0ImhXXNpVN9d44A3DarfPF0T2jEzj_3fA3DySRWZGNxUj05MWsC9GnKw1QB5KoJKAbehq9oVGuPz3CJWhmSR9Ea0YM7q0q6xu87Z8Jft9hvSl7KcJCafXr7Op3gkDo=\"\u003eUofT EAS courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEk-bro-1CfWiGHS8xDQhPTH5q3SR08MD-HDZPiwYaE8dUlKlVZVsJro8eCXi3SX3rIeEe2ifDKZFModswJ4CGj-1BHG4-IOVJzCO3sifqC84qxdGXfVHQsWUvxICJqCiEgBnnPcBnjpnfo0Dr0Cb2t_to6FP2Xiek3NMoqoG6HSgOkW2WypSwD2OWMc0i9pH0-13WbPJjfd9VXiDPbbIboyVwAL6QzYuU=\"\u003eUofT Chinese culture courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFS6eE0vKWO5oBJQRET5PdTKehHQpWZ2Qlorr6JSOa7bR2Z7aN9VUuUGZzRSabzFQy7jvc0I8mNtEHbtwJftsrP5mshlFIz2CDyaYsMsKHeSUyzjcJbEl6eVPk-Qqu0TWm957DL4MjkKTf_5ZK4tL4P-HemKO7j9xMh3zgzrBK00_kjV1vqcAbrBi5ekd7QYpUt16-TMlWhKYp5PcVGbCyGoNTkIuSLYFxdna0=\"\u003eUofT East Asian Studies courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHNEDn7kx9lTAAW8ZYR36lYgFLUvY26oYIQXDlobK7ZSK0VNkG8bbln-T842yYEaJOFy2pk3h1GhspY87m7uosY8wOmFOkJng_59e9mgL25l2NYiY-wtUhXy7kXCmewG3C2EhshzItN6CRWTJufPenlI6yfahHskdMlMMfBwTiu4XmJE1BAUjk4xK1XBmB5EyWtSNyvX0XXdF1WnI8=\"\u003eUofT HPS courses 2024-2025\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+++          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEzAqKZ-mrNI0aXDkjoAyg8pTzbZi1aXqX7qzDxwH4ALCxPeqt0ldxjPm7BNQqHTWS_HwuLrox-r_mIWppQhom1wI6ITTJwNt1ngDgcY92SVEsLBd3bhdFv-n1px7usOkpoWvLg0ilu_Ri8Veme89nMe23fTN7jn8Krdz-iWXpPK8LbAL6yKY73B0MKf-tek5R_HKD1yY7M0WnKlNeDdpZNfnJU1CxYOIyAfJQ=\"\u003eUofT CSC111 course description 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQER7fQZabH5vdE2GA2dGBlAYz_-bQxninW77vgAfdlonMJa5OHUpe8vsu8RKqbljVg_F5gDsVdFw-5-2KWn3cSloQ3lWmPbT2zSKUz4j6BHqZTwiJErxaxIyhMMYnPzBlBVP-D0_WP6SvLifYbA3Hm9vQ2iLRGjtxLU0KRH1_FUjonaZUtR72hHnw-hkX9swNbAqHZrv6F10oGUuWwfNZzyTLhaDCGWe_u3ITM=\"\u003eUofT CSC110 course description 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHbmhGgUj5EiBDNMnFVhurWwtQ3m_I2w8PDFIV-3Lwv_RPNCQSZQyeB-lji9CDWqjwd1tINs8Sbvq1a8_m1LKdUHMZ8ePE1wNnXbzVoFLHIxtEyvXI4KAjNrIlPD6gv2L2hzwHQn4b1mO4oIMa6z4OEvSio0LSmBtyheewm4sv8VcblkCuO6wDVuC0sEc9ftQo_WvMAABavp8iLbenD4DjT97Bd74P4IY1XTKo__zaX6RYNqTTr50FBNpHBAw==\"\u003eUofT introductory computer programming courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHxIxZClxUULpShKmnmRZysOdLIhIEdgz02Ax-B2pCH1_cAayEyIXyvYeOsZ2LIXb1imK_ECIII8ca6O1snP7Nlb59Cq56YC6ZNrbzS5n1jxOAKuOpnSCCcN0KPzVsFBZo6jHLMg-AW-Osv1a7n_R-ArDb9n7rNHnUbuQsugb1Zs1rLGX7DeICp32d2jgkLIJG73BfiQ2lU1Wd3aj2w-XLH4Na0ghXHXUdIKE0=\"\u003eUofT CSC108 course description 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHVL_7DmTkVaqTKG2egA-vqtfYsy2HqVU37_hc9ELqdlhOTVjTFG5aOoun_nGo53Xq9WFS5Ou-0-AEFjmdyjwCW-T5Zjcl7qXsR_Jo1jZXsDgkH0-LIwDRs8w6thxr3NH9HCBJnTtFqVtRMYKv35IMLhg9mqxLQ-73zdwfBTERzEU_O12vU8n8pmDP1qQsuSFp8AGMB_3FivgPBY4bYaI9OkGb4PNP77GQAWrc=\"\u003eUofT ECE150 course description 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHliFtrwECYOd9li1cCfdXCCLuQkZsfhr2F8_h1T3636CihLBhVlnn3iTMjBX8G913OIxo5M7i4yhZBRB6iXDyifv-O1m0tvbHTi0TP3JQtSgkBTtfOB_saB8SC40j1tJoJAtX14B6ODuJ1rmqObSCQELYkiUljAgO-9OYKlxkY-Myt9wyXsWlnAjOZQZ7RlKlM8u1lyK0pUVo3F-cxSBE=\"\u003eUofT prerequisite for CSC108\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFnfvOInFXDHFNhNgGzJJauQpkAX-e0GjvnCIX3zhtLXVXsdBBOZUdLP7ef9Y-_wGebwF9VuixRqFO6KsMNeCLVHh9FTh5NR_tBTxhDCLwsGiL3tJ5qqnTgabluPC2MDzy4_ZVkEjWk4sx9H-SYIxfMX111ub6CIk2ct1zQcamBcsRaxCdjsht5d5qllkEF1_cUJhuCIbTda0icgK4HkL4=\"\u003eUofT prerequisite for CSC110\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGLgN-dla9XbtdN0V4IByQoULuqPk0po9UCLbYS8Lr0tgqNbYFCaD3aAXrFsnNODudOAwIe7dmuqOp2VEFatdybUkECp6FjfiFQlYnzlGOBmrJAGk70g7lCSmP145EqqSGN54K3PTyJFpJdtnquENd_SDXa9lf2bUgnOMjYKpMtd8TRrUsnk2QLn9Q-ZZnviEuGFmzmU8fQPg9rnWlaeYw=\"\u003eUofT prerequisite for ECE150\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEQ_pCmWaKt4WESr_oe_YJdskHYLccB2ZTnWwnlHb2jkKrhcA_vIeCboDN3CoPSUsi7jwE_Q4NWcQbimyZPLyA2dV8flmxKfVYUSPBEUTxByK3NN8ITu0VESZngOF8CxugRJjS5MXNfqDYOG1FFWw5S_TAoXaTH2SXf3d_Yt-qZ-LV6UvaOdyMo38g90fwHPTMYSJ7G2z_aPXkXoWbXF_Q=\"\u003eUofT prerequisite for CSC111\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
++         },
++         "groundingChunks": [
++           {
++             "web": {
++-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFfgbzZz7gKzX_doWEQ2SKKKpBc2aiZ8Cm-oXsL7GB4j-90ZZfxQk3Dvac5OXsjrPCLdj5nEEzMmVtxPHrAovC0bQ_7b2FQxqGmQET0wM8HlhwfX7iseRnQsrpHO5Hp4nWsAd5aug21MTOLS4QyTN7h1zwPQ7b_0MA=",
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH-_d9rRrH3BsiaLAJpTtyTp1QZMI01-V2zkRoPMLnHVvVKNaGn7Ke4i92ykzOb_Fdn5CgZ9eohhPNcfr-5xdwBDccpGxHZa7rBldXWokwIBLVFqv4jolw2agwt_wPDdSAdkwuhJRAuZg==",
++               "title": "utoronto.ca"
++             }
++           },
++           {
++             "web": {
++-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGStPQdqhPyT-OwE9PiTS5gdVf5TZ5q3CejMOwp7FsWOO3y-kLnOQxM1sxYFME-t7g4l4pZAcDGGelVzuj_qqgrtkAR5sWlFzHkzIhM5fA0PcUGtbApe99FMO2sY7ocBcCm9V5xSgc3IpQLRvmhLRM3qZM_347j1P1wMitN4g5sVvZw61201A2zuWvmmQ==",
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHmDIel51QBdNTgmw_-G39CozpTcbe_j9jID5T6_D4MSzjonIAj51ps_6xIdydmXgvByH3h5uAXicaRzfoqOlgXwbWsEbvCEyy4jsFIAI3o4aQzhzWKb0f-PKQcwMMVEBUG2ZdL4jxHHkqcr5IifQ==",
++               "title": "utoronto.ca"
++             }
++           },
++           {
++             "web": {
++-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFGymLYbFj_CpeXEJcZgrrxPbZHDty-5uALjqqaS-HQN2KO_0Gesn6mbux-bj0P2HDD-ymDaDf3-ROhi_ibVWDSyU22EvCFKNok0XASW5Vof7EBoV3JVReaZBys6-djxzoJNadyQIIRudNFcVOnqspSAyNi-XiRbtbYvAPPUUyHp4GqhurH_cyteAeujhg6-cKv0TdRxQY=",
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFY_897Huvct0JUuG6jWTjgDJEPl7PBCr7HZfburKNallgXSHWfEZnQuToqcH0uHUzSan7Rjq36fm2g_uerQCdcVSEmI5XThfhx-ecO-jCg3mpy0edhuLj8ea02NTkWTGdclWI0h0CMZb_9j2ih0g==",
++               "title": "utoronto.ca"
++             }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH759fjb0iWc2VuxRDM15yNbBaLk1Ke4X4MscA0Ppqe0qxV_ldih3JUGvYLsYKmpPTTuBJ2n8SgO6VhAVpcAFIMhNQgo7setZ_r_mihljt1yhoLBwSaE9TG9Zzle5WPtGBU7AuuZ4H0nJhO7ZL-1yku0c5_V2RQl_8fk8zaLK0ruUbkVCBrcHbe9Hq1h9dtAQvO",
+++              "title": "toronto.edu"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQENpyqXyO82BKqjhbixtCRXqlko9ayrfgMKsZlTjJgy5CjGw-y9oqU1l89WDbzsncmTiBaZ0tXza1q02aVn2c9VsIUXUL4J1yey-RHqgHOzt7xiKhJZGunAvgxory09IGqqzjoaVh0TCbtLQCA-UVgwNbLvslcr1iT-O8IUeIlGermDDf3B8OW2jL5j-ZeiuS0=",
+++              "title": "toronto.edu"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGz6gc6PUxMqxjWk6m0s-tWKExlN8oHJe0nDWN0r2ZRFNqHQKmmHOt06U3sDr83QdCW8oiz2Eekm2CKd1yDBPOwyVaBpEnMcgQT74DfQZW1dr7ywoWjdhKFxuxwLlQs9slx5qjygReiVWcR11aBy0K1gLZbPp8w1yhH62PJZA1COKb5ibLDBNeDxCv_lB2FO4U=",
+++              "title": "toronto.edu"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFHVV_5P7trCNHh4ffweATnU_9c_eeYyL8_UCRi8OaoYxffMloKO-SQwTCMK3ljI9PPPxskW8XrNsGMEOrVazgek4XDFtlpP4JmDzjpbdmaFIjSVzycgo7_3-zFVOlOw9Z6t5nEf6rX5s0cWSlVRw==",
+++              "title": "utoronto.ca"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEfnmLTemjriv8xv1r-Tu72neHygKjTeF3lFoEgpYFEBD9zc0zhPtCfLh5FHyj9a7SuCe2LSEDMJI4iDPC3aIxOomOguWocnShTBWA_Vwj5c8f6LS1ajLBtRrs0sQ==",
+++              "title": "uwaterloo.ca"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFqIbJCGAW53OQlWFaJHyp4r7tU07myVEL-h74eSR5Jbfiwrbn-WlzmajK_g5m70xj2CSmFkyMsn6yWBM-ebg_IBfhUYFR0LtyFaVR4MH0vqPWJN6X5Cy6i5BaMGAcJaAil1Oko",
+++              "title": "toronto.edu"
+++            }
+++          },
+++          {
+++            "web": {
+++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGujCoqY3n2p4xqDI1EB50Hai-Ee8TFeR_L_P4BMVYln4tEftZ2DESSmOQ6TLRPvHR2lP-coZWDR42DmYBwCubxoK_Z6ZTWLomrhuZ_6DWpnLu3PN9CZKvb0jcBnGFrO9Le9tfaCM3nnTQvkxnMWw==",
+++              "title": "uwaterloo.ca"
+++            }
++           }
++         ],
++         "groundingSupports": [
++           {
++             "segment": {
++-              "startIndex": 601,
++-              "endIndex": 671,
++-              "text": "It should be taken as early as possible, preferably in the second year"
+++              "startIndex": 207,
+++              "endIndex": 349,
+++              "text": "Topics include data types, control flow, functions, classes, objects, methods, algorithms, problem-solving, searching, sorting, and complexity"
+++            },
+++            "groundingChunkIndices": [
+++              0,
+++              1
+++            ],
+++            "confidenceScores": [
+++              0.37836358,
+++              0.7701279
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 351,
+++              "endIndex": 394,
+++              "text": "No prior programming experience is required"
+++            },
+++            "groundingChunkIndices": [
+++              2,
+++              1
+++            ],
+++            "confidenceScores": [
+++              0.7476971,
+++              0.9192562
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 396,
+++              "endIndex": 473,
+++              "text": "Emphasis is placed on good programming style and core computer science topics"
+++            },
+++            "groundingChunkIndices": [
+++              3
+++            ],
+++            "confidenceScores": [
+++              0.009883046
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 684,
+++              "endIndex": 823,
+++              "text": "It's a great starting point for students with no prior experience and covers essential topics like data types, control flow, and algorithms"
+++            },
+++            "groundingChunkIndices": [
+++              0,
+++              1
+++            ],
+++            "confidenceScores": [
+++              0.7279735,
+++              0.032169063
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 823,
+++              "endIndex": 1071,
+++              "text": ".\"\n  },\n  {\n    \"course_code\": \"CSC110Y1\",\n    \"course_name\": \"Foundations of Computer Science I\",\n    \"course_description\": \"An introductory course that combines programming techniques using Python with rigorous mathematical analysis and reasoning"
+++            },
+++            "groundingChunkIndices": [
+++              4,
+++              5,
+++              2
+++            ],
+++            "confidenceScores": [
+++              0.69591844,
+++              0.64680135,
+++              0.85374814
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1073,
+++              "endIndex": 1215,
+++              "text": "Topics covered include data representations, program control flow, mathematical logic, algorithm analysis, and software engineering principles"
+++            },
+++            "groundingChunkIndices": [
+++              4,
+++              2
+++            ],
+++            "confidenceScores": [
+++              0.9468233,
+++              0.9266657
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1217,
+++              "endIndex": 1258,
+++              "text": "No prior programming experience is needed"
+++            },
+++            "groundingChunkIndices": [
+++              2,
+++              5,
+++              4
+++            ],
+++            "confidenceScores": [
+++              0.6527156,
+++              0.7693908,
+++              0.0070389956
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1260,
+++              "endIndex": 1334,
+++              "text": "Restricted to students in the first-year Computer Science admission stream"
+++            },
+++            "groundingChunkIndices": [
+++              2,
+++              5,
+++              6,
+++              4
+++            ],
+++            "confidenceScores": [
+++              0.96344703,
+++              0.0060298317,
+++              0.9269446,
+++              0.01611936
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1335,
+++              "endIndex": 1536,
+++              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"CSC110Y1 is designed for students in the Computer Science admission stream and combines programming with mathematical analysis"
+++            },
+++            "groundingChunkIndices": [
+++              4,
+++              2
+++            ],
+++            "confidenceScores": [
+++              0.52004665,
+++              0.7167633
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1538,
+++              "endIndex": 1607,
+++              "text": "While comprehensive, it is restricted to a specific group of students"
+++            },
+++            "groundingChunkIndices": [
+++              6,
+++              2
+++            ],
+++            "confidenceScores": [
+++              0.27992833,
+++              0.52305
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1607,
+++              "endIndex": 1773,
+++              "text": ".\"\n  },\n  {\n    \"course_code\": \"ECE150\",\n    \"course_name\": \"Fundamentals of Programming\",\n    \"course_description\": \"An introductory programming course that uses C++"
+++            },
+++            "groundingChunkIndices": [
+++              7
+++            ],
+++            "confidenceScores": [
+++              0.49148646
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1775,
+++              "endIndex": 1858,
+++              "text": "Students will learn fundamental programming concepts and problem-solving techniques"
+++            },
+++            "groundingChunkIndices": [
+++              8
+++            ],
+++            "confidenceScores": [
+++              0.7589899
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1860,
+++              "endIndex": 1945,
+++              "text": "Topics include programming fundamentals, addresses, pointers, algorithms, and classes"
+++            },
+++            "groundingChunkIndices": [
+++              9
+++            ],
+++            "confidenceScores": [
+++              0.036400728
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 1946,
+++              "endIndex": 2105,
+++              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"ECE150 is offered by the Electrical and Computer Engineering department and uses C++"
+++            },
+++            "groundingChunkIndices": [
+++              7
+++            ],
+++            "confidenceScores": [
+++              0.14314368
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 2107,
+++              "endIndex": 2275,
+++              "text": "It covers fundamental programming concepts, but the focus on C++ might make it less immediately applicable to general programming tasks compared to Python-based courses"
+++            },
+++            "groundingChunkIndices": [
+++              7
+++            ],
+++            "confidenceScores": [
+++              0.011114127
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 2275,
+++              "endIndex": 2479,
+++              "text": ".\"\n  },\n  {\n    \"course_code\": \"ESC180\",\n    \"course_name\": \"Introduction to Programming\",\n    \"course_description\": \"This course introduces computer programming and computer science concepts using Python"
++             },
++             "groundingChunkIndices": [
++-              0
+++              8
++             ],
++             "confidenceScores": [
++-              0.008658046
+++              0.74223995
++             ]
++           },
++           {
++             "segment": {
++-              "startIndex": 672,
++-              "endIndex": 1176,
++-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 1,\n    \"explanation\": \"This course is foundational for East Asian Studies, providing necessary theoretical background.\"\n  },\n  {\n    \"course_code\": \"EAS241H1\",\n    \"course_name\": \"Introduction to Chinese Philosophy\",\n    \"course_description\": \"This course introduces students to the main schools and figures in the history of Chinese philosophy, covering topics such as Confucianism, Daoism, and Buddhism and their impact on Chinese culture and thought"
+++              "startIndex": 2481,
+++              "endIndex": 2562,
+++              "text": "Students will learn problem-solving techniques and software engineering practices"
++             },
++             "groundingChunkIndices": [
++-              1
+++              8
++             ],
++             "confidenceScores": [
++-              0.031609338
+++              0.9321354
++             ]
++           },
++           {
++             "segment": {
++-              "startIndex": 1177,
++-              "endIndex": 1721,
++-              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 2,\n    \"explanation\": \"An ideal course for understanding the philosophical underpinnings of Chinese culture.\"\n  },\n  {\n    \"course_code\": \"EAS289H1\",\n    \"course_name\": \"Environment and East Asia\",\n    \"course_description\": \"This course introduces environmental issues that are important to East Asia and examines East Asia's role in the global environmental crisis, engaging with both the factual and humanities dimensions of climate change, biodiversity loss, and other environmental crises"
+++              "startIndex": 2564,
+++              "endIndex": 2646,
+++              "text": "Topics include algorithm efficiency and various research areas in computer science"
++             },
++             "groundingChunkIndices": [
++-              0
+++              8
++             ],
++             "confidenceScores": [
++-              0.14333108
+++              0.9516904
++             ]
++           },
++           {
++             "segment": {
++-              "startIndex": 2056,
++-              "endIndex": 2133,
++-              "text": "Most courses will involve both lecture-based content and classroom discussion"
+++              "startIndex": 2648,
+++              "endIndex": 2692,
+++              "text": "No prior knowledge of programming is assumed"
++             },
++             "groundingChunkIndices": [
++-              1
+++              8
++             ],
++             "confidenceScores": [
++-              0.008335124
+++              0.7910558
++             ]
++           },
++           {
++             "segment": {
++-              "startIndex": 2640,
++-              "endIndex": 2767,
++-              "text": "Issues may include nuclear, biological, and chemical weapons; genetic engineering; the Human Genome Project; and climate change"
+++              "startIndex": 2693,
+++              "endIndex": 2853,
+++              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"ESC180 provides a broad introduction to programming and computer science using Python"
++             },
++             "groundingChunkIndices": [
++-              2
+++              8
++             ],
++             "confidenceScores": [
++-              0.9302797
+++              0.49279112
+++            ]
+++          },
+++          {
+++            "segment": {
+++              "startIndex": 2855,
+++              "endIndex": 2975,
+++              "text": "It covers problem-solving, software engineering, and algorithm efficiency, making it a well-rounded option for beginners"
+++            },
+++            "groundingChunkIndices": [
+++              8
+++            ],
+++            "confidenceScores": [
+++              0.044256516
++             ]
++           }
++         ],
++         "retrievalMetadata": {},
++         "webSearchQueries": [
++-          "UofT HPS courses 2024-2025",
++-          "UofT East Asian Studies courses 2024-2025",
++-          "UofT Chinese culture courses 2024-2025",
++-          "UofT EAS courses 2024-2025"
+++          "UofT CSC108 course description 2024-2025",
+++          "UofT CSC111 course description 2024-2025",
+++          "UofT CSC110 course description 2024-2025",
+++          "UofT prerequisite for CSC110",
+++          "UofT prerequisite for CSC108",
+++          "UofT prerequisite for CSC111",
+++          "UofT prerequisite for ECE150",
+++          "UofT introductory computer programming courses 2024-2025",
+++          "UofT ECE150 course description 2024-2025"
++         ]
++       }
++     }
++   ],
++   "usageMetadata": {
++-    "promptTokenCount": 132,
++-    "candidatesTokenCount": 709,
++-    "totalTokenCount": 841,
+++    "promptTokenCount": 128,
+++    "candidatesTokenCount": 635,
+++    "totalTokenCount": 763,
++     "promptTokensDetails": [
++       {
++         "modality": "TEXT",
++-        "tokenCount": 132
+++        "tokenCount": 128
++       }
++     ],
++     "candidatesTokensDetails": [
++       {
++         "modality": "TEXT",
++-        "tokenCount": 709
+++        "tokenCount": 635
++       }
++     ]
++   },
++   "modelVersion": "gemini-2.0-flash",
++-  "responseId": "01gqaYegF_2zjrEPs4eVoAE"
+++  "responseId": "K5graaqjJ8WOjMcP-I_aqA4"
++ }
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__4_46p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__4_46p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__4_46p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494431)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__4_46p_m___Changes_.xml	(date 1764654494431)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]" date="1764366385769" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2025-11-28, 4:46 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__5_54p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__5_54p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__5_54p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654491729)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__5_54p_m___Changes_.xml	(date 1764654491729)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]" date="1764370494181" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2025-11-28, 5:54 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491721)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch	(date 1764654491721)
+@@ -0,0 +1,62 @@
++Index: .idea/misc.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"KubernetesApiProvider\">{}</component>\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/misc.xml b/.idea/misc.xml
++--- a/.idea/misc.xml	(revision 740448bbdefda26a7dc07d672910bd239011736a)
+++++ b/.idea/misc.xml	(date 1764651700482)
++@@ -9,4 +9,5 @@
++       </list>
++     </option>
++   </component>
+++  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="ms-17" project-jdk-type="JavaSDK" />
++ </project>
++\ No newline at end of file
++Index: .idea/workspace.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\">\n      <change afterPath=\"$PROJECT_DIR$/.idea/checkstyle-idea.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.env\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.env\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/gemini_debug.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/gemini_debug.json\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;customColor&quot;: &quot;&quot;,\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"36Aek2bmBQg2nnzmlJRM9lt6zKH\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.Main.executor\": \"Run\",\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"SONARLINT_PRECOMMIT_ANALYSIS\": \"true\",\n    \"git-widget-placeholder\": \"add__alternateflow__noAPIKey\",\n    \"ignore.virus.scanning.warn.message\": \"true\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"last_opened_file_path\": \"C:/Users/izaya/CSC207-team-8-project\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RunManager\">\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"app.Main\" />\n      <module name=\"TeamProject\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"app.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\n      <module name=\"CSC207-team-8-project\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\n      <module name=\"CSC207-team-8-project\" />\n      <option name=\"filePath\" />\n      <method v=\"2\" />\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131\" />\n        <option value=\"bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"\" />\n      <created>1764453944603</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1764453944603</updated>\n      <workItem from=\"1764453947764\" duration=\"303000\" />\n      <workItem from=\"1764454332389\" duration=\"80000\" />\n      <workItem from=\"1764454543951\" duration=\"5000\" />\n      <workItem from=\"1764458128284\" duration=\"796000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1764625733004</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1764625733004</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"2\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\" />\n  </component>\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/workspace.xml b/.idea/workspace.xml
++--- a/.idea/workspace.xml	(revision 740448bbdefda26a7dc07d672910bd239011736a)
+++++ b/.idea/workspace.xml	(date 1764651611393)
++@@ -4,14 +4,7 @@
++     <option name="autoReloadType" value="SELECTIVE" />
++   </component>
++   <component name="ChangeListManager">
++-    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.">
++-      <change afterPath="$PROJECT_DIR$/.idea/checkstyle-idea.xml" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/gemini_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/gemini_debug.json" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" afterDir="false" />
++-    </list>
+++    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet." />
++     <option name="SHOW_DIALOG" value="false" />
++     <option name="HIGHLIGHT_CONFLICTS" value="true" />
++     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++@@ -30,6 +23,9 @@
++   &quot;associatedIndex&quot;: 2
++ }</component>
++   <component name="ProjectId" id="36Aek2bmBQg2nnzmlJRM9lt6zKH" />
+++  <component name="ProjectLevelVcsManager">
+++    <ConfirmationsSetting value="2" id="Add" />
+++  </component>
++   <component name="ProjectViewState">
++     <option name="hideEmptyMiddlePackages" value="true" />
++     <option name="showLibraryContents" value="true" />
++@@ -43,7 +39,7 @@
++     "RunOnceActivity.git.unshallow": "true",
++     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
++     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
++-    "git-widget-placeholder": "add__alternateflow__noAPIKey",
+++    "git-widget-placeholder": "main",
++     "ignore.virus.scanning.warn.message": "true",
++     "kotlin-language-version-configured": "true",
++     "last_opened_file_path": "C:/Users/izaya/CSC207-team-8-project",
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__7_17p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__7_17p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__7_17p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494444)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__7_17p_m___Changes_.xml	(date 1764654494444)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]" date="1764375479522" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2025-11-28, 7:17 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: gemini_debug.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"candidates\": [\n    {\n      \"content\": {\n        \"parts\": [\n          {\n            \"text\": \"```json\\n[\\n  {\\n    \\\"course_code\\\": \\\"ENT200H1\\\",\\n    \\\"course_name\\\": \\\"Introduction to Entrepreneurship\\\",\\n    \\\"course_description\\\": \\\"This course introduces students to the fundamentals of entrepreneurship, providing a broad overview of the entrepreneurial process. It covers idea generation, market analysis, business model development, and strategies for launching and scaling a new venture.\\\",\\n    \\\"prerequisite_codes\\\": \\\"9.0 credits in any subject\\\",\\n    \\\"course_rank\\\": 5,\\n    \\\"explanation\\\": \\\"This course provides a solid foundation in entrepreneurship, covering essential concepts and skills for new venture creation, making it an excellent starting point for students interested in launching their own businesses.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"CCT226H5\\\",\\n    \\\"course_name\\\": \\\"Data Analysis I\\\",\\n    \\\"course_description\\\": \\\"This course introduces the basic tools of data analysis, particularly statistics and modeling. Students learn descriptive and inferential statistics, focusing on data types commonly encountered in digital environments.\\\",\\n    \\\"prerequisite_codes\\\": \\\"CCT109H5 and CCT110H5 and (CCT111H5 or CCT112H5)\\\",\\n    \\\"course_rank\\\": 4,\\n    \\\"explanation\\\": \\\"As a foundational course in data analysis, it equips students with essential statistical tools and techniques applicable in various fields, including business and science.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"APS1013H\\\",\\n    \\\"course_name\\\": \\\"Applying Innovation in Engineering and Business Operations\\\",\\n    \\\"course_description\\\": \\\"This course teaches the application of innovation management tools and techniques, including strategic and systems thinking, business process analysis, creativity, problem-solving, solution design and implementation, organizational teamwork, and project management.\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 3,\\n    \\\"explanation\\\": \\\"Focusing on applying innovation in real-world scenarios, this course is beneficial for students interested in product management and leadership roles within innovative environments.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"ACT390H1\\\",\\n    \\\"course_name\\\": \\\"Professional Experience in Actuarial Science\\\",\\n    \\\"course_description\\\": \\\"This course prepares students for an internship work term, including professional skill workshops, networking activities, and a speaker series. It is mandatory for Actuarial Science Specialist students.\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"This course offers practical experience and professional development in the field of actuarial science, valuable for students interested in data analysis and risk management.\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"APS1023H\\\",\\n    \\\"course_name\\\": \\\"New Product Innovation\\\",\\n    \\\"course_description\\\": \\\"This course examines the technical and organizational aspects of managing new products and process innovations. Topics include human creativity, problem-solving, product design and development, feasibility assessments, requirements engineering, managing research and development, project management, team communication, technology implementation, and innovation strategy.\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"Given the interest in product and management, this course provides a strong understanding of how to manage new products from conception to implementation.\\\"\\n  }\\n]\\n```\"\n          }\n        ],\n        \"role\": \"model\"\n      },\n      \"finishReason\": \"STOP\",\n      \"groundingMetadata\": {\n        \"searchEntryPoint\": {\n          \"renderedContent\": \"\\u003cstyle\\u003e\\n.container {\\n  align-items: center;\\n  border-radius: 8px;\\n  display: flex;\\n  font-family: Google Sans, Roboto, sans-serif;\\n  font-size: 14px;\\n  line-height: 20px;\\n  padding: 8px 12px;\\n}\\n.chip {\\n  display: inline-block;\\n  border: solid 1px;\\n  border-radius: 16px;\\n  min-width: 14px;\\n  padding: 5px 16px;\\n  text-align: center;\\n  user-select: none;\\n  margin: 0 8px;\\n  -webkit-tap-highlight-color: transparent;\\n}\\n.carousel {\\n  overflow: auto;\\n  scrollbar-width: none;\\n  white-space: nowrap;\\n  margin-right: -12px;\\n}\\n.headline {\\n  display: flex;\\n  margin-right: 4px;\\n}\\n.gradient-container {\\n  position: relative;\\n}\\n.gradient {\\n  position: absolute;\\n  transform: translate(3px, -9px);\\n  height: 36px;\\n  width: 9px;\\n}\\n@media (prefers-color-scheme: light) {\\n  .container {\\n    background-color: #fafafa;\\n    box-shadow: 0 0 0 1px #0000000f;\\n  }\\n  .headline-label {\\n    color: #1f1f1f;\\n  }\\n  .chip {\\n    background-color: #ffffff;\\n    border-color: #d2d2d2;\\n    color: #5e5e5e;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:focus {\\n    background-color: #f2f2f2;\\n  }\\n  .chip:active {\\n    background-color: #d8d8d8;\\n    border-color: #b6b6b6;\\n  }\\n  .logo-dark {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\\n  }\\n}\\n@media (prefers-color-scheme: dark) {\\n  .container {\\n    background-color: #1f1f1f;\\n    box-shadow: 0 0 0 1px #ffffff26;\\n  }\\n  .headline-label {\\n    color: #fff;\\n  }\\n  .chip {\\n    background-color: #2c2c2c;\\n    border-color: #3c4043;\\n    color: #fff;\\n    text-decoration: none;\\n  }\\n  .chip:hover {\\n    background-color: #353536;\\n  }\\n  .chip:focus {\\n    background-color: #353536;\\n  }\\n  .chip:active {\\n    background-color: #464849;\\n    border-color: #53575b;\\n  }\\n  .logo-light {\\n    display: none;\\n  }\\n  .gradient {\\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\\n  }\\n}\\n\\u003c/style\\u003e\\n\\u003cdiv class=\\\"container\\\"\\u003e\\n  \\u003cdiv class=\\\"headline\\\"\\u003e\\n    \\u003csvg class=\\\"logo-light\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"9 9 35 35\\\" fill=\\\"none\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath fill-rule=\\\"evenodd\\\" clip-rule=\\\"evenodd\\\" d=\\\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003csvg class=\\\"logo-dark\\\" width=\\\"18\\\" height=\\\"18\\\" viewBox=\\\"0 0 48 48\\\" xmlns=\\\"http://www.w3.org/2000/svg\\\"\\u003e\\n      \\u003ccircle cx=\\\"24\\\" cy=\\\"23\\\" fill=\\\"#FFF\\\" r=\\\"22\\\"/\\u003e\\n      \\u003cpath d=\\\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\\\" fill=\\\"#4285F4\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\\\" fill=\\\"#34A853\\\"/\\u003e\\n      \\u003cpath d=\\\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\\\" fill=\\\"#FBBC05\\\"/\\u003e\\n      \\u003cpath d=\\\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\\\" fill=\\\"#EA4335\\\"/\\u003e\\n    \\u003c/svg\\u003e\\n    \\u003cdiv class=\\\"gradient-container\\\"\\u003e\\u003cdiv class=\\\"gradient\\\"\\u003e\\u003c/div\\u003e\\u003c/div\\u003e\\n  \\u003c/div\\u003e\\n  \\u003cdiv class=\\\"carousel\\\"\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGPcu_40R82Q2FWETR0JgBRMAjK734AafCeOfjOSpPmHkWotu9Z_PZWIiOkqNg7VMp-ZXOFPXz9Pl_rGpcgNthc4Szhe9xxk_OSyF0YYeSHyBb2rSDAMBx5RqWNzH2l7AqXrsmDYC1td8edEQgdYDDKCfhClknLHa6IvTWcKlLbh75X3m99MNPHpyIEIsIf69ZGb45e1XaQeGvzjfCzA0xCfi1ayxfK7R-NwzL4iA==\\\"\\u003eUofT course calendar 2024-2025 data analysis\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGdrboq2u33S3j-OOfXmCXNNu7884VVJPAV4ZZlUHbhaCbq5yXfn9tLSz4ckCxQMPkEbYo3X3f9uMfk_RoLwNNb-OoSDyNj3xegW_5bFJKz4r7YsM1_fViwsXPtrEARCvOU5h6GLmZyaObrdSVoUvYYUlCfEc75chLxczVKV9EmevVhNBnBTA4GG5NFMkECCfVwXPKsygX8kiR67gDUZBApENW_1lOZQFqCAmkBTgd81Q==\\\"\\u003eUofT course calendar 2024-2025 entrepreneurship\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF7RGbuhX_lT5ljhRVanw1f38SwQrQjkebzntys0cwXFdoup0UQKUl05NfBJaSJK_tqV7m5WfuJ7a8bP3RskTvvjfuWu6lYbHLfkpjhKMG6mYFW89xKAj2dIPThWmkqxooN1XHMDgkRN8_gHUnhOpaYaPeyuS71DxnJ0SsaKvkJWHqcGeloZ9aw_NPvPGTr-14jUPkzZHitUk0S95pN6scVQjOk3N6k0XnHnsH9yAHSc3lCSCgIYl-_93jv_jOZPCUZ-pqmnDnVBhcbCHmjxmx2FTBo\\\"\\u003eUofT entrepreneurship product data analysis leadership science management courses\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF1eR_NyBItWsqrQsuTkGrq6wKuTiAYpZV4V1vpxY-sR-PXEVAwGtjSwzsb77CjaQ0e0o7aqJVgI0JnORmQOaA1LUzK6hv-6kE4jMiGuNrpqIUPXIpy36HdqtFKaQFWTWAGjHCmAf5u120DVEuruSOjIKCB9_PxCEiJRjvo3iz2os1Wux9cDVdmlx8OHRLQCiN-JvfvKsptZ0I75ueiMjmsb_ANIYcjGogH0dUfEZ3I-z2A\\\"\\u003eUofT course calendar 2024-2025 product management\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGSqmhXT6egdwKz3_L9pX47FcRP7S9JAvIJlmYmviKffWp9IkPxpqc7Zkx1fHAF4-IXPfrOQkS8ChnLeW48iK_PL-hqorxPl6Ra7fK8Q7TotXdiA41bnOe_0We1-do3npr-PL4YxflF-LW2ETeL7A35-546p2PbllaTzb2TGk75EjlLJSaFmDExN_KDh980dzudHHh5m00TszfMKlMDitKf917vCehkC8p-TQ==\\\"\\u003eUofT course calendar 2024-2025 leadership\\u003c/a\\u003e\\n    \\u003ca class=\\\"chip\\\" href=\\\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEERUcscX0Fuzu7RzM4p48qUE2lN-xdmTu4-zr6sV5PWOAaTDqqCuRMMZrMH-xwR7PmXVCKEmBKPG5r15dvLQLSjZwe_2TkLYFrfJIZjsPrOuxbeOrTnrgUZTwLqY0bFYIujIH1CXEfk0qLiORHp-zp3uylzqI8j5Gdb_QxRqtaydaw3KOWwiv4gf7nGKH1ew_mUgJHeqtp8VA4cHz3G5AxKeUHBrNDRScxF-1kzQ6SW5OW\\\"\\u003eUofT course calendar 2024-2025 science management\\u003c/a\\u003e\\n  \\u003c/div\\u003e\\n\\u003c/div\\u003e\\n\"\n        },\n        \"groundingChunks\": [\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHaYsbc8Nf9fotOwav1INGCmKss-7WslWChRMN2ptSf2z-5Rbpch7ULYab_rcT5kjYhHs-S39t61RGbpW4f43A4a4i_8jdWTZq_sMSZvWBAKBcMw1plaPHYwprJoWPvjIUn8YPR17DyNe6S2GukGfrjAF57_gKcKtNPdYWKLSX1yJxT4u3XVYJeqb26qA==\",\n              \"title\": \"utoronto.ca\"\n            }\n          },\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFb7TdTTzc6sKWvjEXXabHdTaiAkS3ZMG7E3T4oJVGlvVJYG93QBjeZXHE9flbAGgwtFDFgUfWHo2Artdyhd3Cmhtq8O-rRhTFX7nsH-HRIzqSz3Tpe07jdz_wvpSPysz34GOeEUXhGKNw=\",\n              \"title\": \"utoronto.ca\"\n            }\n          },\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFEjze0zuJXUWqCRy-OGMCJTXOsd7FnkF1JLd4xI_ikKN-hMT3M_B4teCjZlxD3DdSEwTn5OjIzk1YQHRd9mEnhZK-EqMKqC1sUXtgOOPCa9QbTGC9_Oz3Iv_8BGgWKIK0CB32TsUqZLqewpXslUcuj6IRmr-201tZWWv-7R0Imo40p2Vic9sAKb9NWF9BRhYNmSuDrJjcWM4Mgc2k0LCQvUY9wMGEMYwimKyKAZ6g_B4jnKkIwj08ZXhQ=\",\n              \"title\": \"utoronto.ca\"\n            }\n          },\n          {\n            \"web\": {\n              \"uri\": \"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHT2c2Qj93yuGD9IjNF0RTu_zDhG6zhFtiDh-JP_9OEvPiFfrsFl4Nbi75GsDsPJSD12NcarqDhZ4Z4OF2YRZ-dLYblOD7LbzE9tNH1ZwktZTXvHQw4zkl7PDXXb5CprswXQC5kQfw_AR6Nqg==\",\n              \"title\": \"utoronto.ca\"\n            }\n          }\n        ],\n        \"groundingSupports\": [\n          {\n            \"segment\": {\n              \"startIndex\": 259,\n              \"endIndex\": 385,\n              \"text\": \"It covers idea generation, market analysis, business model development, and strategies for launching and scaling a new venture\"\n            },\n            \"groundingChunkIndices\": [\n              0\n            ],\n            \"confidenceScores\": [\n              0.14596966\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 386,\n              \"endIndex\": 442,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": \\\"9.0 credits in any subject\"\n            },\n            \"groundingChunkIndices\": [\n              0\n            ],\n            \"confidenceScores\": [\n              0.86185163\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 442,\n              \"endIndex\": 708,\n              \"text\": \"\\\",\\n    \\\"course_rank\\\": 5,\\n    \\\"explanation\\\": \\\"This course provides a solid foundation in entrepreneurship, covering essential concepts and skills for new venture creation, making it an excellent starting point for students interested in launching their own businesses\"\n            },\n            \"groundingChunkIndices\": [\n              0\n            ],\n            \"confidenceScores\": [\n              0.09549614\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 911,\n              \"endIndex\": 1033,\n              \"text\": \"Students learn descriptive and inferential statistics, focusing on data types commonly encountered in digital environments\"\n            },\n            \"groundingChunkIndices\": [\n              1\n            ],\n            \"confidenceScores\": [\n              0.9617571\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 1034,\n              \"endIndex\": 1112,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": \\\"CCT109H5 and CCT110H5 and (CCT111H5 or CCT112H5)\"\n            },\n            \"groundingChunkIndices\": [\n              1\n            ],\n            \"confidenceScores\": [\n              0.6077391\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 1112,\n              \"endIndex\": 1327,\n              \"text\": \"\\\",\\n    \\\"course_rank\\\": 4,\\n    \\\"explanation\\\": \\\"As a foundational course in data analysis, it equips students with essential statistical tools and techniques applicable in various fields, including business and science\"\n            },\n            \"groundingChunkIndices\": [\n              1\n            ],\n            \"confidenceScores\": [\n              0.065602906\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 1327,\n              \"endIndex\": 1742,\n              \"text\": \".\\\"\\n  },\\n  {\\n    \\\"course_code\\\": \\\"APS1013H\\\",\\n    \\\"course_name\\\": \\\"Applying Innovation in Engineering and Business Operations\\\",\\n    \\\"course_description\\\": \\\"This course teaches the application of innovation management tools and techniques, including strategic and systems thinking, business process analysis, creativity, problem-solving, solution design and implementation, organizational teamwork, and project management\"\n            },\n            \"groundingChunkIndices\": [\n              2\n            ],\n            \"confidenceScores\": [\n              0.12543441\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 1743,\n              \"endIndex\": 2009,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 3,\\n    \\\"explanation\\\": \\\"Focusing on applying innovation in real-world scenarios, this course is beneficial for students interested in product management and leadership roles within innovative environments\"\n            },\n            \"groundingChunkIndices\": [\n              2\n            ],\n            \"confidenceScores\": [\n              0.015519632\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 2290,\n              \"endIndex\": 2347,\n              \"text\": \"It is mandatory for Actuarial Science Specialist students\"\n            },\n            \"groundingChunkIndices\": [\n              3\n            ],\n            \"confidenceScores\": [\n              0.26875922\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 2348,\n              \"endIndex\": 2607,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 2,\\n    \\\"explanation\\\": \\\"This course offers practical experience and professional development in the field of actuarial science, valuable for students interested in data analysis and risk management\"\n            },\n            \"groundingChunkIndices\": [\n              3\n            ],\n            \"confidenceScores\": [\n              0.24113189\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 2834,\n              \"endIndex\": 3092,\n              \"text\": \"Topics include human creativity, problem-solving, product design and development, feasibility assessments, requirements engineering, managing research and development, project management, team communication, technology implementation, and innovation strategy\"\n            },\n            \"groundingChunkIndices\": [\n              2\n            ],\n            \"confidenceScores\": [\n              0.012946399\n            ]\n          },\n          {\n            \"segment\": {\n              \"startIndex\": 3093,\n              \"endIndex\": 3332,\n              \"text\": \"\\\",\\n    \\\"prerequisite_codes\\\": \\\"None found.\\\",\\n    \\\"course_rank\\\": 1,\\n    \\\"explanation\\\": \\\"Given the interest in product and management, this course provides a strong understanding of how to manage new products from conception to implementation\"\n            },\n            \"groundingChunkIndices\": [\n              2\n            ],\n            \"confidenceScores\": [\n              0.015726944\n            ]\n          }\n        ],\n        \"retrievalMetadata\": {},\n        \"webSearchQueries\": [\n          \"UofT course calendar 2024-2025 leadership\",\n          \"UofT course calendar 2024-2025 data analysis\",\n          \"UofT entrepreneurship product data analysis leadership science management courses\",\n          \"UofT course calendar 2024-2025 entrepreneurship\",\n          \"UofT course calendar 2024-2025 science management\",\n          \"UofT course calendar 2024-2025 product management\"\n        ]\n      }\n    }\n  ],\n  \"usageMetadata\": {\n    \"promptTokenCount\": 136,\n    \"candidatesTokenCount\": 738,\n    \"totalTokenCount\": 874,\n    \"promptTokensDetails\": [\n      {\n        \"modality\": \"TEXT\",\n        \"tokenCount\": 136\n      }\n    ],\n    \"candidatesTokensDetails\": [\n      {\n        \"modality\": \"TEXT\",\n        \"tokenCount\": 738\n      }\n    ]\n  },\n  \"modelVersion\": \"gemini-2.0-flash\",\n  \"responseId\": \"hxAuafyxLbHi_uMPy5_csQI\"\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gemini_debug.json b/gemini_debug.json
+--- a/gemini_debug.json	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/gemini_debug.json	(date 1764654491706)
+@@ -4,7 +4,7 @@
+       "content": {
+         "parts": [
+           {
+-            "text": "```json\n[\n  {\n    \"course_code\": \"ENT200H1\",\n    \"course_name\": \"Introduction to Entrepreneurship\",\n    \"course_description\": \"This course introduces students to the fundamentals of entrepreneurship, providing a broad overview of the entrepreneurial process. It covers idea generation, market analysis, business model development, and strategies for launching and scaling a new venture.\",\n    \"prerequisite_codes\": \"9.0 credits in any subject\",\n    \"course_rank\": 5,\n    \"explanation\": \"This course provides a solid foundation in entrepreneurship, covering essential concepts and skills for new venture creation, making it an excellent starting point for students interested in launching their own businesses.\"\n  },\n  {\n    \"course_code\": \"CCT226H5\",\n    \"course_name\": \"Data Analysis I\",\n    \"course_description\": \"This course introduces the basic tools of data analysis, particularly statistics and modeling. Students learn descriptive and inferential statistics, focusing on data types commonly encountered in digital environments.\",\n    \"prerequisite_codes\": \"CCT109H5 and CCT110H5 and (CCT111H5 or CCT112H5)\",\n    \"course_rank\": 4,\n    \"explanation\": \"As a foundational course in data analysis, it equips students with essential statistical tools and techniques applicable in various fields, including business and science.\"\n  },\n  {\n    \"course_code\": \"APS1013H\",\n    \"course_name\": \"Applying Innovation in Engineering and Business Operations\",\n    \"course_description\": \"This course teaches the application of innovation management tools and techniques, including strategic and systems thinking, business process analysis, creativity, problem-solving, solution design and implementation, organizational teamwork, and project management.\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 3,\n    \"explanation\": \"Focusing on applying innovation in real-world scenarios, this course is beneficial for students interested in product management and leadership roles within innovative environments.\"\n  },\n  {\n    \"course_code\": \"ACT390H1\",\n    \"course_name\": \"Professional Experience in Actuarial Science\",\n    \"course_description\": \"This course prepares students for an internship work term, including professional skill workshops, networking activities, and a speaker series. It is mandatory for Actuarial Science Specialist students.\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 2,\n    \"explanation\": \"This course offers practical experience and professional development in the field of actuarial science, valuable for students interested in data analysis and risk management.\"\n  },\n  {\n    \"course_code\": \"APS1023H\",\n    \"course_name\": \"New Product Innovation\",\n    \"course_description\": \"This course examines the technical and organizational aspects of managing new products and process innovations. Topics include human creativity, problem-solving, product design and development, feasibility assessments, requirements engineering, managing research and development, project management, team communication, technology implementation, and innovation strategy.\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 1,\n    \"explanation\": \"Given the interest in product and management, this course provides a strong understanding of how to manage new products from conception to implementation.\"\n  }\n]\n```"
++            "text": "```json\n[\n  {\n    \"course_code\": \"ENT200H1\",\n    \"course_name\": \"Introduction to Entrepreneurship\",\n    \"course_description\": \"This course, offered by the Centre for Entrepreneurship, is designed for students from across the Faculty of Arts & Science. It provides an introduction to the fundamentals of entrepreneurship, combining scholarly and experiential learning.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"This course provides a broad introduction to entrepreneurship, which aligns with your interests in entrepreneurship and management. It is open to students from diverse backgrounds.\"\n  },\n  {\n    \"course_code\": \"RSM100H1\",\n    \"course_name\": \"Introduction to Management\",\n    \"course_description\": \"An introductory course to management principles.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in management, this introductory course will provide a solid foundation in core management concepts.\"\n  },\n  {\n    \"course_code\": \"MIE1624H\",\n    \"course_name\": \"Introduction to Data Science and Analytics\",\n    \"course_description\": \"This course introduces graduate students to scientific data analysis, statistical inference, and machine learning tools to gain insights from data sets. Topics include Python and R programming, version control, automation, modular programming, and scientific visualization.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Addresses your interests in data analysis and machine learning. Note that this is a graduate course, and auditing may be an option.\"\n  },\n  {\n    \"course_code\": \"STA130H1\",\n    \"course_name\": \"Introduction to Statistical Reasoning and Data Science\",\n    \"course_description\": \"A first-year introductory course that introduces the field of Data Science, using logical thinking, mathematics, computer simulation, and discussion.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"Since you are interested in data analysis, this course provides an introduction to data science, statistical reasoning, and practical applications.\"\n  },\n  {\n    \"course_code\": \"4117\",\n    \"course_name\": \"Product Management Bootcamp\",\n    \"course_description\": \"A bootcamp that prepares you for a product management role in the tech industry. You'll learn about the entire product lifecycle, from ideation to launch, including strategic planning, agile execution, and data-driven optimization.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Given your interests in product and data analysis, this bootcamp offers comprehensive skills for product management, covering strategy, execution, and data-driven decision-making.\"\n  }\n]\n```"
+           }
+         ],
+         "role": "model"
+@@ -12,221 +12,192 @@
+       "finishReason": "STOP",
+       "groundingMetadata": {
+         "searchEntryPoint": {
+-          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGPcu_40R82Q2FWETR0JgBRMAjK734AafCeOfjOSpPmHkWotu9Z_PZWIiOkqNg7VMp-ZXOFPXz9Pl_rGpcgNthc4Szhe9xxk_OSyF0YYeSHyBb2rSDAMBx5RqWNzH2l7AqXrsmDYC1td8edEQgdYDDKCfhClknLHa6IvTWcKlLbh75X3m99MNPHpyIEIsIf69ZGb45e1XaQeGvzjfCzA0xCfi1ayxfK7R-NwzL4iA==\"\u003eUofT course calendar 2024-2025 data analysis\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGdrboq2u33S3j-OOfXmCXNNu7884VVJPAV4ZZlUHbhaCbq5yXfn9tLSz4ckCxQMPkEbYo3X3f9uMfk_RoLwNNb-OoSDyNj3xegW_5bFJKz4r7YsM1_fViwsXPtrEARCvOU5h6GLmZyaObrdSVoUvYYUlCfEc75chLxczVKV9EmevVhNBnBTA4GG5NFMkECCfVwXPKsygX8kiR67gDUZBApENW_1lOZQFqCAmkBTgd81Q==\"\u003eUofT course calendar 2024-2025 entrepreneurship\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF7RGbuhX_lT5ljhRVanw1f38SwQrQjkebzntys0cwXFdoup0UQKUl05NfBJaSJK_tqV7m5WfuJ7a8bP3RskTvvjfuWu6lYbHLfkpjhKMG6mYFW89xKAj2dIPThWmkqxooN1XHMDgkRN8_gHUnhOpaYaPeyuS71DxnJ0SsaKvkJWHqcGeloZ9aw_NPvPGTr-14jUPkzZHitUk0S95pN6scVQjOk3N6k0XnHnsH9yAHSc3lCSCgIYl-_93jv_jOZPCUZ-pqmnDnVBhcbCHmjxmx2FTBo\"\u003eUofT entrepreneurship product data analysis leadership science management courses\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF1eR_NyBItWsqrQsuTkGrq6wKuTiAYpZV4V1vpxY-sR-PXEVAwGtjSwzsb77CjaQ0e0o7aqJVgI0JnORmQOaA1LUzK6hv-6kE4jMiGuNrpqIUPXIpy36HdqtFKaQFWTWAGjHCmAf5u120DVEuruSOjIKCB9_PxCEiJRjvo3iz2os1Wux9cDVdmlx8OHRLQCiN-JvfvKsptZ0I75ueiMjmsb_ANIYcjGogH0dUfEZ3I-z2A\"\u003eUofT course calendar 2024-2025 product management\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGSqmhXT6egdwKz3_L9pX47FcRP7S9JAvIJlmYmviKffWp9IkPxpqc7Zkx1fHAF4-IXPfrOQkS8ChnLeW48iK_PL-hqorxPl6Ra7fK8Q7TotXdiA41bnOe_0We1-do3npr-PL4YxflF-LW2ETeL7A35-546p2PbllaTzb2TGk75EjlLJSaFmDExN_KDh980dzudHHh5m00TszfMKlMDitKf917vCehkC8p-TQ==\"\u003eUofT course calendar 2024-2025 leadership\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEERUcscX0Fuzu7RzM4p48qUE2lN-xdmTu4-zr6sV5PWOAaTDqqCuRMMZrMH-xwR7PmXVCKEmBKPG5r15dvLQLSjZwe_2TkLYFrfJIZjsPrOuxbeOrTnrgUZTwLqY0bFYIujIH1CXEfk0qLiORHp-zp3uylzqI8j5Gdb_QxRqtaydaw3KOWwiv4gf7nGKH1ew_mUgJHeqtp8VA4cHz3G5AxKeUHBrNDRScxF-1kzQ6SW5OW\"\u003eUofT course calendar 2024-2025 science management\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
++          "renderedContent": "\u003cstyle\u003e\n.container {\n  align-items: center;\n  border-radius: 8px;\n  display: flex;\n  font-family: Google Sans, Roboto, sans-serif;\n  font-size: 14px;\n  line-height: 20px;\n  padding: 8px 12px;\n}\n.chip {\n  display: inline-block;\n  border: solid 1px;\n  border-radius: 16px;\n  min-width: 14px;\n  padding: 5px 16px;\n  text-align: center;\n  user-select: none;\n  margin: 0 8px;\n  -webkit-tap-highlight-color: transparent;\n}\n.carousel {\n  overflow: auto;\n  scrollbar-width: none;\n  white-space: nowrap;\n  margin-right: -12px;\n}\n.headline {\n  display: flex;\n  margin-right: 4px;\n}\n.gradient-container {\n  position: relative;\n}\n.gradient {\n  position: absolute;\n  transform: translate(3px, -9px);\n  height: 36px;\n  width: 9px;\n}\n@media (prefers-color-scheme: light) {\n  .container {\n    background-color: #fafafa;\n    box-shadow: 0 0 0 1px #0000000f;\n  }\n  .headline-label {\n    color: #1f1f1f;\n  }\n  .chip {\n    background-color: #ffffff;\n    border-color: #d2d2d2;\n    color: #5e5e5e;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #f2f2f2;\n  }\n  .chip:focus {\n    background-color: #f2f2f2;\n  }\n  .chip:active {\n    background-color: #d8d8d8;\n    border-color: #b6b6b6;\n  }\n  .logo-dark {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);\n  }\n}\n@media (prefers-color-scheme: dark) {\n  .container {\n    background-color: #1f1f1f;\n    box-shadow: 0 0 0 1px #ffffff26;\n  }\n  .headline-label {\n    color: #fff;\n  }\n  .chip {\n    background-color: #2c2c2c;\n    border-color: #3c4043;\n    color: #fff;\n    text-decoration: none;\n  }\n  .chip:hover {\n    background-color: #353536;\n  }\n  .chip:focus {\n    background-color: #353536;\n  }\n  .chip:active {\n    background-color: #464849;\n    border-color: #53575b;\n  }\n  .logo-light {\n    display: none;\n  }\n  .gradient {\n    background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);\n  }\n}\n\u003c/style\u003e\n\u003cdiv class=\"container\"\u003e\n  \u003cdiv class=\"headline\"\u003e\n    \u003csvg class=\"logo-light\" width=\"18\" height=\"18\" viewBox=\"9 9 35 35\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M42.8622 27.0064C42.8622 25.7839 42.7525 24.6084 42.5487 23.4799H26.3109V30.1568H35.5897C35.1821 32.3041 33.9596 34.1222 32.1258 35.3448V39.6864H37.7213C40.9814 36.677 42.8622 32.2571 42.8622 27.0064V27.0064Z\" fill=\"#4285F4\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 43.8555C30.9659 43.8555 34.8687 42.3195 37.7213 39.6863L32.1258 35.3447C30.5898 36.3792 28.6306 37.0061 26.3109 37.0061C21.8282 37.0061 18.0195 33.9811 16.6559 29.906H10.9194V34.3573C13.7563 39.9841 19.5712 43.8555 26.3109 43.8555V43.8555Z\" fill=\"#34A853\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M16.6559 29.8904C16.3111 28.8559 16.1074 27.7588 16.1074 26.6146C16.1074 25.4704 16.3111 24.3733 16.6559 23.3388V18.8875H10.9194C9.74388 21.2072 9.06992 23.8247 9.06992 26.6146C9.06992 29.4045 9.74388 32.022 10.9194 34.3417L15.3864 30.8621L16.6559 29.8904V29.8904Z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M26.3109 16.2386C28.85 16.2386 31.107 17.1164 32.9095 18.8091L37.8466 13.8719C34.853 11.082 30.9659 9.3736 26.3109 9.3736C19.5712 9.3736 13.7563 13.245 10.9194 18.8875L16.6559 23.3388C18.0195 19.2636 21.8282 16.2386 26.3109 16.2386V16.2386Z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003csvg class=\"logo-dark\" width=\"18\" height=\"18\" viewBox=\"0 0 48 48\" xmlns=\"http://www.w3.org/2000/svg\"\u003e\n      \u003ccircle cx=\"24\" cy=\"23\" fill=\"#FFF\" r=\"22\"/\u003e\n      \u003cpath d=\"M33.76 34.26c2.75-2.56 4.49-6.37 4.49-11.26 0-.89-.08-1.84-.29-3H24.01v5.99h8.03c-.4 2.02-1.5 3.56-3.07 4.56v.75l3.91 2.97h.88z\" fill=\"#4285F4\"/\u003e\n      \u003cpath d=\"M15.58 25.77A8.845 8.845 0 0 0 24 31.86c1.92 0 3.62-.46 4.97-1.31l4.79 3.71C31.14 36.7 27.65 38 24 38c-5.93 0-11.01-3.4-13.45-8.36l.17-1.01 4.06-2.85h.8z\" fill=\"#34A853\"/\u003e\n      \u003cpath d=\"M15.59 20.21a8.864 8.864 0 0 0 0 5.58l-5.03 3.86c-.98-2-1.53-4.25-1.53-6.64 0-2.39.55-4.64 1.53-6.64l1-.22 3.81 2.98.22 1.08z\" fill=\"#FBBC05\"/\u003e\n      \u003cpath d=\"M24 14.14c2.11 0 4.02.75 5.52 1.98l4.36-4.36C31.22 9.43 27.81 8 24 8c-5.93 0-11.01 3.4-13.45 8.36l5.03 3.85A8.86 8.86 0 0 1 24 14.14z\" fill=\"#EA4335\"/\u003e\n    \u003c/svg\u003e\n    \u003cdiv class=\"gradient-container\"\u003e\u003cdiv class=\"gradient\"\u003e\u003c/div\u003e\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"carousel\"\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFb6O3xoqfvsT3L4TCwRUi4uIBdpA3jSCkkg6Jho4ClZSMy094eN5BkDHx_Z_p69w__QRdW49UcmMs3HEgD2CrFVYS0qWzXPbztMq0PNjV2Moc53zy85kmhokReE0WKr_Om5adOTI1iDK6kxUuCDq9lbWy89rrZTtrMNli9LddqX2m-KVG5jCta21NgQN288URStjFR_Q-6uSEXbo_PAlHB8FJRMcM5\"\u003eUofT data analysis courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFBETxwyWPU-5ncks8yIWxvGHHx5jHUqGzlqFp5pIOcyO3sJ1izSYgHiofpnSTxuFA5VimJpk9bDQhs4ARYcbV7OA5ZH336DBgsx9cNidPl4akdiJcIYZOlQmdY9GKThGsht8RigOxLg0tfzwPn8_vGXxY9l3C4DotafRrGg4vRv8OqvN-YPEsioDbvVXTEL0cM5R1mI2BulAgYQ7rMo9D2SSI0iiYK0_m3\"\u003eUofT entrepreneurship courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHwPiS1P_W-XP5dTiWQlqYO5GzPpRvVI9J42skGXVn-91oNFZKBhrolZYr7yHUeW8Uj0qxmCIjbBgg2lXeG-QtFtXBkujE3nEWH7BIn5zhy9Ey_irRSkUAA8uiT9OYlp6ITRiLDNfWLRM8ifoYUk56uk-bFJA1VrWZebq7KYbIbBTWK0TlNHOzqIjat1sSqb52mAVPFWsQlr7t7lScVO3zwFeblmjjTsgrFXsk=\"\u003eUofT product management courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGPtmX9LyZI1Z3GhFTAe-4ku-wNgmuYLJQbeMDJ5CeX5HmaBl-uZsQz2XqTKVTE5E0bjGdR0l4myCVuX6xhq2bTaidvSrgAu-2PBvknR0sv9jiBi8FOteg1pMRbPEEXJLyxf-PFWcTahOOzLr7C11XmfRObJmMg3w--fnxAg5GD43gFQFIC369rsbmYElksuSNXVKj8hLe_c79uzFCIG_W3mprNYYUDXEOxYsY=\"\u003eUofT science management courses 2024-2025\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFHwh8hnwCNEu4SCI3OrG-ayG7ksS-oxqwmd7uaBO2DZr-LOs3EDbAC68soQdrYw4xShXiD4G-JsqRp2EBkv0bHgB266-ak0aLsHRTMH-QX2N9Gcq8A7Oc3vV9RgdYgTuJym_7zOm7GvEfQ6koqDTVFmbTHI1I855nMZN4bDMeTlEE_v-gNbJHIRabinzEbVDSlcNC9\"\u003eUofT course finder\u003c/a\u003e\n    \u003ca class=\"chip\" href=\"https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHuPbD2kzc-GeEpk2gPq-bgmP0N8_PDrrClZNpSYEWRhWKqWRHTmgxVi08ktRe8lUmG2kawEOn2673_8Cy1gWOBp5NOpmas1dEIrNR_Knb6p0CxQiffy_adpx25nU6psctxdi8L1ed-V_z6ATHdyxgKrp4whPG6-wjuoeJO9F961vawX4Dt7D9tcbIYccXMfflH2_dvNDrIMScxguPYk8DcMHhY\"\u003eUofT leadership courses 2024-2025\u003c/a\u003e\n  \u003c/div\u003e\n\u003c/div\u003e\n"
+         },
+         "groundingChunks": [
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHaYsbc8Nf9fotOwav1INGCmKss-7WslWChRMN2ptSf2z-5Rbpch7ULYab_rcT5kjYhHs-S39t61RGbpW4f43A4a4i_8jdWTZq_sMSZvWBAKBcMw1plaPHYwprJoWPvjIUn8YPR17DyNe6S2GukGfrjAF57_gKcKtNPdYWKLSX1yJxT4u3XVYJeqb26qA==",
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQERMFsOqGLxiqpcRehG8awTGUzfXMtcjSmJieMJUBLyAAqx8mlAqqjXIN4xdFG9QNy4PhYR7gsKchYu2SlCQHOHRS64L0WFVb8epr8KgThfu6uAOPBqo4vv_HcWcXrBPs0g_4n34tNERZx-kOr2q6ZAQnTTW8T1sdPDQo0Chcnzpd_mU_vRDF3oMAo0btk=",
+               "title": "utoronto.ca"
+             }
+           },
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFb7TdTTzc6sKWvjEXXabHdTaiAkS3ZMG7E3T4oJVGlvVJYG93QBjeZXHE9flbAGgwtFDFgUfWHo2Artdyhd3Cmhtq8O-rRhTFX7nsH-HRIzqSz3Tpe07jdz_wvpSPysz34GOeEUXhGKNw=",
+-              "title": "utoronto.ca"
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGcCQfj34UqXdD9UdhFECyFsvRGWjymu55Z8PD0zi0ZfOHkqgsN_FopJgtasowsBRvc7zAVqT2Whv0pftzDCoKuvjULrHt_eTZvEFg9y37Tit4ZZvp3mqbP6L8KNzcpz_d8amK5Fzg3huTGBCY_mA==",
++              "title": "scinethpc.ca"
+             }
+           },
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFEjze0zuJXUWqCRy-OGMCJTXOsd7FnkF1JLd4xI_ikKN-hMT3M_B4teCjZlxD3DdSEwTn5OjIzk1YQHRd9mEnhZK-EqMKqC1sUXtgOOPCa9QbTGC9_Oz3Iv_8BGgWKIK0CB32TsUqZLqewpXslUcuj6IRmr-201tZWWv-7R0Imo40p2Vic9sAKb9NWF9BRhYNmSuDrJjcWM4Mgc2k0LCQvUY9wMGEMYwimKyKAZ6g_B4jnKkIwj08ZXhQ=",
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFlJ9p1tVfmsSgP36PRoXiCCXTDWM7CbL5y9sGMUQL7QEzD7ggTlFUcm2lqwGcSioycCKXiixz3E6Kze5prKRnTNkWAqoJlCn3GrHDqXQ1n_wZkxdQWe2Vrnasoy34bvjferrJf8PVbYtSIZEMJlCI1LQI=",
+               "title": "utoronto.ca"
+             }
+           },
+           {
+             "web": {
+-              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHT2c2Qj93yuGD9IjNF0RTu_zDhG6zhFtiDh-JP_9OEvPiFfrsFl4Nbi75GsDsPJSD12NcarqDhZ4Z4OF2YRZ-dLYblOD7LbzE9tNH1ZwktZTXvHQw4zkl7PDXXb5CprswXQC5kQfw_AR6Nqg==",
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH4h53yCLIZoNb0HSLY8MizQgyGfhjo3yh0dlv1-3xEdnhG7smdotbkdNABWWWBjV5NqxRjyhrp7uULSd_-oZYCubUb8XJT9rDHwP1vRONaGwJ6csZGDaeJF6W8eDVLk0kHcj8k8Agxg9NwW4E2NYbI2OGl6lOaUp9TwDvCNmMQcb9kKXVlPA9IOw9Ewf8=",
+               "title": "utoronto.ca"
+             }
++          },
++          {
++            "web": {
++              "uri": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFU_R12b53JPgvogFD38tjNVNRHy1taXu8Iaco1udCkQJMvTVQDTjYYoFa_o1EWiMUzBkbSXDAQvk0WgZwtvJcwSGDfs3ZN-1_30GbVv4NDO-CsuGy3c-Vj1I925CK5uWFCz1HQVNToCB1ApEI=",
++              "title": "xrcourse.com"
++            }
+           }
+         ],
+         "groundingSupports": [
+           {
+             "segment": {
+-              "startIndex": 259,
+-              "endIndex": 385,
+-              "text": "It covers idea generation, market analysis, business model development, and strategies for launching and scaling a new venture"
+-            },
+-            "groundingChunkIndices": [
+-              0
+-            ],
+-            "confidenceScores": [
+-              0.14596966
+-            ]
+-          },
+-          {
+-            "segment": {
+-              "startIndex": 386,
+-              "endIndex": 442,
+-              "text": "\",\n    \"prerequisite_codes\": \"9.0 credits in any subject"
++              "startIndex": 252,
++              "endIndex": 366,
++              "text": "It provides an introduction to the fundamentals of entrepreneurship, combining scholarly and experiential learning"
+             },
+             "groundingChunkIndices": [
+               0
+             ],
+             "confidenceScores": [
+-              0.86185163
++              0.38977024
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 442,
+-              "endIndex": 708,
+-              "text": "\",\n    \"course_rank\": 5,\n    \"explanation\": \"This course provides a solid foundation in entrepreneurship, covering essential concepts and skills for new venture creation, making it an excellent starting point for students interested in launching their own businesses"
++              "startIndex": 574,
++              "endIndex": 621,
++              "text": "It is open to students from diverse backgrounds"
+             },
+             "groundingChunkIndices": [
+               0
+             ],
+             "confidenceScores": [
+-              0.09549614
++              0.84371835
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 911,
+-              "endIndex": 1033,
+-              "text": "Students learn descriptive and inferential statistics, focusing on data types commonly encountered in digital environments"
++              "startIndex": 621,
++              "endIndex": 1268,
++              "text": ".\"\n  },\n  {\n    \"course_code\": \"RSM100H1\",\n    \"course_name\": \"Introduction to Management\",\n    \"course_description\": \"An introductory course to management principles.\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 3,\n    \"explanation\": \"Given your interest in management, this introductory course will provide a solid foundation in core management concepts.\"\n  },\n  {\n    \"course_code\": \"MIE1624H\",\n    \"course_name\": \"Introduction to Data Science and Analytics\",\n    \"course_description\": \"This course introduces graduate students to scientific data analysis, statistical inference, and machine learning tools to gain insights from data sets"
+             },
+             "groundingChunkIndices": [
+               1
+             ],
+             "confidenceScores": [
+-              0.9617571
++              0.5694708
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 1034,
+-              "endIndex": 1112,
+-              "text": "\",\n    \"prerequisite_codes\": \"CCT109H5 and CCT110H5 and (CCT111H5 or CCT112H5)"
++              "startIndex": 1270,
++              "endIndex": 1389,
++              "text": "Topics include Python and R programming, version control, automation, modular programming, and scientific visualization"
+             },
+             "groundingChunkIndices": [
+               1
+             ],
+             "confidenceScores": [
+-              0.6077391
++              0.9626807
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 1112,
+-              "endIndex": 1327,
+-              "text": "\",\n    \"course_rank\": 4,\n    \"explanation\": \"As a foundational course in data analysis, it equips students with essential statistical tools and techniques applicable in various fields, including business and science"
++              "startIndex": 1529,
++              "endIndex": 1595,
++              "text": "Note that this is a graduate course, and auditing may be an option"
+             },
+             "groundingChunkIndices": [
+               1
+             ],
+             "confidenceScores": [
+-              0.065602906
++              0.61713606
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 1327,
+-              "endIndex": 1742,
+-              "text": ".\"\n  },\n  {\n    \"course_code\": \"APS1013H\",\n    \"course_name\": \"Applying Innovation in Engineering and Business Operations\",\n    \"course_description\": \"This course teaches the application of innovation management tools and techniques, including strategic and systems thinking, business process analysis, creativity, problem-solving, solution design and implementation, organizational teamwork, and project management"
++              "startIndex": 1595,
++              "endIndex": 1890,
++              "text": ".\"\n  },\n  {\n    \"course_code\": \"STA130H1\",\n    \"course_name\": \"Introduction to Statistical Reasoning and Data Science\",\n    \"course_description\": \"A first-year introductory course that introduces the field of Data Science, using logical thinking, mathematics, computer simulation, and discussion"
+             },
+             "groundingChunkIndices": [
+               2
+             ],
+             "confidenceScores": [
+-              0.12543441
++              0.046313386
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 1743,
+-              "endIndex": 2009,
+-              "text": "\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 3,\n    \"explanation\": \"Focusing on applying innovation in real-world scenarios, this course is beneficial for students interested in product management and leadership roles within innovative environments"
++              "startIndex": 1891,
++              "endIndex": 2307,
++              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 4,\n    \"explanation\": \"Since you are interested in data analysis, this course provides an introduction to data science, statistical reasoning, and practical applications.\"\n  },\n  {\n    \"course_code\": \"4117\",\n    \"course_name\": \"Product Management Bootcamp\",\n    \"course_description\": \"A bootcamp that prepares you for a product management role in the tech industry"
+             },
+             "groundingChunkIndices": [
+-              2
++              3
+             ],
+             "confidenceScores": [
+-              0.015519632
++              0.43729553
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 2290,
+-              "endIndex": 2347,
+-              "text": "It is mandatory for Actuarial Science Specialist students"
++              "startIndex": 2309,
++              "endIndex": 2458,
++              "text": "You'll learn about the entire product lifecycle, from ideation to launch, including strategic planning, agile execution, and data-driven optimization"
+             },
+             "groundingChunkIndices": [
+-              3
++              3,
++              4
+             ],
+             "confidenceScores": [
+-              0.26875922
++              0.07398,
++              0.109307066
+             ]
+           },
+           {
+             "segment": {
+-              "startIndex": 2348,
+-              "endIndex": 2607,
+-              "text": "\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 2,\n    \"explanation\": \"This course offers practical experience and professional development in the field of actuarial science, valuable for students interested in data analysis and risk management"
++              "startIndex": 2459,
++              "endIndex": 2712,
++              "text": "\",\n    \"prerequisite_codes\": [],\n    \"course_rank\": 5,\n    \"explanation\": \"Given your interests in product and data analysis, this bootcamp offers comprehensive skills for product management, covering strategy, execution, and data-driven decision-making"
+             },
+             "groundingChunkIndices": [
+-              3
++              3,
++              4
+             ],
+             "confidenceScores": [
+-              0.24113189
+-            ]
+-          },
+-          {
+-            "segment": {
+-              "startIndex": 2834,
+-              "endIndex": 3092,
+-              "text": "Topics include human creativity, problem-solving, product design and development, feasibility assessments, requirements engineering, managing research and development, project management, team communication, technology implementation, and innovation strategy"
+-            },
+-            "groundingChunkIndices": [
+-              2
+-            ],
+-            "confidenceScores": [
+-              0.012946399
+-            ]
+-          },
+-          {
+-            "segment": {
+-              "startIndex": 3093,
+-              "endIndex": 3332,
+-              "text": "\",\n    \"prerequisite_codes\": \"None found.\",\n    \"course_rank\": 1,\n    \"explanation\": \"Given the interest in product and management, this course provides a strong understanding of how to manage new products from conception to implementation"
+-            },
+-            "groundingChunkIndices": [
+-              2
+-            ],
+-            "confidenceScores": [
+-              0.015726944
++              0.3025375,
++              0.5689801
+             ]
+           }
+         ],
+         "retrievalMetadata": {},
+         "webSearchQueries": [
+-          "UofT course calendar 2024-2025 leadership",
+-          "UofT course calendar 2024-2025 data analysis",
+-          "UofT entrepreneurship product data analysis leadership science management courses",
+-          "UofT course calendar 2024-2025 entrepreneurship",
+-          "UofT course calendar 2024-2025 science management",
+-          "UofT course calendar 2024-2025 product management"
++          "UofT science management courses 2024-2025",
++          "UofT entrepreneurship courses 2024-2025",
++          "UofT leadership courses 2024-2025",
++          "UofT product management courses 2024-2025",
++          "UofT data analysis courses 2024-2025",
++          "UofT course finder"
+         ]
+       }
+     }
+   ],
+   "usageMetadata": {
+-    "promptTokenCount": 136,
+-    "candidatesTokenCount": 738,
+-    "totalTokenCount": 874,
++    "promptTokenCount": 137,
++    "candidatesTokenCount": 637,
++    "totalTokenCount": 774,
+     "promptTokensDetails": [
+       {
+         "modality": "TEXT",
+-        "tokenCount": 136
++        "tokenCount": 137
+       }
+     ],
+     "candidatesTokensDetails": [
+       {
+         "modality": "TEXT",
+-        "tokenCount": 738
++        "tokenCount": 637
+       }
+     ]
+   },
+   "modelVersion": "gemini-2.0-flash",
+-  "responseId": "hxAuafyxLbHi_uMPy5_csQI"
++  "responseId": "jGMuaaefF-bY_uMPr9Pa6AU"
+ }
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494441)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_.xml	(date 1764654494441)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]" date="1764629002133" recycled="false" toDelete="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2025-12-01, 5:43 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01__5_43p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01__5_43p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01__5_43p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494438)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01__5_43p_m___Changes_.xml	(date 1764654494438)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]" date="1764629019832" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2025-12-01, 5:43 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__5_59p_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__5_59p_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__5_59p_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494434)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__5_59p_m___Changes_.xml	(date 1764654494434)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]" date="1764370785502" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Update at 2025-11-28, 5:59 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>target/\n!.mvn/wrapper/maven-wrapper.jar\n!**/src/main/**/target/\n!**/src/test/**/target/\n\n### IntelliJ IDEA ###\n.idea/modules.xml\n.idea/jarRepositories.xml\n.idea/compiler.xml\n.idea/libraries/\n*.iws\n*.iml\n*.ipr\n\n### Eclipse ###\n.apt_generated\n.classpath\n.factorypath\n.project\n.settings\n.springBeans\n.sts4-cache\n\n### NetBeans ###\n/nbproject/private/\n/nbbuild/\n/dist/\n/nbdist/\n/.nb-gradle/\nbuild/\n!**/src/main/**/build/\n!**/src/test/**/build/\n\n### VS Code ###\n.vscode/\n\n### Mac OS ###\n.DS_Store\n\n### Environment Variables ###\n.env
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/.gitignore	(date 1764654491718)
+@@ -38,4 +38,7 @@
+ .DS_Store
+ 
+ ### Environment Variables ###
+-.env
+\ No newline at end of file
++.env
++
++### Gemini Debug File ###
++gemini_debug.json
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\">\n      <change afterPath=\"$PROJECT_DIR$/.idea/checkstyle-idea.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.env\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.env\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/gemini_debug.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/gemini_debug.json\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;customColor&quot;: &quot;&quot;,\n  &quot;associatedIndex&quot;: 2\n}</component>\n  <component name=\"ProjectId\" id=\"36Aek2bmBQg2nnzmlJRM9lt6zKH\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.Main.executor\": \"Run\",\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"SONARLINT_PRECOMMIT_ANALYSIS\": \"true\",\n    \"git-widget-placeholder\": \"add__alternateflow__noAPIKey\",\n    \"ignore.virus.scanning.warn.message\": \"true\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"last_opened_file_path\": \"C:/Users/izaya/CSC207-team-8-project\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"RunManager\">\n    <configuration name=\"Main\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\n      <option name=\"MAIN_CLASS_NAME\" value=\"app.Main\" />\n      <module name=\"TeamProject\" />\n      <extension name=\"coverage\">\n        <pattern>\n          <option name=\"PATTERN\" value=\"app.*\" />\n          <option name=\"ENABLED\" value=\"true\" />\n        </pattern>\n      </extension>\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\n      <module name=\"CSC207-team-8-project\" />\n      <method v=\"2\">\n        <option name=\"Make\" enabled=\"true\" />\n      </method>\n    </configuration>\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\n      <module name=\"CSC207-team-8-project\" />\n      <option name=\"filePath\" />\n      <method v=\"2\" />\n    </configuration>\n    <recent_temporary>\n      <list>\n        <item itemvalue=\"Application.Main\" />\n      </list>\n    </recent_temporary>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131\" />\n        <option value=\"bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"430c56fc-94cf-4880-aedb-db6814b7f9b2\" name=\"Changes\" comment=\"\" />\n      <created>1764453944603</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1764453944603</updated>\n      <workItem from=\"1764453947764\" duration=\"303000\" />\n      <workItem from=\"1764454332389\" duration=\"80000\" />\n      <workItem from=\"1764454543951\" duration=\"5000\" />\n      <workItem from=\"1764458128284\" duration=\"796000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1764625733004</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1764625733004</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"2\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/.idea/workspace.xml	(date 1764654491725)
+@@ -4,13 +4,42 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.">
+-      <change afterPath="$PROJECT_DIR$/.idea/checkstyle-idea.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
++    <list default="true" id="430c56fc-94cf-4880-aedb-db6814b7f9b2" name="Changes" comment="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_4_46 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__4_46p_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28__5_54p_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_1.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02__12_02a_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__5_59p_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28__7_17p_m___Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01__5_43p_m___Changes_.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/gemini_debug.json" beforeDir="false" afterPath="$PROJECT_DIR$/gemini_debug.json" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/app/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/app/Main.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/data_access/WhyCoursesDataAccessObject.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/entity/RecommendCoursesUseCase.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/why_courses/WhyCoursesController.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/why_courses/WhyCoursesPresenter.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/interface_adapter/why_courses/WhyCoursesViewModel.java" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/ApiKeyDialog.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/CourseExplorerPanel.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/ui/CourseResultPanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ui/CourseResultPanel.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesDataAccessInterface.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInputBoundary.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInputData.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesInteractor.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesOutputBoundary.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/use_case/why_courses/WhyCoursesOutputData.java" beforeDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -25,11 +54,36 @@
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;storeBE&quot;
++  }
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/RaincallerMei/CSC207-team-8-project.git&quot;,
++    &quot;accountId&quot;: &quot;0a0ce86d-50d0-400a-8ff5-c564f4d4e8d9&quot;
++  },
++  &quot;recentNewPullRequestHead&quot;: {
++    &quot;server&quot;: {
++      &quot;useHttp&quot;: false,
++      &quot;host&quot;: &quot;github.com&quot;,
++      &quot;port&quot;: null,
++      &quot;suffix&quot;: null
++    },
++    &quot;owner&quot;: &quot;RaincallerMei&quot;,
++    &quot;repository&quot;: &quot;CSC207-team-8-project&quot;
++  }
++}</component>
+   <component name="ProjectColorInfo">{
+   &quot;customColor&quot;: &quot;&quot;,
+   &quot;associatedIndex&quot;: 2
+ }</component>
+   <component name="ProjectId" id="36Aek2bmBQg2nnzmlJRM9lt6zKH" />
++  <component name="ProjectLevelVcsManager">
++    <ConfirmationsSetting value="2" id="Add" />
++  </component>
+   <component name="ProjectViewState">
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+@@ -43,14 +97,16 @@
+     "RunOnceActivity.git.unshallow": "true",
+     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+     "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+-    "git-widget-placeholder": "add__alternateflow__noAPIKey",
++    "git-widget-placeholder": "Merging arthur2",
+     "ignore.virus.scanning.warn.message": "true",
++    "junie.onboarding.icon.badge.shown": "true",
+     "kotlin-language-version-configured": "true",
+     "last_opened_file_path": "C:/Users/izaya/CSC207-team-8-project",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+     "node.js.selected.package.eslint": "(autodetect)",
+     "node.js.selected.package.tslint": "(autodetect)",
++    "to.speed.mode.migration.done": "true",
+     "vue.rearranger.settings.migration": "true"
+   }
+ }]]></component>
+@@ -82,6 +138,8 @@
+     <recent_temporary>
+       <list>
+         <item itemvalue="Application.Main" />
++        <item itemvalue="Application.Main" />
++        <item itemvalue="Application.Main" />
+       </list>
+     </recent_temporary>
+   </component>
+@@ -104,6 +162,7 @@
+       <workItem from="1764454332389" duration="80000" />
+       <workItem from="1764454543951" duration="5000" />
+       <workItem from="1764458128284" duration="796000" />
++      <workItem from="1764632619796" duration="822000" />
+     </task>
+     <task id="LOCAL-00001" summary="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet.">
+       <option name="closed" value="true" />
+@@ -113,7 +172,23 @@
+       <option name="project" value="LOCAL" />
+       <updated>1764625733004</updated>
+     </task>
+-    <option name="localTasksCounter" value="2" />
++    <task id="LOCAL-00002" summary="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
++      <option name="closed" value="true" />
++      <created>1764627045486</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1764627045486</updated>
++    </task>
++    <task id="LOCAL-00003" summary="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked">
++      <option name="closed" value="true" />
++      <created>1764627071492</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1764627071492</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -121,6 +196,7 @@
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet." />
+-    <option name="LAST_COMMIT_MESSAGE" value="New branch addressing alternate flow when No API Key is entered: Prevents 'Get Recommendations' from being clicked, inform user that API Key isn't entered yet.&#10;Placeholder commit, no new implementation has been added yet." />
++    <MESSAGE value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
++    <option name="LAST_COMMIT_MESSAGE" value="New features:&#10;- When No API Key is entered, 'Get Recommendations' button is greyed out (prevents user from clicking)&#10;- API Key is now validated upon entering in APIKeyDialog.java, using okhttp&#10;- Cursor shows progress indicator when 'Get Recommendations' is clicked" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02__12_02a_m___Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02__12_02a_m___Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02__12_02a_m___Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1764654494449)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02__12_02a_m___Changes_.xml	(date 1764654494449)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]" date="1764651795297" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-02,_12_02 a_m__[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2025-12-02, 12:02 a.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491689)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_7_17 p_m__[Changes]/shelved.patch	(date 1764654491689)
+@@ -0,0 +1,18 @@
++Index: .idea/misc.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"openjdk-25\" project-jdk-type=\"JavaSDK\" />\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/misc.xml b/.idea/misc.xml
++--- a/.idea/misc.xml	(revision 1ae5ccaeac58e7a92580109cd76ca5c35bc01d0d)
+++++ b/.idea/misc.xml	(date 1764373499071)
++@@ -8,5 +8,5 @@
++       </list>
++     </option>
++   </component>
++-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
+++  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
++ </project>
++\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"KubernetesApiProvider\">{}</component>\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_24\" default=\"true\" project-jdk-name=\"corretto-24\" project-jdk-type=\"JavaSDK\" />\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision c75b058ae3f3b9942a71a0263f6f7de0db623aa0)
++++ b/.idea/misc.xml	(date 1764654494415)
+@@ -9,5 +9,4 @@
+       </list>
+     </option>
+   </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_24" default="true" project-jdk-name="corretto-24" project-jdk-type="JavaSDK" />
+ </project>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_1.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_1.xml b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_1.xml
+new file mode 100644
+--- /dev/null	(date 1764654491686)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01__5_43p_m___Changes_1.xml	(date 1764654491686)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1" date="1764629006905" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 2025-12-01, 5:43 p.m. [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491696)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-12-01,_5_43 p_m__[Changes]1/shelved.patch	(date 1764654491696)
+@@ -0,0 +1,10 @@
++Index: .env
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.env b/.env
++--- a/.env	(revision eb9adec8125b02a0bad360c483262623eb94ee2c)
+++++ b/.env	(date 1764464343611)
++@@ -1,0 +1,1 @@
+++GEMINI_API_KEY=AIzaSyCfkR4o0i0ir92QwpBDZ5cxe4fNZVIUtMQ
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491692)
++++ b/.idea/shelf/Uncommitted_changes_before_Checkout_at_2025-11-28,_5_54 p_m__[Changes]/shelved.patch	(date 1764654491692)
+@@ -0,0 +1,18 @@
++Index: .idea/misc.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"openjdk-25\" project-jdk-type=\"JavaSDK\" />\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/misc.xml b/.idea/misc.xml
++--- a/.idea/misc.xml	(revision fa550bfedc9e2f627cccc9e1ab6fe853131f7211)
+++++ b/.idea/misc.xml	(date 1764369913128)
++@@ -8,5 +8,5 @@
++       </list>
++     </option>
++   </component>
++-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
+++  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
++ </project>
++\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491703)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-12-01,_5_43 p_m__[Changes]/shelved.patch	(date 1764654491703)
+@@ -0,0 +1,14 @@
++Index: .env
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+>GEMINI_API_KEY=
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.env b/.env
++--- a/.env	(revision 60c027817d98c6d61d00d89771c724eafe1ca8d3)
+++++ b/.env	(date 1764629003363)
++@@ -1,1 +1,2 @@
+++GEMINI_API_KEY=AIzaSyCfkR4o0i0ir92QwpBDZ5cxe4fNZVIUtMQ
++ GEMINI_API_KEY=
++\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1764654491699)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_2025-11-28,_5_59 p_m__[Changes]/shelved.patch	(date 1764654491699)
+@@ -0,0 +1,18 @@
++Index: .idea/misc.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_25\" default=\"true\" project-jdk-name=\"openjdk-25\" project-jdk-type=\"JavaSDK\" />\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/misc.xml b/.idea/misc.xml
++--- a/.idea/misc.xml	(revision fa550bfedc9e2f627cccc9e1ab6fe853131f7211)
+++++ b/.idea/misc.xml	(date 1764370778066)
++@@ -8,5 +8,5 @@
++       </list>
++     </option>
++   </component>
++-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
+++  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
++ </project>
++\ No newline at end of file

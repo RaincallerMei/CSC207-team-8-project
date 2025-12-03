@@ -1,0 +1,266 @@
+Index: src/main/java/ui/CourseResultPanel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\n\nimport entity.Course;\nimport interface_adapter.why_courses.WhyCoursesController;\nimport interface_adapter.why_courses.WhyCoursesViewModel;\n\nimport javax.swing.*;\nimport javax.swing.border.EmptyBorder;\nimport java.awt.*;\nimport java.beans.PropertyChangeEvent;\nimport java.beans.PropertyChangeListener;\n\n/**\n * One accordion item for a single recommended course.\n * Shows basic info + “Details” + “Why this course?” button.\n */\npublic class CourseResultPanel extends JPanel implements PropertyChangeListener {\n\n    private final Course course;\n    private final WhyCoursesController whyController;\n    private final WhyCoursesViewModel whyViewModel;\n\n    private final JButton whyButton = new JButton(\"Why this course?\");\n\n    public CourseResultPanel(\n            Course course,\n            WhyCoursesController whyController,\n            WhyCoursesViewModel whyViewModel\n    ) {\n        this.course = course;\n        this.whyController = whyController;\n        this.whyViewModel = whyViewModel;\n\n        setLayout(new BorderLayout());\n        setBorder(new EmptyBorder(8, 8, 8, 8));\n\n        // ===== Top: course code + name =====\n        JLabel title = new JLabel(course.getCourseCode() + \" – \" + course.getCourseName());\n        title.setFont(title.getFont().deriveFont(Font.BOLD, 14f));\n        add(title, BorderLayout.NORTH);\n\n        // ===== Center: short description (multi-line) =====\n        JTextArea descArea = new JTextArea(course.getDescription());\n        descArea.setLineWrap(true);\n        descArea.setWrapStyleWord(true);\n        descArea.setEditable(false);\n        descArea.setFocusable(false);\n        descArea.setOpaque(false);\n        descArea.setBorder(null);\n\n        add(descArea, BorderLayout.CENTER);\n\n        // ===== Bottom: buttons =====\n        JButton detailsButton = new JButton(\"Details\");\n\n        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));\n        buttons.add(detailsButton);\n        buttons.add(whyButton);\n        add(buttons, BorderLayout.SOUTH);\n\n        // ===== Button actions =====\nimport java.awt.event.MouseAdapter;\nimport java.awt.event.MouseEvent;\n\npublic class CourseResultPanel extends JPanel {\n    private final JTextArea descriptionArea;\n    private boolean isExpanded = false;\n\n    public CourseResultPanel(Course course) {\n        // Layout: Header (North), Description (Center)\n        this.setLayout(new BorderLayout());\n        this.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));\n        this.setAlignmentX(Component.LEFT_ALIGNMENT);\n\n        // 1. Header Panel (Clickable)\n        JPanel headerPanel = new JPanel(new BorderLayout());\n        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));\n        headerPanel.setBackground(new Color(245, 245, 245));\n        headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));\n\n        // Use new fields: Code, Name, Rank\n        String headerText = String.format(\"<html><b>%s</b>: %s <span style='color:gray;font-size:10px;'>(Rank %d)</span></html>\",\n                course.getCourseCode(), course.getCourseName(), course.getCourseRank());\n\n        JLabel codeLabel = new JLabel(headerText);\n        codeLabel.setFont(new Font(\"SansSerif\", Font.PLAIN, 14));\n        JLabel arrowLabel = new JLabel(\"▼\");\n\n        headerPanel.add(codeLabel, BorderLayout.CENTER);\n        headerPanel.add(arrowLabel, BorderLayout.EAST);\n\n        // 2. Content Area (Hidden by default)\n        // We include Description + Prerequisites + Relevance + Keywords\n        String details = String.format(\n                \"Description: %s%n%nPrerequisites: %s%n%nRelevance: %s%n%nKeywords: %s\",\n                course.getDescription(),\n                course.getPrerequisiteCodes(),\n                course.getCourseDescription(),\n                course.getCourseKeywords()\n        );\n\n        // Simple “Details” dialog (no why text yet)\n        detailsButton.addActionListener(e -> {\n            CourseDetailsDialog dialog = new CourseDetailsDialog(\n                    this,\n                    course.getCourseCode(),\n                    course.getDescription()\n            );\n            dialog.setLocationRelativeTo(this);\n            dialog.setVisible(true);\n        });\n\n        // “Why this course?” – go through the WhyCourses use case if wired,\n        // otherwise fall back to the static relevance text on the Course entity.\n        whyButton.addActionListener(e -> {\n            if (whyController != null && whyViewModel != null) {\n                // Ask the use case for a reason\n                whyController.execute(course.getCourseCode());\n            } else {\n                // Fallback: just show the relevance string from Course\n                String reason = course.getCourseRelevance();\n                if (reason == null || reason.isEmpty()) {\n                    reason = \"This course matches your selected interests and background.\";\n                }\n                showWhyDialog(reason);\n            }\n        });\n\n        // Listen to updates from WhyCoursesViewModel (if provided)\n        if (whyViewModel != null) {\n            whyViewModel.addPropertyChangeListener(this);\n        }\n    }\n\n    @Override\n    public void propertyChange(PropertyChangeEvent evt) {\n        if (whyViewModel == null) {\n            return;\n        }\n\n        switch (evt.getPropertyName()) {\n            case WhyCoursesViewModel.PROPERTY_REASON -> {\n                // Only react if this reason is for *this* course code\n                String code = whyViewModel.getCourseCode();\n                if (!course.getCourseCode().equals(code)) {\n                    return;\n                }\n                String reason = whyViewModel.getReason();\n                if (reason == null || reason.isEmpty()) {\n                    reason = \"This course matches your selected interests and background.\";\n                }\n                showWhyDialog(reason);\n            }\n            case WhyCoursesViewModel.PROPERTY_ERROR -> {\n                Object msg = evt.getNewValue();\n                JOptionPane.showMessageDialog(\n                        this,\n                        msg == null ? \"Failed to load explanation.\" : msg.toString(),\n                        \"Error\",\n                        JOptionPane.ERROR_MESSAGE\n                );\n            }\n            default -> { /* ignore other properties */ }\n        }\n    }\n\n    /** Small helper to pop up the “why” explanation. */\n    private void showWhyDialog(String reason) {\n        // We reuse CourseDetailsDialog and put the reason into the “why” section.\n        // The current CourseDetailsDialog shows placeholder text;\n        // if later you extend it to accept a 'why' string, adapt here.\n        JTextArea textArea = new JTextArea(reason);\n        textArea.setEditable(false);\n        textArea.setLineWrap(true);\n        textArea.setWrapStyleWord(true);\n\n        JScrollPane scrollPane = new JScrollPane(textArea);\n        scrollPane.setPreferredSize(new Dimension(420, 160));\n\n        JOptionPane.showMessageDialog(\n                this,\n                scrollPane,\n                \"Why \" + course.getCourseCode() + \" was recommended\",\n                JOptionPane.INFORMATION_MESSAGE\n        );\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/ui/CourseResultPanel.java b/src/main/java/ui/CourseResultPanel.java
+--- a/src/main/java/ui/CourseResultPanel.java	(revision b479a4cce26fd2ebe681f0e2a319ff680932430f)
++++ b/src/main/java/ui/CourseResultPanel.java	(date 1764644097571)
+@@ -2,104 +2,63 @@
+ 
+ import entity.Course;
+ import interface_adapter.why_courses.WhyCoursesController;
+-import interface_adapter.why_courses.WhyCoursesViewModel;
+ 
+ import javax.swing.*;
+ import javax.swing.border.EmptyBorder;
+ import java.awt.*;
+-import java.beans.PropertyChangeEvent;
+-import java.beans.PropertyChangeListener;
+ 
+ /**
+- * One accordion item for a single recommended course.
+- * Shows basic info + “Details” + “Why this course?” button.
++ * One row in the "Recommended Courses" list.
++ * Shows course code/name, a collapsible description,
++ * and buttons for Details / Why this course.
+  */
+-public class CourseResultPanel extends JPanel implements PropertyChangeListener {
++public class CourseResultPanel extends JPanel {
+ 
+     private final Course course;
+     private final WhyCoursesController whyController;
+-    private final WhyCoursesViewModel whyViewModel;
+ 
++    private final JLabel headerLabel = new JLabel();
++    private final JTextArea descriptionArea = new JTextArea();
++
++    private final JButton detailsButton = new JButton("Details");
+     private final JButton whyButton = new JButton("Why this course?");
+ 
+-    public CourseResultPanel(
+-            Course course,
+-            WhyCoursesController whyController,
+-            WhyCoursesViewModel whyViewModel
+-    ) {
++    private boolean isExpanded = false;
++
++    public CourseResultPanel(Course course, WhyCoursesController whyController) {
+         this.course = course;
+         this.whyController = whyController;
+-        this.whyViewModel = whyViewModel;
+ 
+         setLayout(new BorderLayout());
+-        setBorder(new EmptyBorder(8, 8, 8, 8));
+-
+-        // ===== Top: course code + name =====
+-        JLabel title = new JLabel(course.getCourseCode() + " – " + course.getCourseName());
+-        title.setFont(title.getFont().deriveFont(Font.BOLD, 14f));
+-        add(title, BorderLayout.NORTH);
++        setBorder(new EmptyBorder(10, 10, 10, 10));
+ 
+-        // ===== Center: short description (multi-line) =====
+-        JTextArea descArea = new JTextArea(course.getDescription());
+-        descArea.setLineWrap(true);
+-        descArea.setWrapStyleWord(true);
+-        descArea.setEditable(false);
+-        descArea.setFocusable(false);
+-        descArea.setOpaque(false);
+-        descArea.setBorder(null);
++        // ===== Header (code + name + buttons) =====
++        headerLabel.setText(course.getCourseCode() + " – " + course.getCourseName());
++        headerLabel.setFont(headerLabel.getFont().deriveFont(Font.BOLD, 14f));
+ 
+-        add(descArea, BorderLayout.CENTER);
+-
+-        // ===== Bottom: buttons =====
+-        JButton detailsButton = new JButton("Details");
++        JPanel header = new JPanel(new BorderLayout());
++        header.add(headerLabel, BorderLayout.WEST);
+ 
+         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+         buttons.add(detailsButton);
+         buttons.add(whyButton);
+-        add(buttons, BorderLayout.SOUTH);
+-
+-        // ===== Button actions =====
+-import java.awt.event.MouseAdapter;
+-import java.awt.event.MouseEvent;
+-
+-public class CourseResultPanel extends JPanel {
+-    private final JTextArea descriptionArea;
+-    private boolean isExpanded = false;
+-
+-    public CourseResultPanel(Course course) {
+-        // Layout: Header (North), Description (Center)
+-        this.setLayout(new BorderLayout());
+-        this.setBorder(new MatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+-        this.setAlignmentX(Component.LEFT_ALIGNMENT);
++        header.add(buttons, BorderLayout.EAST);
+ 
+-        // 1. Header Panel (Clickable)
+-        JPanel headerPanel = new JPanel(new BorderLayout());
+-        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+-        headerPanel.setBackground(new Color(245, 245, 245));
+-        headerPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
++        add(header, BorderLayout.NORTH);
+ 
+-        // Use new fields: Code, Name, Rank
+-        String headerText = String.format("<html><b>%s</b>: %s <span style='color:gray;font-size:10px;'>(Rank %d)</span></html>",
+-                course.getCourseCode(), course.getCourseName(), course.getCourseRank());
++        // ===== Description area (collapsed by default) =====
++        descriptionArea.setLineWrap(true);
++        descriptionArea.setWrapStyleWord(true);
++        descriptionArea.setEditable(false);
++        descriptionArea.setText(course.getDescription());
++        descriptionArea.setBackground(UIManager.getColor("TextField.inactiveBackground"));
++        descriptionArea.setBorder(new EmptyBorder(8, 8, 8, 8));
++        descriptionArea.setVisible(false);  // start collapsed
+ 
+-        JLabel codeLabel = new JLabel(headerText);
+-        codeLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+-        JLabel arrowLabel = new JLabel("▼");
++        add(descriptionArea, BorderLayout.CENTER);
+ 
+-        headerPanel.add(codeLabel, BorderLayout.CENTER);
+-        headerPanel.add(arrowLabel, BorderLayout.EAST);
++        // ===== Listeners =====
+ 
+-        // 2. Content Area (Hidden by default)
+-        // We include Description + Prerequisites + Relevance + Keywords
+-        String details = String.format(
+-                "Description: %s%n%nPrerequisites: %s%n%nRelevance: %s%n%nKeywords: %s",
+-                course.getDescription(),
+-                course.getPrerequisiteCodes(),
+-                course.getCourseDescription(),
+-                course.getCourseKeywords()
+-        );
+-
+-        // Simple “Details” dialog (no why text yet)
+         detailsButton.addActionListener(e -> {
+             CourseDetailsDialog dialog = new CourseDetailsDialog(
+                     this,
+@@ -110,78 +69,28 @@
+             dialog.setVisible(true);
+         });
+ 
+-        // “Why this course?” – go through the WhyCourses use case if wired,
+-        // otherwise fall back to the static relevance text on the Course entity.
+-        whyButton.addActionListener(e -> {
+-            if (whyController != null && whyViewModel != null) {
+-                // Ask the use case for a reason
+-                whyController.execute(course.getCourseCode());
+-            } else {
+-                // Fallback: just show the relevance string from Course
+-                String reason = course.getCourseRelevance();
+-                if (reason == null || reason.isEmpty()) {
+-                    reason = "This course matches your selected interests and background.";
+-                }
+-                showWhyDialog(reason);
+-            }
+-        });
++        whyButton.addActionListener(e ->
++                whyController.execute(course.getCourseCode())
++        );
+ 
+-        // Listen to updates from WhyCoursesViewModel (if provided)
+-        if (whyViewModel != null) {
+-            whyViewModel.addPropertyChangeListener(this);
+-        }
+-    }
+-
+-    @Override
+-    public void propertyChange(PropertyChangeEvent evt) {
+-        if (whyViewModel == null) {
+-            return;
+-        }
+-
+-        switch (evt.getPropertyName()) {
+-            case WhyCoursesViewModel.PROPERTY_REASON -> {
+-                // Only react if this reason is for *this* course code
+-                String code = whyViewModel.getCourseCode();
+-                if (!course.getCourseCode().equals(code)) {
+-                    return;
+-                }
+-                String reason = whyViewModel.getReason();
+-                if (reason == null || reason.isEmpty()) {
+-                    reason = "This course matches your selected interests and background.";
+-                }
+-                showWhyDialog(reason);
++        java.awt.event.MouseAdapter toggleListener = new java.awt.event.MouseAdapter() {
++            @Override
++            public void mouseClicked(java.awt.event.MouseEvent e) {
++                toggleDescription();
+             }
+-            case WhyCoursesViewModel.PROPERTY_ERROR -> {
+-                Object msg = evt.getNewValue();
+-                JOptionPane.showMessageDialog(
+-                        this,
+-                        msg == null ? "Failed to load explanation." : msg.toString(),
+-                        "Error",
+-                        JOptionPane.ERROR_MESSAGE
+-                );
+-            }
+-            default -> { /* ignore other properties */ }
+-        }
++        };
++        header.addMouseListener(toggleListener);
++        headerLabel.addMouseListener(toggleListener);
+     }
+ 
+-    /** Small helper to pop up the “why” explanation. */
+-    private void showWhyDialog(String reason) {
+-        // We reuse CourseDetailsDialog and put the reason into the “why” section.
+-        // The current CourseDetailsDialog shows placeholder text;
+-        // if later you extend it to accept a 'why' string, adapt here.
+-        JTextArea textArea = new JTextArea(reason);
+-        textArea.setEditable(false);
+-        textArea.setLineWrap(true);
+-        textArea.setWrapStyleWord(true);
+-
+-        JScrollPane scrollPane = new JScrollPane(textArea);
+-        scrollPane.setPreferredSize(new Dimension(420, 160));
++    private void toggleDescription() {
++        isExpanded = !isExpanded;
++        descriptionArea.setVisible(isExpanded);
++        revalidate();
++        repaint();
++    }
+ 
+-        JOptionPane.showMessageDialog(
+-                this,
+-                scrollPane,
+-                "Why " + course.getCourseCode() + " was recommended",
+-                JOptionPane.INFORMATION_MESSAGE
+-        );
++    public Course getCourse() {
++        return course;
+     }
+ }
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"ExternalStorageConfigurationManager\" enabled=\"true\" />\n  <component name=\"KubernetesApiProvider\">{}</component>\n  <component name=\"MavenProjectsManager\">\n    <option name=\"originalFiles\">\n      <list>\n        <option value=\"$PROJECT_DIR$/pom.xml\" />\n      </list>\n    </option>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision b479a4cce26fd2ebe681f0e2a319ff680932430f)
++++ b/.idea/misc.xml	(date 1764643637015)
+@@ -1,7 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ExternalStorageConfigurationManager" enabled="true" />
+-  <component name="KubernetesApiProvider">{}</component>
+   <component name="MavenProjectsManager">
+     <option name="originalFiles">
+       <list>
+@@ -9,4 +8,5 @@
+       </list>
+     </option>
+   </component>
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="openjdk-25" project-jdk-type="JavaSDK" />
+ </project>
+\ No newline at end of file

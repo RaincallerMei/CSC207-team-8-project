@@ -1,68 +1,72 @@
 package app;
 
-import data_access.InMemoryCourseDataAccessObject;
-import storage.AppStateStore;
-import interface_adapter.profile.ProfileController; // Import the new controller
+import interface_adapter.profile.ProfileController;
 import interface_adapter.recommend_courses.RecommendCoursesController;
 import interface_adapter.recommend_courses.RecommendCoursesPresenter;
 import interface_adapter.recommend_courses.RecommendCoursesViewModel;
-//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
+import interface_adapter.why_courses.WhyCoursesController;
+import interface_adapter.why_courses.WhyCoursesPresenter;
+import interface_adapter.why_courses.WhyCoursesViewModel;
+import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
 import use_case.recommend_courses.RecommendCoursesInteractor;
+import use_case.why_courses.WhyCoursesDataAccessInterface;
+import use_case.why_courses.WhyCoursesInteractor;
 import ui.CourseExplorerPanel;
 import data_access.GeminiCourseDataAccessObject;
-//import use_case.recommend_courses.RecommendCoursesDataAccessInterface;
-//import use_case.recommend_courses.RecommendCoursesInteractor;
-import io.github.cdimascio.dotenv.Dotenv;
+import storage.AppStateStore;
 
 import javax.swing.*;
 
 public class Main {
 
-    private static void createAndShowGUI() {
-        // 1. Dependencies (Frameworks/Drivers)
-        RecommendCoursesDataAccessInterface dao = new InMemoryCourseDataAccessObject();
-        AppStateStore store = new AppStateStore(); // Persistence
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
 
-        // 2. View Model (Interface Adapter)
-        RecommendCoursesViewModel viewModel = new RecommendCoursesViewModel();
+            AppStateStore store = new AppStateStore();
 
-        // 3. Presenter (Interface Adapter)
-        RecommendCoursesPresenter presenter = new RecommendCoursesPresenter(viewModel);
+            // 1. View Models
+            RecommendCoursesViewModel recommendViewModel = new RecommendCoursesViewModel();
+            WhyCoursesViewModel whyViewModel = new WhyCoursesViewModel();
 
-        // 4. Interactor (Use Case)
-        RecommendCoursesInteractor interactor = new RecommendCoursesInteractor(dao, presenter);
+            // 2. Controllers & Presenters
+            ProfileController profileController = new ProfileController(store, recommendViewModel);
+            RecommendCoursesPresenter recommendPresenter = new RecommendCoursesPresenter(recommendViewModel);
+            WhyCoursesPresenter whyPresenter = new WhyCoursesPresenter(whyViewModel);
 
-        // 5. Controllers (Interface Adapters)
-        RecommendCoursesController recommendController = new RecommendCoursesController(interactor);
-        ProfileController profileController = new ProfileController(store, viewModel); // New!
+            // 3. Create Data Access (Shared instance for both interfaces)
+            GeminiCourseDataAccessObject geminiDAO = new GeminiCourseDataAccessObject();
 
-        // 6. View (Frameworks/Drivers)
-        JFrame frame = new JFrame("UofT Course Explorer & Planner");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            // 4. Create Interactors
+            // Recommend Courses Use Case
+            RecommendCoursesInteractor recommendInteractor = new RecommendCoursesInteractor(
+                    (RecommendCoursesDataAccessInterface) geminiDAO,
+                    recommendPresenter
+            );
 
-        // Inject both controllers into the View
-        CourseExplorerPanel mainPanel = new CourseExplorerPanel(recommendController, profileController, viewModel);
-        frame.add(mainPanel);
+            // Why Courses Use Case
+            WhyCoursesInteractor whyInteractor = new WhyCoursesInteractor(
+                    (WhyCoursesDataAccessInterface) geminiDAO,
+                    whyPresenter
+            );
 
-        frame.pack();
-        frame.setSize(1000, 650);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
+            // 5. Create Controllers
+            RecommendCoursesController recommendController = new RecommendCoursesController(recommendInteractor);
+            WhyCoursesController whyController = new WhyCoursesController(whyInteractor);
 
-            // 6. Create the View (The Panel you provided)
-            CourseExplorerPanel view = new CourseExplorerPanel(controller, viewModel);
-
-            // 7. Setup the Frame
+            // 6. Create View
             JFrame frame = new JFrame("UofT Course Explorer & Planner");
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            CourseExplorerPanel mainPanel = new CourseExplorerPanel(controller, viewModel);
+
+            // Injecting controllers.
+            // Note: CourseExplorerPanel might need updating to accept whyController if you want to trigger
+            // the new use case from the UI (e.g. clicking a button to get specific details).
+            CourseExplorerPanel mainPanel = new CourseExplorerPanel(recommendController, profileController, recommendViewModel);
             frame.add(mainPanel);
+
             frame.pack();
-            frame.setSize(1000, 650); // Set a reasonable default size
-            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setSize(1000, 650);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }
-
 }
