@@ -78,7 +78,6 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
     }
 
-    // New method for WhyCoursesDataAccessInterface
     @Override
     public String getRationaleForCourse(String courseCode) {
         return explanationCache.get(courseCode);
@@ -102,15 +101,13 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                 String name = extractValue(objStr, "course_name");
                 String desc = extractValue(objStr, "course_description");
                 String explanation = extractValue(objStr, "explanation");
+
+                // Extract the prerequisites (which are now grounded by search)
                 String prereqs = extractValue(objStr, "prerequisite_codes");
 
-                // --- NEW CODE START ---
+                // Extract keywords (added to fix the empty display)
                 String keywords = extractValue(objStr, "course_keywords");
-                // Fallback if extraction fails
-                if (keywords.equals("N/A")) {
-                    keywords = "General Interest";
-                }
-                // --- NEW CODE END ---
+                if (keywords.equals("N/A")) keywords = "General Interest";
 
                 // Store explanation in cache
                 explanationCache.put(code, explanation);
@@ -121,7 +118,7 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
                     rank = Integer.parseInt(rankStr);
                 } catch (NumberFormatException e) { /* default */ }
 
-                // UPDATED CONSTRUCTOR CALL: Pass 'keywords' instead of ""
+                // Pass the extracted keywords and prereqs to the Course entity
                 Course course = new Course(code, name, desc, prereqs, rank, keywords, explanation);
                 courses.add(course);
 
@@ -131,11 +128,14 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         }
         return courses;
     }
+
     private String extractValue(String source, String key) {
+        // Regex to handle standard JSON string values
         Pattern pattern = Pattern.compile("\"" + key + "\":\\s*\"(.*?)\"");
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) return matcher.group(1);
 
+        // Regex to handle integers (like course_rank)
         Pattern numPattern = Pattern.compile("\"" + key + "\":\\s*(\\d+)");
         Matcher numMatcher = numPattern.matcher(source);
         if (numMatcher.find()) return numMatcher.group(1);
@@ -145,35 +145,35 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
 
     private String buildPrompt(String interests, List<String> completedCourses) {
         String completedText = (completedCourses == null || completedCourses.isEmpty()) ? "none" : String.join(", ", completedCourses);
+
+        // UPDATED PROMPT:
+        // 1. Added STRICT instructions to use Google Search for prerequisites.
+        // 2. Added instructions to generate 'course_keywords'.
         return String.format(
                 "You are a course recommendation assistant for UofT.\n" +
                         "Interests: %s\n" +
                         "Completed: %s\n" +
                         "Task: Recommend 3-5 valid UofT courses.\n" +
-
-                        // --- UPDATED INSTRUCTIONS START ---
-                        "STRICT DATA REQUIREMENT:\n" +
-                        "1. Use Google Search to find the OFFICIAL 2024-2025 UofT Academic Calendar entry for each course.\n" +
-                        "2. Extract the 'Prerequisite' field VERBATIM (word-for-word).\n" +
-                        "3. DO NOT approximate or substitute equivalent courses (e.g., do not swap APS105 for CSC108).\n" +
-                        "4. If you cannot find the exact prerequisite string in the search results, output 'Check Academic Calendar' for that field. DO NOT GUESS.\n" +
-                        // --- UPDATED INSTRUCTIONS END ---
-
-                        "CRITICAL: Summarize course descriptions in your own words to avoid copyright.\n" +
+                        "STRICT VERIFICATION: Use Google Search tool to verify course codes exist in 2024-2025 calendar.\n" +
+                        "STRICT VERIFICATION: Use Google Search tool to find the EXACT prerequisites for each course in the 2024-2025 calendar. Do NOT guess.\n\n" +
+                        "CRITICAL: Summarize course descriptions in your own words.\n" +
+                        "DO NOT copy text verbatim from the web to avoid copyright blocks.\n\n" +
                         "Output JSON Array ONLY. Keys:\n" +
                         "1. course_code (string)\n" +
                         "2. course_name (string)\n" +
                         "3. course_description (string)\n" +
-                        "4. prerequisite_codes (String: the exact string found, or 'Check Academic Calendar')\n" +
+                        "4. prerequisite_codes (string: exact prerequisites found via search)\n" +
                         "5. course_rank (integer)\n" +
-                        "6. course_keywords (String: comma-separated topic keywords)\n" +
+                        "6. course_keywords (string: comma-separated keywords)\n" +
                         "7. explanation (string)\n" +
                         "Do NOT use Markdown formatting.",
                 interests, completedText
         );
     }
+
     private String buildRequestBody(String prompt) {
         String escapedPrompt = prompt.replace("\"", "\\\"").replace("\n", "\\n");
+        // Ensure the tool definition is present so the prompt instructions can actually work
         return "{"
                 + "\"contents\":[{\"parts\":[{\"text\":\"" + escapedPrompt + "\"}]}],"
                 + "\"tools\": [{\"google_search\": {}}]"
@@ -190,6 +190,8 @@ public class GeminiCourseDataAccessObject implements RecommendCoursesDataAccessI
         if (endQuote <= startQuote) return "[]";
 
         String rawContent = responseBody.substring(startQuote + 1, endQuote);
+
+        // Clean up escaped characters
         String unescaped = rawContent.replace("\\\"", "\"").replace("\\n", " ");
 
         if (unescaped.contains("```")) {
